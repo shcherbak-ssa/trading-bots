@@ -1,0 +1,40 @@
+{
+  "name": "finance-management",
+  "version": "1.0.0",
+  "description": "Financial Management Tools",
+  "main": "index.js",
+  "scripts": {
+    "start": "node build/server/index.js",
+    "build:client": "webpack --config ./client/webpack.config.js",
+    "build:server": "webpack --config ./server/webpack.config.js",
+    "dev:client": "nodemon --config ./client/nodemon.json",
+    "dev:server": "nodemon --config ./server/nodemon.json"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shcherbak-ssa/finance-management.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/shcherbak-ssa/finance-management/issues"
+  },
+  "homepage": "https://github.com/shcherbak-ssa/finance-management#readme",
+  "devDependencies": {
+    "@types/dotenv-safe": "^8.1.2",
+    "@types/node": "^17.0.21",
+    "clean-webpack-plugin": "^4.0.0",
+    "nodemon": "^2.0.15",
+    "ts-loader": "^9.2.7",
+    "ts-node": "^10.7.0",
+    "tsconfig-paths": "^3.13.0",
+    "tsconfig-paths-webpack-plugin": "^3.5.2",
+    "typescript": "^4.6.2",
+    "webpack": "^5.70.0",
+    "webpack-cli": "^4.9.2",
+    "webpack-node-externals": "^3.0.0"
+  },
+  "dependencies": {
+    "dotenv-safe": "^8.2.0"
+  }
+}
