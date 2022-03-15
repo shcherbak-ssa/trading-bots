@@ -1,1 +1,1 @@
-import 'utils/dotenv';
+import 'shared/utils/dotenv';
