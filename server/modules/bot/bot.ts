@@ -1,12 +1,4 @@
-import {
-  BotBroker,
-  BotBrokerFactory,
-  BotBrokerPosition,
-  BotPosition,
-  BotSettings,
-  BotSignal
-} from './types';
-
+import { BotBroker, BotBrokerFactory, BotPosition, BotSettings, BotSignal } from './types';
 import { Calculation } from './calculation';
 
 
@@ -15,7 +7,6 @@ export class Bot {
     private settings: BotSettings,
     private broker: BotBroker,
     private calculation: Calculation,
-    private position: BotBrokerPosition | null = null,
   ) {}
 
 
@@ -32,14 +23,13 @@ export class Bot {
   async processSignal(signal: BotSignal): Promise<void> {
     this.checkSignal(signal);
 
-    const position: BotPosition = this.calculation.calculatePosition(signal);
-
-    await this.closeOpenPosition();
-    this.position = await this.broker.openPosition(position);
+    // @TODO: implement
   }
 
   async updateOpenPosition(signal: BotSignal): Promise<void> {
     this.checkSignal(signal);
+
+    // @TODO: implement
   }
 
 
@@ -54,14 +44,14 @@ export class Bot {
   }
 
   private async closeOpenPosition(): Promise<void> {
-    if (this.position) {
-      // @TODO: save position results
-      await this.position.closePosition();
-      this.position = null;
-    }
+    // @TODO: implement
   }
 
-  private async checkPosition(): Promise<void> {}
+  private async checkPosition(): Promise<void> {
+    // @TODO: implement
+  }
 
-  private async checkCloseTime(): Promise<void> {}
+  private async checkCloseTime(): Promise<void> {
+    // @TODO: implement
+  }
 }

@@ -1,6 +1,5 @@
-import { ONE_HUNDRED } from 'shared/constants';
-import { PositionType } from 'shared/types';
-import { roundToHundredths } from 'shared/utils/math';
+import { FRACTION_DIGITS_TO_HUNDREDTHS, ONE_HUNDRED, PositionType } from 'shared/constants';
+import { roundNumber } from 'shared/utils';
 
 import type { BotBroker, BotPosition, BotSettings, BotSignal } from './types';
 import { Position } from './position';
@@ -59,7 +58,7 @@ export class Calculation {
       positionSize = maxAmountSize * marketLeverage / marketCurrentPriceByAccountCurrency;
       positionSize = this.roundPositionSize(positionSize);
 
-      riskSize = roundToHundredths(positionSize * position.stopLossSize);
+      riskSize = roundNumber(positionSize * position.stopLossSize, FRACTION_DIGITS_TO_HUNDREDTHS);
     }
 
     position.riskSize = riskSize;
@@ -97,7 +96,10 @@ export class Calculation {
     const marketCurrentPriceByAccountCurrency: number = market.getCurrentPriceByAccountCurrency();
     const marketLeverage: number = market.getLeverage();
 
-    return roundToHundredths(positionSize * marketCurrentPriceByAccountCurrency / marketLeverage);
+    return roundNumber(
+      positionSize * marketCurrentPriceByAccountCurrency / marketLeverage,
+      FRACTION_DIGITS_TO_HUNDREDTHS
+    );
   }
 
 
@@ -111,11 +113,12 @@ export class Calculation {
   }
 
   private roundPositionSize(positionSize: number): number {
-    const marketMinTradeSize: number = this.broker.market.getMinTradeSize();
+    // @TODO: add zero position size calculations
+    const marketMinPositionSize: number = this.broker.market.getMinPositionSize();
 
-    let roundedPositionSize: number = positionSize / marketMinTradeSize;
+    let roundedPositionSize: number = positionSize / marketMinPositionSize;
     roundedPositionSize = Math.floor(roundedPositionSize);
-    roundedPositionSize *= marketMinTradeSize;
+    roundedPositionSize *= marketMinPositionSize;
 
     return roundedPositionSize;
   }

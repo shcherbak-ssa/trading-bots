@@ -23,6 +23,7 @@
   "devDependencies": {
     "@types/dotenv-safe": "^8.1.2",
     "@types/node": "^17.0.21",
+    "@types/node-fetch": "^2.5.10",
     "clean-webpack-plugin": "^4.0.0",
     "nodemon": "^2.0.15",
     "ts-loader": "^9.2.7",
@@ -35,6 +36,7 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
-    "dotenv-safe": "^8.2.0"
+    "dotenv-safe": "^8.2.0",
+    "node-fetch": "^2.6.1"
   }
 }

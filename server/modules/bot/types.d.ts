@@ -1,13 +1,15 @@
-import { PositionType } from 'shared/types';
+import { BrokerAccountType } from 'global/constants';
+import { PositionType } from 'shared/constants';
 
 
-/* Bot */
+// Bot
 export type BotSettings = {
   id: string;
   brokerName: string;
   brokerApiKeys: string[];
   brokerMarketSymbol: string;
   brokerAccountId: string;
+  brokerAccountType: BrokerAccountType;
   accountAmountPerPositionPercent: number;
   riskPercent: number;
   useTakeProfit: boolean;
@@ -35,7 +37,7 @@ export type BotPosition = {
 }
 
 
-/* Bot Broker */
+// Bot Broker
 export class BotBrokerFactory {
   abstract setupBroker(settings: BotSettings): Promise<BotBroker>;
 }
@@ -43,13 +45,16 @@ export class BotBrokerFactory {
 export interface BotBroker {
   market: BotBrokerMarket;
   account: BotBrokerAccount;
+  currentOpenPosition: BotPosition | null;
   isCorrectBroker(name: string): boolean;
-  openPosition(position: BotPosition): Promise<BotBrokerPosition>;
+  openPosition(position: BotPosition): Promise<void>;
+  closePosition(): Promise<BotPosition>;
 }
 
 export interface BotBrokerMarket {
-  isCorrectSymbol(marketSymbol): boolean;
-  getMinTradeSize(): number;
+  isCorrectSymbol(marketSymbol: string): boolean;
+  getMinPositionSize(): number;
+  getTickSize(): number;
   getCurrentPrice(): number;
   getCurrentPriceByAccountCurrency(): number;
   getCurrentSpread(): number;
@@ -60,14 +65,4 @@ export interface BotBrokerMarket {
 export interface BotBrokerAccount {
   getAvailableAmount(): number;
   getTotalAmount(): number;
-}
-
-export interface BotBrokerPosition {
-  isClose(): boolean;
-  getPositionType(): PositionType;
-  getStopLossPrice(): number;
-  getTakeProfitPrice(): number;
-  updateStopLoss(price: number): Promise<void>;
-  updateTakeProfit(price: number): Promise<void>;
-  closePosition(): Promise<BotPosition>;
 }

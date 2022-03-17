@@ -1,4 +1,4 @@
-import type { PositionType } from 'shared/types';
+import type { PositionType } from 'shared/constants';
 import type { BotPosition } from './types';
 
 
