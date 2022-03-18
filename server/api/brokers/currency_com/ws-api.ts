@@ -1,7 +1,7 @@
 import WebSocket from 'ws';
 
 import type { WsSubscribeResponse } from './types';
-import { EndpointSubscription, KEEP_WS_CONNECTION_MILLISECONDS, WS_API_URL } from './constants';
+import { EndpointSubscription, WS_PING_MILLISECONDS, WS_API_URL } from './constants';
 
 
 type OpenCallback = (api: WsApi) => void;
@@ -62,6 +62,6 @@ export class WsApi {
   }
 
   private keepConnection(): void {
-    setInterval(() => this.wsClient.ping(), KEEP_WS_CONNECTION_MILLISECONDS);
+    setInterval(() => this.wsClient.ping(), WS_PING_MILLISECONDS);
   }
 }

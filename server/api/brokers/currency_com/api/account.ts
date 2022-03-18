@@ -50,7 +50,7 @@ export class AccountApi {
       id: accountId,
       currency: asset,
       availableAmount: free,
-      totalAmount: free + locked,
+      totalAmount: free + locked, // @TODO: change formula
     };
   }
 }

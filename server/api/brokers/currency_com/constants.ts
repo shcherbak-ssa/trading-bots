@@ -3,19 +3,8 @@ export const DEMO_ACCOUNT_API_URL: string = 'https://demo-api-adapter.backend.cu
 export const WS_API_URL: string = 'wss://api-adapter.backend.currency.com/connect';
 
 
-export const KEEP_WS_CONNECTION_MILLISECONDS: number = 5000;
+export const WS_PING_MILLISECONDS: number = 5000;
 
-
-export enum OrderType {
-  LIMIT = 'LIMIT',
-  LIMIT_MAKER = 'LIMIT_MAKER',
-  MARKET = 'MARKET',
-  STOP = 'STOP',
-  STOP_LOSS = 'STOP_LOSS',
-  STOP_LOSS_LIMIT = 'STOP_LOSS_LIMIT',
-  TAKE_PROFIT = 'TAKE_PROFIT',
-  TAKE_PROFIT_LIMIT = 'TAKE_PROFIT_LIMIT',
-}
 
 export enum MarketFilter {
   LOT_SIZE = 'LOT_SIZE',
@@ -25,17 +14,102 @@ export enum Subscription {
   MARKET_PRICE = 'internal.quote',
 }
 
-
-// Endpoints
 export enum Endpoint {
   ACCOUNT = '/api/v2/account',
   EXCHANGE_INFO = '/api/v2/exchangeInfo',
   MARKET_LEVERAGE = '/api/v2/leverageSettings',
   MARKET_PRICE = '/api/v2/ticker/24hr',
+  ORDER = '/api/v2/order',
+  POSITIONS = '/api/v2/tradingPositions',
+  CLOSE_POSITION = '/api/v2/closeTradingPosition',
 }
 
 export enum EndpointSubscription {
   MARKET_PRICE = 'marketData.subscribe',
+}
+
+
+// Order
+export enum OrderType {
+  LIMIT = 'LIMIT',
+  MARKET = 'MARKET',
+  STOP = 'STOP',
+  LIMIT_MAKER = 'LIMIT_MAKER',
+  STOP_LOSS = 'STOP_LOSS',
+  STOP_LOSS_LIMIT = 'STOP_LOSS_LIMIT',
+  TAKE_PROFIT = 'TAKE_PROFIT',
+  TAKE_PROFIT_LIMIT = 'TAKE_PROFIT_LIMIT',
+}
+
+export enum OrderSide {
+  BUY = 'BUY',
+  SELL = 'SELL',
+}
+
+export enum OrderTimeInForce {
+  GTC = 'GTC',
+  IOC = 'IOC',
+  FOK = 'FOK',
+}
+
+export enum OrderStatus {
+  CANCELED = 'CANCELED',
+  EXPIRED = 'EXPIRED',
+  FILLED = 'FILLED',
+  NEW = 'NEW',
+  PARTIALLY_FILLED = 'PARTIALLY_FILLED',
+  PENDING_CANCEL = 'PENDING_CANCEL',
+  REJECTED = 'REJECTED',
+}
+
+
+// Position
+export enum PositionState {
+  ACTIVE = 'ACTIVE',
+  INACTIVE = 'INACTIVE',
+  INVALID = 'INVALID',
+}
+
+export enum PositionCloseRejectReason {
+  ACCOUNT_NOT_FOUND = 'ACCOUNT_NOT_FOUND',
+  CLOSED_MARKET = 'CLOSED_MARKET',
+  CLOSE_ONLY = 'CLOSE_ONLY',
+  ENGINE_BUSY = 'ENGINE_BUSY',
+  HEDGING_MODE_GSL = 'HEDGING_MODE_GSL',
+  INSTRUMENT_NOT_AVAILABLE = 'INSTRUMENT_NOT_AVAILABLE',
+  INSTRUMENT_NOT_FOUND = 'INSTRUMENT_NOT_FOUND',
+  INVALID_ORDER = 'INVALID_ORDER',
+  INVALID_ORDER_QTY = 'INVALID_ORDER_QTY',
+  INVALID_PRICE = 'INVALID_PRICE',
+  LONG_ONLY = 'LONG_ONLY',
+  OFF_MARKET = 'OFF_MARKET',
+  ORDER_NOT_FOUND = 'ORDER_NOT_FOUND',
+  ORIGINAL_GSL_UPDATE = 'ORIGINAL_GSL_UPDATE',
+  POSITION_NOT_FOUND = 'POSITION_NOT_FOUND',
+  RC_INSTRUMENT_CLIENT_MOP = 'RC_INSTRUMENT_CLIENT_MOP',
+  RC_INSTRUMENT_GLOBAL_MOP = 'RC_INSTRUMENT_GLOBAL_MOP',
+  RC_NOT_ENOUGH_MARGIN = 'RC_NOT_ENOUGH_MARGIN',
+  RC_NOT_FOUND = 'RC_NOT_FOUND',
+  RC_NO_RATES = 'RC_NO_RATES',
+  RC_SETTLEMENT = 'RC_SETTLEMENT',
+  RC_UNKNOWN = 'RC_UNKNOWN',
+  REQUIRED_GSL = 'REQUIRED_GSL',
+  RISK_CHECK = 'RISK_CHECK',
+  THROTTLING = 'THROTTLING',
+  UNKNOWN = 'UNKNOWN',
+}
+
+export enum PositionCloseType {
+  ORDER_CANCEL = 'ORDER_CANCEL',
+  ORDER_MODIFY = 'ORDER_MODIFY',
+  ORDER_NEW = 'ORDER_NEW',
+  POSITION_MODIFY = 'POSITION_MODIFY',
+}
+
+export enum PositionCloseState {
+  CANCELLED = 'CANCELLED',
+  PENDING = 'PENDING',
+  PROCESSED = 'PROCESSED',
 }
 
 
