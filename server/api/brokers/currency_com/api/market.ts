@@ -1,23 +1,29 @@
-import type {
-  ExchangeInfo,
-  ExchangeSymbolInfo,
-  ExchangeSymbolLotSizeFilter,
-  Market,
-  MarketLeverageRequest,
-  MarketLeverageResponse,
-  MarketPrice, MarketPriceRequest,
-  MarketPriceResponse
-} from '../types';
-
-import { Endpoint, MarketFilter } from '../constants';
-import type { RestApi } from '../rest-api';
 import { getFractionDigits, roundNumber } from 'shared/utils';
+
+import type { ExchangeInfo, ExchangeSymbolInfo, ExchangeSymbolLotSizeFilter } from '../types';
+import type { Market, MarketLeverageRequest, MarketLeverageResponse } from '../types';
+import type { MarketPrice, MarketPriceRequest, MarketPriceResponse } from '../types';
+import type { MarketPriceSubscribePayload, MarketPriceSubscribeResponsePayload, WsSubscribeResponse } from '../types';
+import { Endpoint, EndpointSubscription, MarketFilter, Subscription } from '../constants';
+import type { RestApi } from '../rest-api';
+import { WsApi } from '../ws-api';
 
 
 export class MarketApi {
   constructor(
     private restApi: RestApi,
+    private wsApi: WsApi,
   ) {}
+
+
+  static async setup(restApi: RestApi): Promise<MarketApi> {
+    return new Promise((resolve, reject) => {
+      new WsApi((wsApi: WsApi) => {
+        resolve(new MarketApi(restApi, wsApi));
+      });
+    });
+  }
+
 
   async loadMarketData(marketSymbol: string): Promise<Market> {
     const { symbols }: ExchangeInfo = await this.loadExchangeInfo();
@@ -43,12 +49,23 @@ export class MarketApi {
     });
 
     const { askPrice, bidPrice } = marketPrice;
-    const fractionDigits: number = getFractionDigits(askPrice);
 
-    return {
-      price: Number(bidPrice),
-      spread: roundNumber(Number(askPrice) - Number(bidPrice), fractionDigits),
-    };
+    return MarketApi.getMarketPrice(askPrice, bidPrice);
+  }
+
+  subscribeToMarketPriceUpdates(marketSymbol: string, callback: (marketPrice: MarketPrice) => void): void {
+    this.wsApi.subscribe<MarketPriceSubscribePayload, MarketPriceSubscribeResponsePayload>(
+      EndpointSubscription.MARKET_PRICE,
+      { symbols: [marketSymbol] },
+      (message: WsSubscribeResponse<MarketPriceSubscribeResponsePayload>) => {
+        if (message.destination !== Subscription.MARKET_PRICE) return;
+
+        const { ofr: askPrice, bid: bidPrice } = message.payload;
+        const marketPrice: MarketPrice = MarketApi.getMarketPrice(askPrice, bidPrice);
+
+        callback(marketPrice);
+      },
+    );
   }
 
 
@@ -73,6 +90,15 @@ export class MarketApi {
       leverage,
       price,
       spread,
+    };
+  }
+
+  private static getMarketPrice(askPrice: string | number, bidPrice: string | number): MarketPrice {
+    const fractionDigits: number = getFractionDigits(askPrice);
+
+    return {
+      price: Number(bidPrice),
+      spread: roundNumber(Number(askPrice) - Number(bidPrice), fractionDigits),
     };
   }
 }

@@ -52,17 +52,18 @@ export interface BotBroker {
 }
 
 export interface BotBrokerMarket {
+  minPositionSize: number;
+  tickSize: number;
+  leverage: number;
+  currentPrice: number;
+  currentSpread: number;
   isCorrectSymbol(marketSymbol: string): boolean;
-  getMinPositionSize(): number;
-  getTickSize(): number;
-  getCurrentPrice(): number;
   getCurrentPriceByAccountCurrency(): number;
-  getCurrentSpread(): number;
-  getLeverage(): number;
   getCloseTime(): string;
+  subscribeToPriceUpdate(callback: () => void): void;
 }
 
 export interface BotBrokerAccount {
-  getAvailableAmount(): number;
-  getTotalAmount(): number;
+  availableAmount: number;
+  totalAmount: number;
 }

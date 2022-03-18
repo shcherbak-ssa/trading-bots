@@ -1,6 +1,7 @@
 export * from './account';
 export * from './exchange';
 export * from './market';
+export * from './ws';
 
 
 export type ResponseError = {

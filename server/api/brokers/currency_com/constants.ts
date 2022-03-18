@@ -1,13 +1,10 @@
 export const REAL_ACCOUNT_API_URL: string = 'https://api-adapter.backend.currency.com';
 export const DEMO_ACCOUNT_API_URL: string = 'https://demo-api-adapter.backend.currency.com';
+export const WS_API_URL: string = 'wss://api-adapter.backend.currency.com/connect';
 
 
-export enum Endpoint {
-  ACCOUNT = '/api/v2/account',
-  EXCHANGE_INFO = '/api/v2/exchangeInfo',
-  MARKET_LEVERAGE = '/api/v2/leverageSettings',
-  MARKET_PRICE = '/api/v2/ticker/24hr',
-}
+export const KEEP_WS_CONNECTION_MILLISECONDS: number = 5000;
+
 
 export enum OrderType {
   LIMIT = 'LIMIT',
@@ -22,6 +19,23 @@ export enum OrderType {
 
 export enum MarketFilter {
   LOT_SIZE = 'LOT_SIZE',
+}
+
+export enum Subscription {
+  MARKET_PRICE = 'internal.quote',
+}
+
+
+// Endpoints
+export enum Endpoint {
+  ACCOUNT = '/api/v2/account',
+  EXCHANGE_INFO = '/api/v2/exchangeInfo',
+  MARKET_LEVERAGE = '/api/v2/leverageSettings',
+  MARKET_PRICE = '/api/v2/ticker/24hr',
+}
+
+export enum EndpointSubscription {
+  MARKET_PRICE = 'marketData.subscribe',
 }
 
 

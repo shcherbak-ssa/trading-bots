@@ -36,7 +36,9 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
+    "@types/ws": "^8.5.3",
     "dotenv-safe": "^8.2.0",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.1",
+    "ws": "^8.5.0"
   }
 }

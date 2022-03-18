@@ -7,6 +7,14 @@ import { MarketApi } from './api/market';
 
 
 export  class BrokerMarket implements BotBrokerMarket {
+  minPositionSize: number;
+  tickSize: number;
+  leverage: number;
+  currentPrice: number;
+  currentSpread: number;
+
+  private subscribeHandler: () => void;
+
   constructor(
     private market: Market,
     private api: MarketApi,
@@ -14,22 +22,27 @@ export  class BrokerMarket implements BotBrokerMarket {
 
 
   static async setup(marketSymbol: string, restApi: RestApi): Promise<BrokerMarket> {
-    const api: MarketApi = new MarketApi(restApi);
+    const api: MarketApi = await MarketApi.setup(restApi);
     const market: Market = await api.loadMarketData(marketSymbol);
 
     const brokerMarket: BrokerMarket = new BrokerMarket(market, api);
-    setInterval(brokerMarket.updateMarketPrice.bind(brokerMarket), 250);
+    brokerMarket.minPositionSize = market.minPositionSize;
+    brokerMarket.tickSize = market.tickSize;
+    brokerMarket.leverage = market.leverage;
+    brokerMarket.currentPrice = market.price;
+    brokerMarket.currentSpread = market.spread;
+
+    api.subscribeToMarketPriceUpdates(marketSymbol, brokerMarket.updateMarketPrice.bind(brokerMarket));
 
     return brokerMarket;
   }
 
 
-  async updateMarketPrice(): Promise<void> {
-    const { price, spread }: MarketPrice = await this.api.loadMarketPrice(this.market.marketSymbol);
+  updateMarketPrice({ price, spread }: MarketPrice): void {
+    this.currentPrice = price;
+    this.currentSpread = spread;
 
-    this.market.price = price;
-    this.market.spread = spread;
-    console.log(this.market.price, new Date(Date.now()).toISOString());
+    this.subscribeHandler();
   }
 
 
@@ -38,38 +51,23 @@ export  class BrokerMarket implements BotBrokerMarket {
     return marketSymbol === this.market.marketSymbol;
   }
 
-  getMinPositionSize(): number {
-    return this.market.minPositionSize;
-  }
-
-  getTickSize(): number {
-    return this.market.tickSize;
-  }
-
-  getCurrentPrice(): number {
-    return this.market.price;
-  }
-
   getCurrentPriceByAccountCurrency(): number {
     return this.market.price; // @TODO: implement
-  }
-
-  getCurrentSpread(): number {
-    return this.market.spread;
-  }
-
-  getLeverage(): number {
-    return this.market.leverage;
   }
 
   getCloseTime(): string {
     throw new Error(''); // @TODO: implement
   }
+
+  subscribeToPriceUpdate(callback: () => void): void {
+    this.subscribeHandler = callback;
+  }
 }
 
 
 class BrokerAccount implements BotBrokerAccount {
-  private currentAccount: AccountParsedBalance;
+  availableAmount: number;
+  totalAmount: number;
 
   constructor(
     private accountId: string,
@@ -88,19 +86,12 @@ class BrokerAccount implements BotBrokerAccount {
   }
 
   async updateCurrentAccount(): Promise<void> {
-    this.currentAccount = await this.api.loadConcreteAccount({
+    const { availableAmount, totalAmount }: AccountParsedBalance = await this.api.loadConcreteAccount({
       accountId: this.accountId,
     });
-  }
 
-
-  // Implementations
-  getAvailableAmount(): number {
-    return this.currentAccount.availableAmount;
-  }
-
-  getTotalAmount(): number {
-    return this.currentAccount.totalAmount;
+    this.availableAmount = availableAmount;
+    this.totalAmount = totalAmount;
   }
 }
 
@@ -119,6 +110,7 @@ export class Broker implements BotBroker {
 
   static async setup(settings: BotSettings): Promise<Broker> {
     const [ apiKey, secretKey ] = settings.brokerApiKeys;
+
     const restApi: RestApi = new RestApi(apiKey, secretKey).setAccountType(settings.brokerAccountType);
     const broker: Broker = new Broker(restApi);
 

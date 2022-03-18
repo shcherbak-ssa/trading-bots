@@ -15,6 +15,21 @@ export type MarketPrice = {
 }
 
 
+// WebSocket Subscribes
+export type MarketPriceSubscribePayload = {
+  symbols: string[];
+}
+
+export type MarketPriceSubscribeResponsePayload = {
+  symbolName: string;
+  bid: number;
+  bidQty: number;
+  ofr: number;
+  ofrQty: number;
+  timestamp: number;
+}
+
+
 // Request Models
 export type MarketLeverageRequest = {
   recvWindow?: number;

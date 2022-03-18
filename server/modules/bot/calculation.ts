@@ -28,9 +28,7 @@ export class Calculation {
 
   // Calculations
   private calculateStopLossSize(position: BotPosition): void {
-    const { market } = this.broker;
-    const marketCurrentPrice: number = market.getCurrentPrice();
-    const marketCurrentSpread: number = market.getCurrentSpread();
+    const { currentPrice: marketCurrentPrice, currentSpread: marketCurrentSpread } = this.broker.market;
 
     const stopLossSizeWithoutSpread: number = this.isLongSignal(position)
       ? marketCurrentPrice - position.stopLossPrice
@@ -52,8 +50,8 @@ export class Calculation {
 
     if (positionAmount > maxAmountSize) {
       const { market } = this.broker;
+      const { leverage: marketLeverage } = market;
       const marketCurrentPriceByAccountCurrency: number = market.getCurrentPriceByAccountCurrency();
-      const marketLeverage: number = market.getLeverage();
 
       positionSize = maxAmountSize * marketLeverage / marketCurrentPriceByAccountCurrency;
       positionSize = this.roundPositionSize(positionSize);
@@ -68,9 +66,7 @@ export class Calculation {
   private calculateTakeProfit(position: BotPosition): void {
     if (!this.settings.useTakeProfit) return;
 
-    const { market } = this.broker;
-    const marketCurrentPrice: number = market.getCurrentPrice();
-    const marketCurrentSpread: number = market.getCurrentSpread();
+    const { currentPrice: marketCurrentPrice, currentSpread: marketCurrentSpread } = this.broker.market;
 
     const takeProfitSize: number = position.stopLossSize * this.settings.takeProfitPL;
     const takeProfitSizeWithSpread: number = marketCurrentSpread + takeProfitSize;
@@ -93,8 +89,8 @@ export class Calculation {
 
   private calculatePositionAmount(positionSize: number): number {
     const { market } = this.broker;
+    const { leverage: marketLeverage } = market;
     const marketCurrentPriceByAccountCurrency: number = market.getCurrentPriceByAccountCurrency();
-    const marketLeverage: number = market.getLeverage();
 
     return roundNumber(
       positionSize * marketCurrentPriceByAccountCurrency / marketLeverage,
@@ -109,12 +105,12 @@ export class Calculation {
   }
 
   private getAccountTotalAmount(): number {
-    return this.broker.account.getTotalAmount();
+    return this.broker.account.totalAmount;
   }
 
   private roundPositionSize(positionSize: number): number {
     // @TODO: add zero position size calculations
-    const marketMinPositionSize: number = this.broker.market.getMinPositionSize();
+    const { minPositionSize: marketMinPositionSize } = this.broker.market;
 
     let roundedPositionSize: number = positionSize / marketMinPositionSize;
     roundedPositionSize = Math.floor(roundedPositionSize);
