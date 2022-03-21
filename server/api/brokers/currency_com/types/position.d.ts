@@ -1,11 +1,5 @@
-import {
-  PositionCloseRejectReason, PositionCloseState,
-  PositionCloseType,
-  OrderSide,
-  OrderStatus,
-  OrderTimeInForce,
-  OrderType, PositionState
-} from '../constants';
+import { PositionCloseRejectReason, PositionCloseState, PositionCloseType, PositionState } from '../constants';
+import { OrderSide, OrderStatus, OrderTimeInForce, OrderType } from '../constants';
 
 
 // Custom Models

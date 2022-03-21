@@ -1,4 +1,4 @@
-import { FRACTION_DIGITS_TO_HUNDREDTHS, ONE_HUNDRED, PositionType } from 'shared/constants';
+import { FRACTION_DIGITS_TO_HUNDREDTHS, ONE_HUNDRED } from 'shared/constants';
 import { roundNumber } from 'shared/utils';
 
 import type { BotBroker, BotPosition, BotSettings, BotSignal } from './types';
@@ -12,10 +12,10 @@ export class Calculation {
   ) {}
 
 
-  calculatePosition({ type, stopLossPrice }: BotSignal): BotPosition {
+  calculatePosition({ isLong, stopLossPrice }: BotSignal): BotPosition {
     const position: BotPosition = new Position();
 
-    position.type = type;
+    position.isLong = isLong;
     position.stopLossPrice = stopLossPrice;
 
     this.calculateStopLossSize(position);
@@ -30,7 +30,7 @@ export class Calculation {
   private calculateStopLossSize(position: BotPosition): void {
     const { currentPrice: marketCurrentPrice, currentSpread: marketCurrentSpread } = this.broker.market;
 
-    const stopLossSizeWithoutSpread: number = this.isLongSignal(position)
+    const stopLossSizeWithoutSpread: number = position.isLong
       ? marketCurrentPrice - position.stopLossPrice
       : position.stopLossPrice - marketCurrentPrice;
 
@@ -71,7 +71,7 @@ export class Calculation {
     const takeProfitSize: number = position.stopLossSize * this.settings.takeProfitPL;
     const takeProfitSizeWithSpread: number = marketCurrentSpread + takeProfitSize;
 
-    const takeProfitPrice: number = this.isLongSignal(position)
+    const takeProfitPrice: number = position.isLong
       ? takeProfitSizeWithSpread + marketCurrentPrice
       : marketCurrentPrice - takeProfitSizeWithSpread;
 
@@ -100,10 +100,6 @@ export class Calculation {
 
 
   // Helpers
-  private isLongSignal(position: BotPosition): boolean {
-    return position.type === PositionType.LONG;
-  }
-
   private getAccountTotalAmount(): number {
     return this.broker.account.totalAmount;
   }

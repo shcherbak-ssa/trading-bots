@@ -1,8 +1,9 @@
 import { BrokerAccountType } from 'global/constants';
-import { PositionType } from 'shared/constants';
 
 
 // Bot
+export type ClosePositionHandler = (position: BotPosition) => void;
+
 export type BotSettings = {
   id: string;
   brokerName: string;
@@ -20,32 +21,35 @@ export type BotSettings = {
 
 export type BotSignal = {
   botId: string;
-  type: PositionType;
+  isLong: boolean;
   brokerName: string;
   marketSymbol: string;
   stopLossPrice: number;
 }
 
-export type BotPosition = {
-  type: PositionType;
+export interface BotPosition {
+  id: string;
+  isLong: boolean;
   riskSize: number;
   positionSize: number;
   stopLossPrice: number;
   stopLossSize: number
   takeProfitPrice: number | null;
   takeProfitSize: number | null;
+  feeOpen: number | null;
+  feeClose: number | null;
 }
 
 
 // Bot Broker
-export class BotBrokerFactory {
-  abstract setupBroker(settings: BotSettings): Promise<BotBroker>;
+export interface BotBrokerFactory {
+  setupBroker(settings: BotSettings): Promise<BotBroker>;
 }
 
 export interface BotBroker {
   market: BotBrokerMarket;
   account: BotBrokerAccount;
-  currentOpenPosition: BotPosition | null;
+  currentPosition: BotPosition | null;
   isCorrectBroker(name: string): boolean;
   openPosition(position: BotPosition): Promise<void>;
   closePosition(): Promise<BotPosition>;
@@ -58,9 +62,10 @@ export interface BotBrokerMarket {
   currentPrice: number;
   currentSpread: number;
   isCorrectSymbol(marketSymbol: string): boolean;
-  getCurrentPriceByAccountCurrency(): number;
+  getCurrentPriceByAccountCurrency(): number; // @TODO: implement and convert to property
   getCloseTime(): string;
-  subscribeToPriceUpdate(callback: () => void): void;
+  subscribeToPriceUpdates(callback: () => void): void;
+  unsubscribeToPriceUpdates(): void;
 }
 
 export interface BotBrokerAccount {

@@ -1,13 +1,15 @@
-import type { PositionType } from 'shared/constants';
 import type { BotPosition } from './types';
 
 
 export class Position implements BotPosition {
-  type: PositionType;
+  id: string;
+  isLong: boolean;
   riskSize: number;
   positionSize: number;
   stopLossPrice: number;
   stopLossSize: number
   takeProfitPrice: number | null = null;
   takeProfitSize: number | null = null;
+  feeOpen: number | null = null;
+  feeClose: number | null = null;
 }

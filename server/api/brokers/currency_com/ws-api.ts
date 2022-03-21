@@ -51,12 +51,12 @@ export class WsApi {
     };
 
     this.wsClient.onclose = () => {
-      // @TODO: close processing
+      // @TODO: implement close processing
       console.log('ws closed');
     };
 
     this.wsClient.onerror = (err) => {
-      // @TODO: error processing
+      // @TODO: implement error processing
       console.log('ws error', err);
     };
   }

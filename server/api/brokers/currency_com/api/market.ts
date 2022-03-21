@@ -4,6 +4,7 @@ import type { ExchangeInfo, ExchangeSymbolInfo, ExchangeSymbolLotSizeFilter } fr
 import type { Market, MarketLeverageRequest, MarketLeverageResponse } from '../types';
 import type { MarketPrice, MarketPriceRequest, MarketPriceResponse } from '../types';
 import type { MarketPriceSubscribePayload, MarketPriceSubscribeResponsePayload, WsSubscribeResponse } from '../types';
+
 import { Endpoint, EndpointSubscription, MarketFilter, Subscription } from '../constants';
 import type { RestApi } from '../rest-api';
 import { WsApi } from '../ws-api';

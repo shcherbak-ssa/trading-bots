@@ -12,3 +12,12 @@ export enum BrokerAccountType {
   REAL = 'REAL',
   DEMO = 'DEMO',
 }
+
+export enum SignalType {
+  LONG = 'LONG',
+  SHORT = 'SHORT',
+}
+
+export enum BrokerList {
+  CURRENCY_COM = 'CURRENCY_COM',
+}

@@ -1,5 +1,6 @@
 import type { ClosePositionRequest, CreateOrderRequest, CreateOrderResponse } from '../types';
-import type { ActivePosition, Position, PositionListRequest, PositionListResponse, OpenPosition } from '../types';
+import type { Position, PositionListRequest, PositionListResponse } from '../types';
+import type { ActivePosition, OpenPosition } from '../types';
 
 import { Endpoint, OrderType } from '../constants';
 import type { RestApi } from '../rest-api';
@@ -40,5 +41,7 @@ export class PositionApi {
       positionId,
       timestamp: Date.now(),
     });
+
+    // @TODO: implement extend position info
   }
 }

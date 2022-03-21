@@ -1,19 +1,23 @@
+import { BrokerList } from 'global/constants';
 import type { BotBroker, BotBrokerAccount, BotBrokerMarket, BotPosition, BotSettings } from 'modules/bot/types';
 
-import type { AccountParsedBalance, Market, MarketPrice } from './types';
+import type { AccountParsedBalance, Market, MarketPrice, OpenPosition } from './types';
+import { OrderSide } from './constants';
 import { RestApi } from './rest-api';
+
 import { AccountApi } from './api/account';
 import { MarketApi } from './api/market';
+import { PositionApi } from './api/position';
 
 
-export  class BrokerMarket implements BotBrokerMarket {
+class BrokerMarket implements BotBrokerMarket {
   minPositionSize: number;
   tickSize: number;
   leverage: number;
   currentPrice: number;
   currentSpread: number;
 
-  private subscribeHandler: () => void;
+  private subscribeHandler: (() => void) | null = null;
 
   constructor(
     private market: Market,
@@ -42,7 +46,9 @@ export  class BrokerMarket implements BotBrokerMarket {
     this.currentPrice = price;
     this.currentSpread = spread;
 
-    this.subscribeHandler();
+    if (this.subscribeHandler) {
+      this.subscribeHandler();
+    }
   }
 
 
@@ -59,8 +65,12 @@ export  class BrokerMarket implements BotBrokerMarket {
     throw new Error(''); // @TODO: implement
   }
 
-  subscribeToPriceUpdate(callback: () => void): void {
+  subscribeToPriceUpdates(callback: () => void): void {
     this.subscribeHandler = callback;
+  }
+
+  unsubscribeToPriceUpdates() {
+    this.subscribeHandler = null;
   }
 }
 
@@ -99,20 +109,24 @@ class BrokerAccount implements BotBrokerAccount {
 export class Broker implements BotBroker {
   market: BotBrokerMarket;
   account: BotBrokerAccount;
-  currentOpenPosition: BotPosition | null = null;
+  currentPosition: BotPosition | null = null;
 
-  private name: string = ''; // @TODO: implement
+  private name: string = BrokerList.CURRENCY_COM;
 
   constructor(
-    private restApi: RestApi,
+    private botSettings: BotSettings,
+    private positionApi: PositionApi,
   ) {}
 
 
   static async setup(settings: BotSettings): Promise<Broker> {
     const [ apiKey, secretKey ] = settings.brokerApiKeys;
 
-    const restApi: RestApi = new RestApi(apiKey, secretKey).setAccountType(settings.brokerAccountType);
-    const broker: Broker = new Broker(restApi);
+    const restApi: RestApi = new RestApi(apiKey, secretKey);
+    restApi.setAccountType(settings.brokerAccountType);
+
+    const positionApi: PositionApi = new PositionApi(restApi);
+    const broker: Broker = new Broker(settings, positionApi);
 
     broker.account = await BrokerAccount.setup(settings.brokerAccountId, restApi);
     broker.market = await BrokerMarket.setup(settings.brokerMarketSymbol, restApi);
@@ -127,12 +141,32 @@ export class Broker implements BotBroker {
   }
 
   async openPosition(position: BotPosition): Promise<void> {
-    // @TODO: implement
-    throw new Error('');
+    const { brokerAccountId, brokerMarketSymbol } = this.botSettings;
+
+    const openPosition: OpenPosition = await this.positionApi.openPosition({
+      accountId: brokerAccountId,
+      quantity: position.positionSize,
+      symbol: brokerMarketSymbol,
+      side: position.isLong ? OrderSide.BUY : OrderSide.SELL,
+    });
+
+    position.id = openPosition.id;
+    position.feeOpen = openPosition.feeOpen;
+
+    this.currentPosition = position;
   }
 
   async closePosition(): Promise<BotPosition> {
-    // @TODO: implement
-    throw new Error('');
+    if (this.currentPosition === null) {
+      throw new Error(''); // @TODO: implement
+    }
+
+    const position: BotPosition = this.currentPosition;
+
+    await this.positionApi.closePosition(position.id);
+
+    this.currentPosition = null;
+
+    return position;
   }
 }
