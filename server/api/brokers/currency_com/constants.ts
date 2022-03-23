@@ -3,7 +3,8 @@ export const DEMO_ACCOUNT_API_URL: string = 'https://demo-api-adapter.backend.cu
 export const WS_API_URL: string = 'wss://api-adapter.backend.currency.com/connect';
 
 
-export const WS_PING_MILLISECONDS: number = 5000;
+export const ACCOUNT_UPDATE_INTERVAL: number = 60000;
+export const WS_PING_DELAY: number = 5000;
 
 
 export enum MarketFilter {
@@ -21,6 +22,7 @@ export enum Endpoint {
   MARKET_PRICE = '/api/v2/ticker/24hr',
   ORDER = '/api/v2/order',
   POSITIONS = '/api/v2/tradingPositions',
+  POSITIONS_HISTORY = '/api/v2/tradingPositionsHistory',
   CLOSE_POSITION = '/api/v2/closeTradingPosition',
 }
 
@@ -68,6 +70,24 @@ export enum PositionState {
   ACTIVE = 'ACTIVE',
   INACTIVE = 'INACTIVE',
   INVALID = 'INVALID',
+}
+
+export enum PositionStatus {
+  CLOSED = 'CLOSED',
+  DIVIDEND = 'DIVIDEND',
+  MODIFIED = 'MODIFIED',
+  MODIFY_REJECT = 'MODIFY_REJECT',
+  OPENED = 'OPENED',
+  SWAP = 'SWAP',
+}
+
+export enum PositionSource {
+  CLOSE_OUT = 'CLOSE_OUT',
+  DEALER = 'DEALER',
+  SL = 'SL',
+  SYSTEM = 'SYSTEM',
+  TP = 'TP',
+  USER = 'USER',
 }
 
 export enum PositionCloseRejectReason {

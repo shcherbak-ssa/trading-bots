@@ -1,4 +1,6 @@
 import { BrokerList } from 'global/constants';
+import { BrokerError } from 'shared/exceptions';
+
 import type { BotBroker, BotBrokerFactory, BotSettings } from 'modules/bot/types';
 
 import { Broker as CurrencyComBroker } from './currency_com/bot-interface';
@@ -11,6 +13,6 @@ export class BrokerFactory implements BotBrokerFactory {
         return await CurrencyComBroker.setup(settings);
     }
 
-    throw new Error(''); // @TODO: implement
+    throw new BrokerError(`Cannot found broker '${settings.brokerName}'.`);
   }
 }

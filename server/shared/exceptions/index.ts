@@ -1,13 +1,20 @@
-import type { ErrorProps } from 'shared/types';
 import { ErrorName } from 'shared/constants';
 
 
 export class BotError extends Error {
-  props: ErrorProps
+  name = ErrorName.BOT_ERROR;
+}
 
-  constructor(message: string, props: ErrorProps) {
+export class BrokerError extends Error {
+  name = ErrorName.BROKER_ERROR;
+}
+
+export class BrokerApiError extends Error {
+  name = ErrorName.BROKER_API_ERROR;
+  status: number;
+
+  constructor(message: string, status: number) {
     super(message);
-    this.name = ErrorName.BOT_ERROR;
-    this.props = props;
+    this.status = status;
   }
 }

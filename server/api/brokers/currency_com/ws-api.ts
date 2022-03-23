@@ -1,7 +1,8 @@
 import WebSocket from 'ws';
+import { AliveBotErrorPlace, botController } from 'modules/bot';
 
 import type { WsSubscribeResponse } from './types';
-import { EndpointSubscription, WS_PING_MILLISECONDS, WS_API_URL } from './constants';
+import { EndpointSubscription, WS_API_URL, WS_PING_DELAY } from './constants';
 
 
 type OpenCallback = (api: WsApi) => void;
@@ -10,8 +11,10 @@ type OpenCallback = (api: WsApi) => void;
 export class WsApi {
   private wsClient: WebSocket;
   private correlationId: number = 0;
+  private readonly botId: string;
 
-  constructor(openCallback?: OpenCallback) {
+  constructor(botId: string, openCallback?: OpenCallback) {
+    this.botId = botId;
     this.setupWebSocket(openCallback);
   }
 
@@ -50,18 +53,16 @@ export class WsApi {
       }
     };
 
-    this.wsClient.onclose = () => {
-      // @TODO: implement close processing
-      console.log('ws closed');
+    this.wsClient.onclose = (event) => {
+      botController.processAliveBotError(this.botId, AliveBotErrorPlace.MARKET_WS_CLOSE, event.reason);
     };
 
     this.wsClient.onerror = (err) => {
-      // @TODO: implement error processing
-      console.log('ws error', err);
+      botController.processAliveBotError(this.botId, AliveBotErrorPlace.MARKET_WS_ERROR, err.message);
     };
   }
 
   private keepConnection(): void {
-    setInterval(() => this.wsClient.ping(), WS_PING_MILLISECONDS);
+    setInterval(() => this.wsClient.ping(), WS_PING_DELAY);
   }
 }

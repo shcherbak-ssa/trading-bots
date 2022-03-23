@@ -1,6 +1,7 @@
 import fetch from 'node-fetch';
 
 import { BrokerAccountType, QUERY_URL_SEPARATOR, RequestMethod } from 'global/constants';
+import { BrokerApiError } from 'shared/exceptions';
 import { generateHmacSignature, stringifyPayload } from 'shared/utils';
 
 import type { ResponseError } from './types';
@@ -19,6 +20,7 @@ export class RestApi {
 
   setAccountType(accountType: BrokerAccountType): RestApi {
     this.accountType = accountType;
+
     return this;
   }
 
@@ -34,7 +36,7 @@ export class RestApi {
   private async send<RequestPayload, ResponsePayload>(
     method: RequestMethod,
     endpoint: Endpoint,
-    payload: RequestPayload
+    payload: RequestPayload,
   ): Promise<ResponsePayload> {
     const requestUrl: string = this.preparingUrl(endpoint, payload);
 
@@ -50,9 +52,9 @@ export class RestApi {
       return await response.json() as ResponsePayload;
     }
 
-    // @TODO: error processing
-    const error = await response.json() as ResponseError;
-    throw new Error(error.msg);
+    const { msg } = await response.json() as ResponseError;
+
+    throw new BrokerApiError(msg, response.status);
   }
 
   private preparingUrl<Payload>(endpoint: Endpoint, payload: Payload): string {

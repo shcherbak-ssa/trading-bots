@@ -2,6 +2,7 @@ import { FRACTION_DIGITS_TO_HUNDREDTHS, ONE_HUNDRED } from 'shared/constants';
 import { getFractionDigits, roundNumber } from 'shared/utils';
 
 import type { BotBroker, BotPosition, BotSettings, BotSignal } from './types';
+import { TAKE_COMMISSION_TIMES, ZERO_COMMISSION } from './constants';
 import { Position } from './position';
 
 
@@ -12,11 +13,12 @@ export class PositionCalculation {
   ) {}
 
 
-  calculatePosition({ isLong, stopLossPrice }: BotSignal): BotPosition {
+  calculatePosition({ isLong, stopLossPrice, marketSymbol }: BotSignal): BotPosition {
     const position: BotPosition = new Position();
 
     position.isLong = isLong;
     position.stopLossPrice = stopLossPrice;
+    position.marketSymbol = marketSymbol;
 
     this.calculateStopLossSize(position);
     this.calculatePositionSize(position);
@@ -28,8 +30,6 @@ export class PositionCalculation {
 
   // Calculations
   private calculateStopLossSize(position: BotPosition): void {
-    // @TODO: add commission calculation
-
     const { currentPrice: marketCurrentPrice, currentSpread: marketCurrentSpread } = this.broker.market;
 
     const stopLossSizeWithoutSpread: number = position.isLong
@@ -40,29 +40,24 @@ export class PositionCalculation {
   }
 
   private calculatePositionSize(position: BotPosition): void {
-    let riskSize: number, positionSize: number;
+    let riskSize: number = this.getRiskSize();
+
+    let positionSize: number = this.broker.market.commission === ZERO_COMMISSION
+      ? this.getPositionSizeWithoutCommission(position)
+      : this.getPositionSizeWithCommission(position);
 
     const maxAmountSize: number = this.getMaxAmountSize();
-
-    riskSize = this.getRiskSize();
-    positionSize = riskSize / position.stopLossSize;
-    positionSize = this.roundPositionSize(positionSize);
-
     const positionAmount: number = this.getPositionAmount(positionSize);
 
     if (positionAmount > maxAmountSize) {
-      const { market } = this.broker;
-      const { leverage: marketLeverage } = market;
-      const marketCurrentPriceByAccountCurrency: number = market.getCurrentPriceByAccountCurrency();
+      const { leverage: marketLeverage, currentPrice: marketCurrentPrice } = this.broker.market;
 
-      positionSize = maxAmountSize * marketLeverage / marketCurrentPriceByAccountCurrency;
-      positionSize = this.roundPositionSize(positionSize);
-
-      riskSize = roundNumber(positionSize * position.stopLossSize, FRACTION_DIGITS_TO_HUNDREDTHS);
+      positionSize = maxAmountSize * marketLeverage / marketCurrentPrice;
+      riskSize = positionSize * position.stopLossSize;
     }
 
-    position.riskSize = riskSize;
-    position.positionSize = positionSize;
+    position.riskSize = roundNumber(riskSize, FRACTION_DIGITS_TO_HUNDREDTHS);
+    position.positionSize = this.roundPositionSize(positionSize);
   }
 
   private calculateTakeProfit(position: BotPosition): void {
@@ -88,22 +83,17 @@ export class PositionCalculation {
 
   // Helpers
   private getRiskSize(): number {
-    return (this.getAccountTotalAmount() * this.botSettings.riskPercent) / ONE_HUNDRED;
+    return this.getAccountTotalAmount() * this.botSettings.riskPercent / ONE_HUNDRED;
   }
 
   private getMaxAmountSize(): number {
-    return (this.getAccountTotalAmount() * this.botSettings.accountAmountPerPositionPercent) / ONE_HUNDRED;
+    return this.getAccountTotalAmount() * this.botSettings.accountAmountPercentUseForBot / ONE_HUNDRED;
   }
 
   private getPositionAmount(positionSize: number): number {
-    const { market } = this.broker;
-    const { leverage: marketLeverage } = market;
-    const marketCurrentPriceByAccountCurrency: number = market.getCurrentPriceByAccountCurrency();
+    const { leverage: marketLeverage, currentPrice: marketCurrentPrice } = this.broker.market;
 
-    return roundNumber(
-      positionSize * marketCurrentPriceByAccountCurrency / marketLeverage,
-      FRACTION_DIGITS_TO_HUNDREDTHS
-    );
+    return roundNumber(positionSize * marketCurrentPrice / marketLeverage, FRACTION_DIGITS_TO_HUNDREDTHS);
   }
 
   private getAccountTotalAmount(): number {
@@ -118,5 +108,18 @@ export class PositionCalculation {
     roundedPositionSize *= marketMinPositionSize;
 
     return roundedPositionSize;
+  }
+
+  private getPositionSizeWithoutCommission({ stopLossSize }: BotPosition): number {
+    return this.getRiskSize() / stopLossSize;
+  }
+
+  private getPositionSizeWithCommission({ stopLossSize }: BotPosition): number {
+    const { currentPrice: marketCurrentPrice, commission: marketCommission } = this.broker.market;
+
+    return (
+      this.getRiskSize() /
+      (TAKE_COMMISSION_TIMES * marketCurrentPrice * marketCommission / ONE_HUNDRED + stopLossSize)
+    );
   }
 }

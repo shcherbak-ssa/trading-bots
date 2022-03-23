@@ -1,4 +1,5 @@
-import { PositionCloseRejectReason, PositionCloseState, PositionCloseType, PositionState } from '../constants';
+import { PositionCloseRejectReason, PositionCloseState, PositionCloseType } from '../constants';
+import { PositionSource, PositionState, PositionStatus } from '../constants';
 import { OrderSide, OrderStatus, OrderTimeInForce, OrderType } from '../constants';
 
 
@@ -10,9 +11,14 @@ export type Position = {
   side: OrderSide;
 }
 
-export type OpenPosition = {
+export type ActiveParsedPosition = {
   id: string;
-  feeOpen: number;
+  fee: number;
+}
+
+export type ClosedParsedPosition = {
+  fee: number;
+  result: number;
 }
 
 
@@ -48,6 +54,35 @@ export type ActivePosition = {
   uplConverted: number;
 }
 
+export type ClosedPosition = {
+  accountId: number;
+  accountCurrency: string;
+  createdTimestamp: number;
+  currency: string;
+  execTimestamp: number;
+  executionType: OrderTimeInForce;
+  fee: number;
+  feeDetails: {
+    [key: string]: number;
+  };
+  fxRate: number;
+  gSL: boolean;
+  instrumentId: number;
+  positionId: string;
+  price: number;
+  quantity: number;
+  rejectReason: PositionCloseRejectReason;
+  rpl: number
+  rplConverted: number;
+  source: PositionSource;
+  status: PositionStatus;
+  stopLoss: number;
+  swap: number;
+  swapConverted: number;
+  symbol: string;
+  takeProfit: number;
+}
+
 
 // Request Models
 export type CreateOrderRequest = {
@@ -68,6 +103,7 @@ export type CreateOrderRequest = {
 }
 
 export type PositionListRequest = {
+  symbol?: string;
   timestamp: number;
 }
 
@@ -98,8 +134,12 @@ export type CreateOrderResponse = {
   type: OrderType;
 }
 
-export type PositionListResponse = {
+export type ActivePositionsResponse = {
   positions: ActivePosition[];
+}
+
+export type ClosedPositionsResponse = {
+  history: ClosedPosition[];
 }
 
 export type ClosePositionResponse = {

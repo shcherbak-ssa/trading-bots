@@ -1,3 +1,4 @@
+import { BrokerError } from 'shared/exceptions';
 import { getFractionDigits, roundNumber } from 'shared/utils';
 
 import type { ExchangeInfo, ExchangeSymbolInfo, ExchangeSymbolLotSizeFilter } from '../types';
@@ -17,9 +18,9 @@ export class MarketApi {
   ) {}
 
 
-  static async setup(restApi: RestApi): Promise<MarketApi> {
+  static async setup(botId: string, restApi: RestApi): Promise<MarketApi> {
     return new Promise((resolve, reject) => {
-      new WsApi((wsApi: WsApi) => {
+      new WsApi(botId, (wsApi: WsApi) => {
         resolve(new MarketApi(restApi, wsApi));
       });
     });
@@ -34,7 +35,7 @@ export class MarketApi {
       return await this.parseExchangeSymbol(foundSymbol);
     }
 
-    throw new Error(''); // @TODO: implement
+    throw new BrokerError(`Cannot found broker symbol '${marketSymbol}'.`);
   }
 
   async loadMarketLeverage(marketSymbol: string): Promise<MarketLeverageResponse> {
@@ -75,7 +76,7 @@ export class MarketApi {
   }
 
   private async parseExchangeSymbol(
-    { symbol, quoteAsset, tickSize, filters }: ExchangeSymbolInfo,
+    { symbol, quoteAsset, tickSize, filters, takerFee }: ExchangeSymbolInfo,
   ): Promise<Market> {
     const { value: leverage }: MarketLeverageResponse = await this.loadMarketLeverage(symbol);
     const { price, spread }: MarketPrice = await this.loadMarketPrice(symbol);
@@ -91,6 +92,7 @@ export class MarketApi {
       leverage,
       price,
       spread,
+      commission: takerFee,
     };
   }
 

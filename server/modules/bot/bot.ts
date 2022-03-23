@@ -1,43 +1,46 @@
-import { ErrorReason, ErrorSolution } from 'shared/constants';
 import { BotError } from 'shared/exceptions';
 import { BrokerFactory } from 'api/brokers/bot-broker-factory';
 
-import type { BotBroker, BotBrokerFactory, BotPosition, BotSettings, BotSignal, ClosePositionHandler } from './types';
+import type { BotBroker, BotBrokerFactory, BotPosition, BotSettings, BotSignal } from './types';
+import { AliveBotErrorPlace } from './constants';
+import { botController } from './bot-controller';
 import { PositionCalculation } from './position-calculation';
 import { PositionCheck } from './position-check';
 
 
 export class Bot {
+  currentPosition: BotPosition | null = null;
+
   constructor(
-    private settings: BotSettings,
+    public settings: BotSettings,
     private broker: BotBroker,
     private calculation: PositionCalculation,
     private check: PositionCheck,
-    private closePositionHandler: ClosePositionHandler,
   ) {}
 
 
   static brokerFactory: BotBrokerFactory = new BrokerFactory();
 
-  static async create(settings: BotSettings, closePositionHandler: ClosePositionHandler): Promise<Bot> {
+  static async create(settings: BotSettings): Promise<Bot> {
     const broker: BotBroker = await Bot.brokerFactory.setupBroker(settings);
     const calculation: PositionCalculation = new PositionCalculation(settings, broker);
     const check: PositionCheck = new PositionCheck(settings);
-
-    // @TODO: check if min position size is zero
 
     return new Bot(
       settings,
       broker,
       calculation,
       check,
-      closePositionHandler,
     );
   }
 
 
   async processSignal(signal: BotSignal): Promise<void> {
     this.checkSignal(signal);
+
+    if (this.currentPosition !== null) {
+      await this.closeOpenPosition();
+    }
 
     const position: BotPosition = this.calculation.calculatePosition(signal);
     await this.broker.openPosition(position);
@@ -48,57 +51,54 @@ export class Bot {
   async updateOpenPosition(signal: BotSignal): Promise<void> {
     this.checkSignal(signal);
 
-    if (this.broker.currentPosition === null) return;
+    if (this.currentPosition === null) return;
 
-    this.broker.currentPosition.stopLossPrice = signal.stopLossPrice;
+    this.currentPosition.stopLossPrice = signal.stopLossPrice;
+  }
+
+  async closeOpenPosition(): Promise<void> {
+    if (this.currentPosition === null) return;
+
+    this.broker.market.unsubscribeToPriceUpdates();
+
+    await this.broker.closePosition(this.currentPosition);
+
+    botController.processPositionClosing(this.settings.id, this.currentPosition);
+
+    this.currentPosition = null;
   }
 
 
   private checkSignal({ brokerName, marketSymbol }: BotSignal): void {
     if (!this.broker.isCorrectBroker(brokerName)) {
-      throw new BotError('Incorrect Broker', {
-        reason: ErrorReason.INVALID_SIGNAL,
-        expected: this.broker.name,
-        actual: brokerName,
-        solution: ErrorSolution.CHECK_STRATEGY_SCRIPT,
-      });
+      throw new BotError(`Incorrect Broker - expected ${this.broker.name}, actual ${brokerName}`);
     }
 
     if (!this.broker.market.isCorrectSymbol(marketSymbol)) {
-      throw new BotError('Incorrect Symbol', {
-        reason: ErrorReason.INVALID_SIGNAL,
-        expected: this.broker.market.symbol,
-        actual: marketSymbol,
-        solution: ErrorSolution.CHECK_STRATEGY_SCRIPT,
-      });
+      throw new BotError(`Incorrect Symbol - expected ${this.broker.market.symbol}, actual ${marketSymbol}`);
     }
   }
 
-  private async closeOpenPosition(): Promise<void> {
-    this.broker.market.unsubscribeToPriceUpdates();
-
-    const position: BotPosition = await this.broker.closePosition();
-    this.closePositionHandler(position);
-  }
-
   private async checkPosition(): Promise<void> {
-    if (this.broker.currentPosition === null) return;
+    try {
+      if (this.currentPosition === null) return;
 
-    // @TODO: check if position closed by broker system
+      const { currentPrice: marketCurrentPrice } = this.broker.market;
 
-    const { currentPosition, market } = this.broker;
+      const closePosition: boolean = (
+        this.check.closeByStopLoss(this.currentPosition, marketCurrentPrice) ||
+        this.check.closeByTakeProfit(this.currentPosition, marketCurrentPrice)
+      );
 
-    const closePosition: boolean = (
-      this.check.closeByStopLoss(currentPosition, market.currentPrice) ||
-      this.check.closeByTakeProfit(currentPosition, market.currentPrice)
-    );
-
-    if (closePosition) {
-      return await this.closeOpenPosition();
+      if (closePosition) {
+        return await this.closeOpenPosition();
+      }
+    } catch (err: any) {
+      botController.processAliveBotError(this.settings.id, AliveBotErrorPlace.POSITION_CLOSE, err.message);
     }
   }
 
   private async checkCloseTime(): Promise<void> {
-    // @TODO: implement
+    throw new Error('TODO: implement');
   }
 }

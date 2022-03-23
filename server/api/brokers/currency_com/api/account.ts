@@ -1,3 +1,5 @@
+import { BrokerError } from 'shared/exceptions';
+
 import type {
   AccountBalance,
   AccountParsedBalance,
@@ -32,7 +34,7 @@ export class AccountApi {
       return AccountApi.parseBalance(foundBalance);
     }
 
-    throw new Error(''); // @TODO: add extensions
+    throw new BrokerError(`Cannot found broker account with id '${accountId}'.`);
   }
 
 
@@ -50,7 +52,7 @@ export class AccountApi {
       id: accountId,
       currency: asset,
       availableAmount: free,
-      totalAmount: free + locked, // @TODO: change formula
+      totalAmount: free + locked,
     };
   }
 }

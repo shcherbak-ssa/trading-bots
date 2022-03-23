@@ -7,6 +7,7 @@ export type Market = {
   leverage: number;
   price: number;
   spread: number;
+  commission: number;
 }
 
 export type MarketPrice = {

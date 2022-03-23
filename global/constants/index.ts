@@ -19,5 +19,5 @@ export enum SignalType {
 }
 
 export enum BrokerList {
-  CURRENCY_COM = 'CURRENCY_COM',
+  CURRENCY_COM = 'Currency.com',
 }

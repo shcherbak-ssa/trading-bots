@@ -5,6 +5,7 @@ export class Position implements BotPosition {
   id: string;
   isLong: boolean;
   riskSize: number;
+  marketSymbol: string;
   positionSize: number;
   stopLossPrice: number;
   stopLossSize: number
@@ -12,4 +13,5 @@ export class Position implements BotPosition {
   takeProfitSize: number | null = null;
   feeOpen: number | null = null;
   feeClose: number | null = null;
+  result: number;
 }
