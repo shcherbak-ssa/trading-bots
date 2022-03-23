@@ -47,6 +47,7 @@ export interface BotBrokerFactory {
 }
 
 export interface BotBroker {
+  name: string;
   market: BotBrokerMarket;
   account: BotBrokerAccount;
   currentPosition: BotPosition | null;
@@ -56,6 +57,7 @@ export interface BotBroker {
 }
 
 export interface BotBrokerMarket {
+  symbol: string;
   minPositionSize: number;
   tickSize: number;
   leverage: number;

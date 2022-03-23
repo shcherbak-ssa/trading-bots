@@ -1,7 +1,9 @@
-import { BrokerFactory } from 'api/brokers/bot-factory';
+import { ErrorReason, ErrorSolution } from 'shared/constants';
+import { BotError } from 'shared/exceptions';
+import { BrokerFactory } from 'api/brokers/bot-broker-factory';
 
 import type { BotBroker, BotBrokerFactory, BotPosition, BotSettings, BotSignal, ClosePositionHandler } from './types';
-import { Calculation } from './calculation';
+import { PositionCalculation } from './position-calculation';
 import { PositionCheck } from './position-check';
 
 
@@ -9,8 +11,8 @@ export class Bot {
   constructor(
     private settings: BotSettings,
     private broker: BotBroker,
-    private calculation: Calculation,
-    private positionCheck: PositionCheck,
+    private calculation: PositionCalculation,
+    private check: PositionCheck,
     private closePositionHandler: ClosePositionHandler,
   ) {}
 
@@ -19,14 +21,16 @@ export class Bot {
 
   static async create(settings: BotSettings, closePositionHandler: ClosePositionHandler): Promise<Bot> {
     const broker: BotBroker = await Bot.brokerFactory.setupBroker(settings);
-    const calculation: Calculation = new Calculation(settings, broker);
-    const positionCheck: PositionCheck = new PositionCheck(settings);
+    const calculation: PositionCalculation = new PositionCalculation(settings, broker);
+    const check: PositionCheck = new PositionCheck(settings);
+
+    // @TODO: check if min position size is zero
 
     return new Bot(
       settings,
       broker,
       calculation,
-      positionCheck,
+      check,
       closePositionHandler,
     );
   }
@@ -52,11 +56,21 @@ export class Bot {
 
   private checkSignal({ brokerName, marketSymbol }: BotSignal): void {
     if (!this.broker.isCorrectBroker(brokerName)) {
-      throw new Error(''); // @TODO: add extensions
+      throw new BotError('Incorrect Broker', {
+        reason: ErrorReason.INVALID_SIGNAL,
+        expected: this.broker.name,
+        actual: brokerName,
+        solution: ErrorSolution.CHECK_STRATEGY_SCRIPT,
+      });
     }
 
     if (!this.broker.market.isCorrectSymbol(marketSymbol)) {
-      throw new Error(''); // @TODO: add extensions
+      throw new BotError('Incorrect Symbol', {
+        reason: ErrorReason.INVALID_SIGNAL,
+        expected: this.broker.market.symbol,
+        actual: marketSymbol,
+        solution: ErrorSolution.CHECK_STRATEGY_SCRIPT,
+      });
     }
   }
 
@@ -75,8 +89,8 @@ export class Bot {
     const { currentPosition, market } = this.broker;
 
     const closePosition: boolean = (
-      this.positionCheck.closeByStopLoss(currentPosition, market.currentPrice) ||
-      this.positionCheck.closeByTakeProfit(currentPosition, market.currentPrice)
+      this.check.closeByStopLoss(currentPosition, market.currentPrice) ||
+      this.check.closeByTakeProfit(currentPosition, market.currentPrice)
     );
 
     if (closePosition) {

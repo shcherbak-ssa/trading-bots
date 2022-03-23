@@ -11,6 +11,7 @@ import { PositionApi } from './api/position';
 
 
 class BrokerMarket implements BotBrokerMarket {
+  symbol: string;
   minPositionSize: number;
   tickSize: number;
   leverage: number;
@@ -30,6 +31,7 @@ class BrokerMarket implements BotBrokerMarket {
     const market: Market = await api.loadMarketData(marketSymbol);
 
     const brokerMarket: BrokerMarket = new BrokerMarket(market, api);
+    brokerMarket.symbol = market.marketSymbol;
     brokerMarket.minPositionSize = market.minPositionSize;
     brokerMarket.tickSize = market.tickSize;
     brokerMarket.leverage = market.leverage;
@@ -107,11 +109,11 @@ class BrokerAccount implements BotBrokerAccount {
 
 
 export class Broker implements BotBroker {
+  name: string = BrokerList.CURRENCY_COM;
   market: BotBrokerMarket;
   account: BotBrokerAccount;
   currentPosition: BotPosition | null = null;
 
-  private name: string = BrokerList.CURRENCY_COM;
 
   constructor(
     private botSettings: BotSettings,
