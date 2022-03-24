@@ -4,7 +4,7 @@ export type AccountRequestSettings = {
   showZeroBalance?: boolean;
 }
 
-export type AccountParsedBalance = {
+export type ParsedBalance = {
   id: string;
   currency: string;
   availableAmount: number;

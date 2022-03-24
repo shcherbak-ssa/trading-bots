@@ -1,25 +1,21 @@
 import fetch from 'node-fetch';
 
-import { QUERY_URL_SEPARATOR, RequestMethod } from 'global/constants';
+import { RequestMethod } from 'global/constants';
 import { BrokerApiError } from 'shared/exceptions';
-import { generateHmacSignature, stringifyPayload } from 'shared/utils';
 
 import { BrokerRestApi } from '../broker-rest-api';
 
-import type { ResponseError } from './types';
 import type { Endpoint } from './constants';
 import { getApiUrl } from './utils';
 
 
 export class RestApi extends BrokerRestApi {
-  private readonly apiKey: string;
-  private readonly secretKey: string;
+  private readonly apiKey: string
 
-  constructor(apiKey: string, secretKey: string) {
+  constructor(apiKey: string) {
     super();
 
     this.apiKey = apiKey;
-    this.secretKey = secretKey;
   }
 
 
@@ -37,13 +33,12 @@ export class RestApi extends BrokerRestApi {
     endpoint: Endpoint,
     payload: RequestPayload,
   ): Promise<ResponsePayload> {
-    const requestUrl: string = this.preparingUrl(endpoint, payload);
+    const requestUrl: string = this.preparingUrl(endpoint);
 
     const response = await fetch(requestUrl, {
       method,
       headers: {
         'Content-Type': 'application/json',
-        'X-MBX-APIKEY': this.apiKey,
       },
     });
 
@@ -51,24 +46,12 @@ export class RestApi extends BrokerRestApi {
       return await response.json() as ResponsePayload;
     }
 
-    const { msg } = await response.json() as ResponseError;
-
-    throw new BrokerApiError(msg, response.status);
+    throw new BrokerApiError('TODO: add error interface', response.status);
   }
 
-  private preparingUrl<Payload>(endpoint: Endpoint, payload: Payload): string {
+  private preparingUrl(endpoint: Endpoint): string {
     const apiUrl: string = getApiUrl(this.accountType);
-    const queryPayload: string = this.preparingPayload(payload);
 
-    return apiUrl + endpoint + QUERY_URL_SEPARATOR + queryPayload;
-  }
-
-  private preparingPayload<Payload>(payload: Payload): string {
-    const signature: string = generateHmacSignature(
-      this.secretKey,
-      stringifyPayload(payload),
-    );
-
-    return stringifyPayload({ ...payload, signature });
+    return apiUrl + endpoint;
   }
 }

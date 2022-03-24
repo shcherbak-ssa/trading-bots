@@ -6,8 +6,8 @@ import type { Market, MarketLeverageRequest, MarketLeverageResponse } from '../t
 import type { MarketPrice, MarketPriceRequest, MarketPriceResponse } from '../types';
 import type { MarketPriceSubscribePayload, MarketPriceSubscribeResponsePayload, WsSubscribeResponse } from '../types';
 
-import { Endpoint, EndpointSubscription, MarketFilter, Subscription } from '../constants';
 import type { RestApi } from '../rest-api';
+import { Endpoint, EndpointSubscription, MarketFilter, Subscription } from '../constants';
 import { WsApi } from '../ws-api';
 
 

@@ -1,12 +1,7 @@
 import { BrokerError } from 'shared/exceptions';
 
-import type {
-  AccountBalance,
-  AccountParsedBalance,
-  AccountRequest,
-  AccountRequestSettings,
-  AccountResponse
-} from '../types';
+import type { AccountRequest, AccountRequestSettings, AccountResponse } from '../types';
+import type { AccountBalance, ParsedBalance } from '../types';
 
 import { Endpoint } from '../constants';
 import type { RestApi } from '../rest-api';
@@ -18,27 +13,27 @@ export class AccountApi {
   ) {}
 
 
-  async loadAccounts({ showZeroBalance = true }: AccountRequestSettings): Promise<AccountParsedBalance[]> {
-    const { balances }: AccountResponse = await this.loadAccountInfo(showZeroBalance);
+  async loadAccounts({ showZeroBalance = true }: AccountRequestSettings): Promise<ParsedBalance[]> {
+    const { balances }: AccountResponse = await this.loadAccountsInfo(showZeroBalance);
 
     return balances.map(AccountApi.parseBalance);
   }
 
   async loadConcreteAccount(
     { showZeroBalance = true, accountId }: AccountRequestSettings,
-  ): Promise<AccountParsedBalance> {
-    const { balances }: AccountResponse = await this.loadAccountInfo(showZeroBalance);
+  ): Promise<ParsedBalance> {
+    const { balances }: AccountResponse = await this.loadAccountsInfo(showZeroBalance);
     const foundBalance: AccountBalance | undefined = balances.find(({ accountId: id }) => accountId === id);
 
     if (foundBalance) {
       return AccountApi.parseBalance(foundBalance);
     }
 
-    throw new BrokerError(`Cannot found broker account with id '${accountId}'.`);
+    throw new BrokerError(`Cannot found account with id '${accountId}'.`);
   }
 
 
-  private async loadAccountInfo(showZeroBalance: boolean): Promise<AccountResponse> {
+  private async loadAccountsInfo(showZeroBalance: boolean): Promise<AccountResponse> {
     return await this.restApi.get<AccountRequest, AccountResponse>(Endpoint.ACCOUNT, {
       showZeroBalance,
       timestamp: Date.now(),
@@ -47,7 +42,7 @@ export class AccountApi {
 
   private static parseBalance(
     { accountId, asset, free, locked }: AccountBalance,
-  ): AccountParsedBalance {
+  ): ParsedBalance {
     return {
       id: accountId,
       currency: asset,
