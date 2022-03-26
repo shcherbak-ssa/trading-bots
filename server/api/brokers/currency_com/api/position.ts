@@ -1,4 +1,4 @@
-import { BrokerError } from 'shared/exceptions';
+import { ProcessError } from 'shared/exceptions';
 
 import type { ClosePositionRequest, CreateOrderRequest, CreateOrderResponse } from '../types';
 import type { ClosedPositionsResponse, ClosePositionResponse } from '../types';
@@ -29,8 +29,6 @@ export class PositionApi {
     const createdPosition: ActivePosition | undefined
       = positions.find(({ orderId }) => orderId === createdOrder.orderId);
 
-    console.log('createdPosition:', createdPosition);
-
     if (createdPosition) {
       return {
         id: createdPosition.id,
@@ -38,7 +36,7 @@ export class PositionApi {
       };
     }
 
-    throw new BrokerError(`Something went wrong with open position. Please, check position in broker system.`);
+    throw new ProcessError(`Something went wrong with open position. Please, check position in broker system.`);
   }
 
   async closePosition(positionId: string, marketSymbol: string): Promise<ClosedParsedPosition> {
@@ -53,7 +51,6 @@ export class PositionApi {
     });
 
     const closedPosition: ClosedPosition | undefined = history.find(({ positionId: id }) => id === positionId);
-    console.log('closedPosition:', closedPosition);
 
     if (closedPosition) {
       return {
@@ -62,6 +59,6 @@ export class PositionApi {
       };
     }
 
-    throw new BrokerError(`Something went wrong with position closing. Please, check position in broker system.`);
+    throw new ProcessError(`Something went wrong with position closing. Please, check position in broker system.`);
   }
 }

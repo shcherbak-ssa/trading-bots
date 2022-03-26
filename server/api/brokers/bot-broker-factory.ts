@@ -1,5 +1,5 @@
-import { BrokerList } from 'global/constants';
-import { BrokerError } from 'shared/exceptions';
+import { BrokerList, StatusCode } from 'global/constants';
+import { ProcessError } from 'shared/exceptions';
 
 import type { BotBroker, BotBrokerFactory, BotSettings } from 'modules/bot/types';
 
@@ -13,6 +13,6 @@ export class BrokerFactory implements BotBrokerFactory {
         return await CurrencyComBroker.setup(settings);
     }
 
-    throw new BrokerError(`Cannot found broker '${settings.brokerName}'.`);
+    throw new ProcessError(`Cannot found broker '${settings.brokerName}'`, StatusCode.BAD_REQUEST);
   }
 }

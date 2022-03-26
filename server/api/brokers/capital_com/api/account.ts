@@ -1,8 +1,9 @@
-import { BrokerError } from 'shared/exceptions';
+import { ProcessError } from 'shared/exceptions';
 
 import type { AccountItem, AccountResponse, EmptyRequest, ParsedAccount } from '../types';
 import type { RestApi } from '../rest-api';
 import { Endpoint } from '../constants';
+import { StatusCode } from 'global/constants';
 
 
 export class AccountApi {
@@ -25,7 +26,7 @@ export class AccountApi {
       return AccountApi.parseAccount(foundAccount);
     }
 
-    throw new BrokerError(`Cannot found account with id '${accountId}'.`);
+    throw new ProcessError(`Cannot found account with id '${accountId}'`, StatusCode.BAD_REQUEST);
   }
 
 

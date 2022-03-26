@@ -1,4 +1,4 @@
-import { BotError } from 'shared/exceptions';
+import { ProcessError } from 'shared/exceptions';
 import { BrokerFactory } from 'api/brokers/bot-broker-factory';
 
 import type { BotBroker, BotBrokerFactory, BotPosition, BotSettings, BotSignal } from './types';
@@ -6,6 +6,7 @@ import { AliveBotErrorPlace } from './constants';
 import { botController } from './bot-controller';
 import { PositionCalculation } from './position-calculation';
 import { PositionCheck } from './position-check';
+import { StatusCode } from 'global/constants';
 
 
 export class Bot {
@@ -71,11 +72,17 @@ export class Bot {
 
   private checkSignal({ brokerName, marketSymbol }: BotSignal): void {
     if (!this.broker.isCorrectBroker(brokerName)) {
-      throw new BotError(`Incorrect Broker - expected ${this.broker.name}, actual ${brokerName}`);
+      throw new ProcessError(
+        `Incorrect Broker - expected ${this.broker.name}, actual ${brokerName}`,
+        StatusCode.BAD_REQUEST,
+      );
     }
 
     if (!this.broker.market.isCorrectSymbol(marketSymbol)) {
-      throw new BotError(`Incorrect Symbol - expected ${this.broker.market.symbol}, actual ${marketSymbol}`);
+      throw new ProcessError(
+        `Incorrect Symbol - expected ${this.broker.market.symbol}, actual ${marketSymbol}`,
+        StatusCode.BAD_REQUEST,
+      );
     }
   }
 

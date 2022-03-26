@@ -1,19 +1,12 @@
 import { ErrorName } from 'shared/constants';
+import { StatusCode } from 'global/constants';
 
 
-export class BotError extends Error {
-  name = ErrorName.BOT_ERROR;
-}
+export class ProcessError extends Error {
+  name = ErrorName.PROCESS_ERROR;
+  status: StatusCode;
 
-export class BrokerError extends Error {
-  name = ErrorName.BROKER_ERROR;
-}
-
-export class BrokerApiError extends Error {
-  name = ErrorName.BROKER_API_ERROR;
-  status: number;
-
-  constructor(message: string, status: number) {
+  constructor(message: string, status: StatusCode = StatusCode.INTERNAL_SERVER_ERROR) {
     super(message);
     this.status = status;
   }

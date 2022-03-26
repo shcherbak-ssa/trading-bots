@@ -1,8 +1,9 @@
-import { BotError } from 'shared/exceptions';
+import { ProcessError } from 'shared/exceptions';
 
 import type { BotEventPayload, BotPosition, BotSettings, BotSignal } from './types';
 import { AliveBotErrorPlace, BotEvent } from './constants';
 import { Bot } from './bot';
+import { StatusCode } from 'global/constants';
 
 
 class BotController {
@@ -62,7 +63,7 @@ class BotController {
     const bot: Bot | undefined = this.bots.get(botId);
 
     if (!bot) {
-      throw new BotError(`Bot with id '${botId}' does not exist.`);
+      throw new ProcessError(`Bot with id '${botId}' does not exist`, StatusCode.BAD_REQUEST);
     }
 
     return bot;
