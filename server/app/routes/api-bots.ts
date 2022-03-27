@@ -1,4 +1,4 @@
-import type { App, Bot } from 'shared/types';
+import type { App, Bots } from 'shared/types';
 import { RequestMethod, RoutePathname, StatusCode } from 'global/constants';
 
 import { botsController } from '../controllers/bots';
@@ -10,8 +10,8 @@ export const apiBotsRoutes = {
     {
       method: RequestMethod.GET,
       handler: async ({ params }: App.Request): Promise<App.Response> => {
-        const payload = { ...params } as Bot.ReadPayload;
-        const result: Bot.ReadResult = await botsController.read(payload);
+        const payload = { ...params } as Bots.ReadPayload;
+        const result: Bots.ReadResult = await botsController.read(payload);
 
         return {
           status: StatusCode.SUCCESS,
@@ -22,8 +22,8 @@ export const apiBotsRoutes = {
     {
       method: RequestMethod.POST,
       handler: async (request: App.Request): Promise<App.Response> => {
-        const payload = {} as Bot.ReadPayload;
-        const result: Bot.CreateResult = await botsController.create(payload);
+        const payload = {} as Bots.ReadPayload;
+        const result: Bots.CreateResult = await botsController.create(payload);
 
         return {
           status: StatusCode.CREATED,
@@ -34,7 +34,7 @@ export const apiBotsRoutes = {
     {
       method: RequestMethod.PUT,
       handler: async ({ params }: App.Request): Promise<App.Response> => {
-        const payload = { ...params } as Bot.UpdatePayload;
+        const payload = { ...params } as Bots.UpdatePayload;
         await botsController.update(payload);
 
         return {
@@ -45,7 +45,7 @@ export const apiBotsRoutes = {
     {
       method: RequestMethod.DELETE,
       handler: async ({ params }: App.Request): Promise<App.Response> => {
-        const payload = { ...params } as Bot.DeletePayload;
+        const payload = { ...params } as Bots.DeletePayload;
         await botsController.delete(payload);
 
         return {

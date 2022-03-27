@@ -1,20 +1,20 @@
-import type { Bot } from 'shared/types';
+import type { Bots } from 'shared/types';
 
 
 class BotsController {
-  async create(payload: Bot.CreatePayload): Promise<Bot.CreateResult> {
+  async create(payload: Bots.CreatePayload): Promise<Bots.CreateResult> {
     throw new Error('not implemented');
   }
 
-  async read(payload: Bot.ReadPayload): Promise<Bot.ReadResult> {
+  async read(payload: Bots.ReadPayload): Promise<Bots.ReadResult> {
     throw new Error('not implemented');
   }
 
-  async update(payload: Bot.UpdatePayload): Promise<void> {
+  async update(payload: Bots.UpdatePayload): Promise<void> {
     throw new Error('not implemented');
   }
 
-  async delete(payload: Bot.DeletePayload): Promise<void> {
+  async delete(payload: Bots.DeletePayload): Promise<void> {
     throw new Error('not implemented');
   }
 }

@@ -1,12 +1,10 @@
-import { ProcessError } from 'shared/exceptions';
 import { BrokerFactory } from 'api/brokers/bot-broker-factory';
 
 import type { BotBroker, BotBrokerFactory, BotPosition, BotSettings, BotSignal } from './types';
 import { AliveBotErrorPlace } from './constants';
-import { botController } from './bot-controller';
+import { BotEvents } from './bot-events';
 import { PositionCalculation } from './position-calculation';
 import { PositionCheck } from './position-check';
-import { StatusCode } from 'global/constants';
 
 
 export class Bot {
@@ -14,7 +12,7 @@ export class Bot {
 
   constructor(
     public settings: BotSettings,
-    private broker: BotBroker,
+    public broker: BotBroker,
     private calculation: PositionCalculation,
     private check: PositionCheck,
   ) {}
@@ -36,9 +34,7 @@ export class Bot {
   }
 
 
-  async processSignal(signal: BotSignal): Promise<void> {
-    this.checkSignal(signal);
-
+  async openPosition(signal: BotSignal): Promise<void> {
     if (this.currentPosition !== null) {
       await this.closeOpenPosition();
     }
@@ -50,8 +46,6 @@ export class Bot {
   }
 
   async updateOpenPosition(signal: BotSignal): Promise<void> {
-    this.checkSignal(signal);
-
     if (this.currentPosition === null) return;
 
     this.currentPosition.stopLossPrice = signal.stopLossPrice;
@@ -64,27 +58,11 @@ export class Bot {
 
     await this.broker.closePosition(this.currentPosition);
 
-    botController.processPositionClosing(this.settings.id, this.currentPosition);
+    BotEvents.processPositionClosing(this.settings.id, this.currentPosition);
 
     this.currentPosition = null;
   }
 
-
-  private checkSignal({ brokerName, marketSymbol }: BotSignal): void {
-    if (!this.broker.isCorrectBroker(brokerName)) {
-      throw new ProcessError(
-        `Incorrect Broker - expected ${this.broker.name}, actual ${brokerName}`,
-        StatusCode.BAD_REQUEST,
-      );
-    }
-
-    if (!this.broker.market.isCorrectSymbol(marketSymbol)) {
-      throw new ProcessError(
-        `Incorrect Symbol - expected ${this.broker.market.symbol}, actual ${marketSymbol}`,
-        StatusCode.BAD_REQUEST,
-      );
-    }
-  }
 
   private async checkPosition(): Promise<void> {
     try {
@@ -101,7 +79,7 @@ export class Bot {
         return await this.closeOpenPosition();
       }
     } catch (err: any) {
-      botController.processAliveBotError(this.settings.id, AliveBotErrorPlace.POSITION_CLOSE, err.message);
+      BotEvents.processAliveError(this.settings.id, AliveBotErrorPlace.POSITION_CLOSE, err.message);
     }
   }
 

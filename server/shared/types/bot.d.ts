@@ -1,4 +1,4 @@
-export namespace Bot {
+export namespace Bots {
   type CreatePayload = {}
 
   type CreateResult = {}

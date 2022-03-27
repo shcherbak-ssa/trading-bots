@@ -1,5 +1,5 @@
 import WebSocket from 'ws';
-import { AliveBotErrorPlace, botController } from 'modules/bot';
+import { AliveBotErrorPlace, BotEvents } from 'modules/bot';
 
 import type { WsSubscribeResponse } from './types';
 import { EndpointSubscription, WS_API_URL, WS_PING_DELAY } from './constants';
@@ -54,11 +54,11 @@ export class WsApi {
     };
 
     this.wsClient.onclose = (event) => {
-      botController.processAliveBotError(this.botId, AliveBotErrorPlace.MARKET_WS_CLOSE, event.reason);
+      BotEvents.processAliveError(this.botId, AliveBotErrorPlace.MARKET_WS_CLOSE, event.reason);
     };
 
     this.wsClient.onerror = (err) => {
-      botController.processAliveBotError(this.botId, AliveBotErrorPlace.MARKET_WS_ERROR, err.message);
+      BotEvents.processAliveError(this.botId, AliveBotErrorPlace.MARKET_WS_ERROR, err.message);
     };
   }
 

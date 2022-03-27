@@ -1,5 +1,5 @@
 import type { BotBrokerAccount, BotSettings } from 'modules/bot/types';
-import { AliveBotErrorPlace, botController } from 'modules/bot';
+import { AliveBotErrorPlace, BotEvents } from 'modules/bot';
 
 import type { ParsedAccount } from '../types';
 import type { RestApi } from '../rest-api';
@@ -36,7 +36,7 @@ export class BrokerAccount implements BotBrokerAccount {
       this.availableAmount = availableAmount;
       this.totalAmount = totalAmount;
     } catch (err: any) {
-      botController.processAliveBotError(this.botSettings.id, AliveBotErrorPlace.ACCOUNT_AMOUNT_UPDATE, err.message);
+      BotEvents.processAliveError(this.botSettings.id, AliveBotErrorPlace.ACCOUNT_AMOUNT_UPDATE, err.message);
     }
   }
 }
