@@ -1,12 +1,11 @@
 import { ProcessError } from 'shared/exceptions';
-
-import type { ClosePositionRequest, CreateOrderRequest, CreateOrderResponse } from '../types';
-import type { ClosedPositionsResponse, ClosePositionResponse } from '../types';
-import type { Position, PositionListRequest, ActivePositionsResponse } from '../types';
-import type { ActivePosition, ClosedPosition, ActiveParsedPosition, ClosedParsedPosition } from '../types';
-
 import { Endpoint, OrderType } from '../constants';
-import type { RestApi } from '../rest-api';
+
+import type { ClosePositionRequest, CreateOrderRequest, CreateOrderResponse } from './types';
+import type { ClosedPositionsResponse, ClosePositionResponse } from './types';
+import type { Position, PositionListRequest, ActivePositionsResponse } from './types';
+import type { ActivePosition, ClosedPosition, ActiveParsedPosition, ClosedParsedPosition } from './types';
+import type { RestApi } from './rest-api';
 
 
 export class PositionApi {

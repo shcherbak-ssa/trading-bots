@@ -1,10 +1,10 @@
+import { StatusCode } from 'global/constants';
 import { ProcessError } from 'shared/exceptions';
 
-import type { AccountBalance, AccountRequest, AccountRequestSettings, AccountResponse, ParsedBalance } from '../types';
-
 import { Endpoint } from '../constants';
-import type { RestApi } from '../rest-api';
-import { StatusCode } from 'global/constants';
+
+import type { AccountBalance, AccountRequest, AccountRequestSettings, AccountResponse, ParsedBalance } from './types';
+import type { RestApi } from './rest-api';
 
 
 export class AccountApi {

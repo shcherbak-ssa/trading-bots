@@ -3,11 +3,11 @@ import fetch from 'node-fetch';
 import { QUERY_URL_SEPARATOR, RequestMethod, StatusCode } from 'global/constants';
 import { ProcessError } from 'shared/exceptions';
 import { generateHmacSignature, stringifyPayload } from 'shared/utils';
+import { BrokerRestApi } from 'api/brokers/lib/broker-rest-api';
 
-import { BrokerRestApi } from '../broker-rest-api';
+import type { Endpoint } from '../constants';
 
 import type { ResponseError } from './types';
-import type { Endpoint } from './constants';
 import { getApiUrl } from './utils';
 
 

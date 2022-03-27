@@ -1,5 +1,5 @@
 import 'shared/utils/dotenv';
-import { RestApi } from 'api/brokers/currency_com/rest-api';
+// import { RestApi } from 'api/brokers/currency_com/lib/rest-api';
 import { runServer } from './app/server';
 
 
