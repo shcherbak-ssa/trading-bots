@@ -4,7 +4,7 @@ import {
   ExchangeMarketStatus,
   ExchangeMarketType,
   OrderType
-} from '../constants';
+} from '../../constants';
 
 
 export type ExchangeInfo = {

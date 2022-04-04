@@ -1,11 +1,11 @@
 import type { BotBrokerMarket, BotSettings } from 'modules/bot/types';
 
-import type { Market, MarketPrice } from '../types';
-import type { RestApi } from '../rest-api';
-import { MarketApi } from '../api/market';
+import type { Market, MarketPrice } from './lib/types';
+import type { RestApi } from './lib/rest-api';
+import { MarketApi } from './lib/market';
 
 
-export class BrokerMarket implements BotBrokerMarket {
+export class BotMarket implements BotBrokerMarket {
   symbol: string;
   minPositionSize: number;
   tickSize: number;
@@ -22,11 +22,11 @@ export class BrokerMarket implements BotBrokerMarket {
   ) {}
 
 
-  static async setup({ id: botId, brokerMarketSymbol }: BotSettings, restApi: RestApi): Promise<BrokerMarket> {
+  static async setup({ id: botId, brokerMarketSymbol }: BotSettings, restApi: RestApi): Promise<BotMarket> {
     const api: MarketApi = await MarketApi.setup(botId, restApi);
     const market: Market = await api.loadMarketData(brokerMarketSymbol);
 
-    const brokerMarket: BrokerMarket = new BrokerMarket(market, api);
+    const brokerMarket: BotMarket = new BotMarket(market, api);
     brokerMarket.symbol = market.marketSymbol;
     brokerMarket.minPositionSize = market.minPositionSize;
     brokerMarket.tickSize = market.tickSize;

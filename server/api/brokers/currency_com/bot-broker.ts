@@ -1,16 +1,16 @@
-import type { BotBroker, BotBrokerAccount, BotBrokerMarket, BotPosition, BotSettings } from 'modules/bot/types';
 import { BrokerList } from 'global/constants';
+import type { BotBroker as Broker, BotBrokerAccount, BotBrokerMarket, BotPosition, BotSettings } from 'modules/bot/types';
 
-import type { ActiveParsedPosition, ClosedParsedPosition } from '../types';
-import { OrderSide } from '../constants';
-import { PositionApi } from '../api/position';
-import { RestApi } from '../rest-api';
+import type { ActiveParsedPosition, ClosedParsedPosition } from './lib/types';
+import { PositionApi } from './lib/position';
+import { RestApi } from './lib/rest-api';
 
-import { BrokerMarket } from './market';
-import { BrokerAccount } from './account';
+import { OrderSide } from './constants';
+import { BotMarket } from './bot-market';
+import { BotAccount } from './bot-account';
 
 
-export class Broker implements BotBroker {
+export class BotBroker implements Broker {
   name: string = BrokerList.CURRENCY_COM;
   market: BotBrokerMarket;
   account: BotBrokerAccount;
@@ -22,17 +22,17 @@ export class Broker implements BotBroker {
   ) {}
 
 
-  static async setup(botSettings: BotSettings): Promise<Broker> {
+  static async setup(botSettings: BotSettings): Promise<BotBroker> {
     const [ apiKey, secretKey ] = botSettings.brokerApiKeys;
 
     const restApi: RestApi = new RestApi(apiKey, secretKey);
     restApi.setAccountType(botSettings.brokerAccountType);
 
     const positionApi: PositionApi = new PositionApi(restApi);
-    const broker: Broker = new Broker(botSettings, positionApi);
+    const broker: BotBroker = new BotBroker(botSettings, positionApi);
 
-    broker.account = await BrokerAccount.setup(botSettings, restApi);
-    broker.market = await BrokerMarket.setup(botSettings, restApi);
+    broker.account = await BotAccount.setup(botSettings, restApi);
+    broker.market = await BotMarket.setup(botSettings, restApi);
 
     return broker;
   }

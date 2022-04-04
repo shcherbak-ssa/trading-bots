@@ -1,7 +1,7 @@
 {
-  "name": "finance-management",
+  "name": "trading-bots",
   "version": "1.0.0",
-  "description": "Financial Management Tools",
+  "description": "Trading Bots",
   "main": "index.js",
   "scripts": {
     "start": "node build/server/index.js",
@@ -10,20 +10,14 @@
     "dev:client": "nodemon --config ./client/nodemon.json",
     "dev:server": "nodemon --config ./server/nodemon.json"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/shcherbak-ssa/finance-management.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/shcherbak-ssa/finance-management/issues"
-  },
-  "homepage": "https://github.com/shcherbak-ssa/finance-management#readme",
+  "author": "shcherbak-ssa",
   "devDependencies": {
+    "@types/body-parser": "^1.19.2",
     "@types/dotenv-safe": "^8.1.2",
+    "@types/express": "^4.17.13",
     "@types/node": "^17.0.21",
     "@types/node-fetch": "^2.5.10",
+    "@types/ws": "^8.5.3",
     "clean-webpack-plugin": "^4.0.0",
     "nodemon": "^2.0.15",
     "ts-loader": "^9.2.7",
@@ -36,8 +30,9 @@
     "webpack-node-externals": "^3.0.0"
   },
   "dependencies": {
-    "@types/ws": "^8.5.3",
+    "body-parser": "^1.19.2",
     "dotenv-safe": "^8.2.0",
+    "express": "^4.17.3",
     "node-fetch": "^2.6.1",
     "ws": "^8.5.0"
   }

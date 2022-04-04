@@ -1,14 +1,15 @@
-import { BrokerError } from 'shared/exceptions';
+import { StatusCode } from 'global/constants';
+import { ProcessError } from 'shared/exceptions';
 import { getFractionDigits, roundNumber } from 'shared/utils';
 
-import type { ExchangeInfo, ExchangeSymbolInfo, ExchangeSymbolLotSizeFilter } from '../types';
-import type { Market, MarketLeverageRequest, MarketLeverageResponse } from '../types';
-import type { MarketPrice, MarketPriceRequest, MarketPriceResponse } from '../types';
-import type { MarketPriceSubscribePayload, MarketPriceSubscribeResponsePayload, WsSubscribeResponse } from '../types';
-
-import type { RestApi } from '../rest-api';
 import { Endpoint, EndpointSubscription, MarketFilter, Subscription } from '../constants';
-import { WsApi } from '../ws-api';
+
+import type { ExchangeInfo, ExchangeSymbolInfo, ExchangeSymbolLotSizeFilter } from './types';
+import type { Market, MarketLeverageRequest, MarketLeverageResponse } from './types';
+import type { MarketPrice, MarketPriceRequest, MarketPriceResponse } from './types';
+import type { MarketPriceSubscribePayload, MarketPriceSubscribeResponsePayload, WsSubscribeResponse } from './types';
+import type { RestApi } from './rest-api';
+import { WsApi } from './ws-api';
 
 
 export class MarketApi {
@@ -35,7 +36,7 @@ export class MarketApi {
       return await this.parseExchangeSymbol(foundSymbol);
     }
 
-    throw new BrokerError(`Cannot found broker symbol '${marketSymbol}'.`);
+    throw new ProcessError(`Cannot found broker symbol '${marketSymbol}'`, StatusCode.BAD_REQUEST);
   }
 
   async loadMarketLeverage(marketSymbol: string): Promise<MarketLeverageResponse> {

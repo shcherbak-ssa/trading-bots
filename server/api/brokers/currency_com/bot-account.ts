@@ -1,13 +1,14 @@
 import type { BotBrokerAccount, BotSettings } from 'modules/bot/types';
-import { AliveBotErrorPlace, botController } from 'modules/bot';
+import { AliveBotErrorPlace, BotEvents } from 'modules/bot';
 
-import type { ParsedBalance } from '../types';
-import type { RestApi } from '../rest-api';
-import { ACCOUNT_UPDATE_INTERVAL } from '../constants';
-import { AccountApi } from '../api/account';
+import type { ParsedBalance } from './lib/types';
+import type { RestApi } from './lib/rest-api';
+import { AccountApi } from './lib/account';
+
+import { ACCOUNT_UPDATE_INTERVAL } from './constants';
 
 
-export class BrokerAccount implements BotBrokerAccount {
+export class BotAccount implements BotBrokerAccount {
   availableAmount: number;
   totalAmount: number;
 
@@ -17,9 +18,9 @@ export class BrokerAccount implements BotBrokerAccount {
   ) {}
 
 
-  static async setup(botSettings: BotSettings, restApi: RestApi): Promise<BrokerAccount> {
+  static async setup(botSettings: BotSettings, restApi: RestApi): Promise<BotAccount> {
     const api: AccountApi = new AccountApi(restApi);
-    const brokerAccount: BrokerAccount = new BrokerAccount(botSettings, api);
+    const brokerAccount: BotAccount = new BotAccount(botSettings, api);
 
     await brokerAccount.updateCurrentAccount();
     setInterval(brokerAccount.updateCurrentAccount.bind(brokerAccount), ACCOUNT_UPDATE_INTERVAL);
@@ -37,7 +38,7 @@ export class BrokerAccount implements BotBrokerAccount {
       this.availableAmount = availableAmount;
       this.totalAmount = totalAmount;
     } catch (err: any) {
-      botController.processAliveBotError(this.botSettings.id, AliveBotErrorPlace.ACCOUNT_AMOUNT_UPDATE, err.message);
+      BotEvents.processAliveError(this.botSettings.id, AliveBotErrorPlace.ACCOUNT_AMOUNT_UPDATE, err.message);
     }
   }
 }

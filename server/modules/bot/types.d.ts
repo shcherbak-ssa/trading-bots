@@ -2,8 +2,6 @@ import { BrokerAccountType } from 'global/constants';
 
 
 // Bot
-export type BotEventPayload = BotSettings | BotSignal | string;
-
 export type BotSettings = {
   id: string;
   brokerName: string;

@@ -1,10 +1,10 @@
-import { BrokerError } from 'shared/exceptions';
-
-import type { AccountRequest, AccountRequestSettings, AccountResponse } from '../types';
-import type { AccountBalance, ParsedBalance } from '../types';
+import { StatusCode } from 'global/constants';
+import { ProcessError } from 'shared/exceptions';
 
 import { Endpoint } from '../constants';
-import type { RestApi } from '../rest-api';
+
+import type { AccountBalance, AccountRequest, AccountRequestSettings, AccountResponse, ParsedBalance } from './types';
+import type { RestApi } from './rest-api';
 
 
 export class AccountApi {
@@ -29,7 +29,7 @@ export class AccountApi {
       return AccountApi.parseBalance(foundBalance);
     }
 
-    throw new BrokerError(`Cannot found account with id '${accountId}'.`);
+    throw new ProcessError(`Cannot found account with id '${accountId}'`, StatusCode.BAD_REQUEST);
   }
 
 

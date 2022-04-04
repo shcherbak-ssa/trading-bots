@@ -1,4 +1,4 @@
-import type { RestApi } from '../rest-api';
+import type { RestApi } from './rest-api';
 
 
 export class MarketApi {
