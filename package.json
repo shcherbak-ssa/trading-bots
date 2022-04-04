@@ -1,7 +1,7 @@
 {
-  "name": "finance-management",
+  "name": "trading-bots",
   "version": "1.0.0",
-  "description": "Financial Management Tools",
+  "description": "Trading Bots",
   "main": "index.js",
   "scripts": {
     "start": "node build/server/index.js",
@@ -10,16 +10,7 @@
     "dev:client": "nodemon --config ./client/nodemon.json",
     "dev:server": "nodemon --config ./server/nodemon.json"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/shcherbak-ssa/finance-management.git"
-  },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/shcherbak-ssa/finance-management/issues"
-  },
-  "homepage": "https://github.com/shcherbak-ssa/finance-management#readme",
+  "author": "shcherbak-ssa",
   "devDependencies": {
     "@types/body-parser": "^1.19.2",
     "@types/dotenv-safe": "^8.1.2",

@@ -1,2 +1,1 @@
-# finance-management
-Financial Management Tools
+# Trading Bots
