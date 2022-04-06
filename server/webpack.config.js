@@ -1,7 +1,7 @@
 const path = require('path');
+
 const nodeExternals = require('webpack-node-externals');
-const CleanWebpackPlugin = require('clean-webpack-plugin').CleanWebpackPlugin;
-const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
+const { TsconfigPathsPlugin } = require('tsconfig-paths-webpack-plugin');
 
 
 module.exports = {
@@ -12,6 +12,7 @@ module.exports = {
   output: {
     filename: 'index.js',
     path: path.resolve(__dirname, '..', 'build', 'server'),
+    clean: true,
   },
   module: {
     rules: [
@@ -32,7 +33,6 @@ module.exports = {
   resolve: {
     extensions: ['.ts'],
     plugins: [
-      new CleanWebpackPlugin(),
       new TsconfigPathsPlugin({
         configFile: path.join(__dirname, 'tsconfig.json'),
       }),

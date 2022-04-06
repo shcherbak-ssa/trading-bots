@@ -2,7 +2,9 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "global/*": ["../global/*"]
+      "global/*": ["../global/*"],
+      "shared/*": ["shared/*"],
+      "api/*": ["api/*"]
     },
     "target": "ES2020",
     "module": "commonjs",
@@ -17,7 +19,8 @@
     "removeComments": true,
     "moduleResolution": "node",
     "strictPropertyInitialization": false,
-    "importsNotUsedAsValues": "error"
+    "importsNotUsedAsValues": "error",
+    "incremental": true
   },
   "exclude": ["node_modules", "tests"],
   "include": ["**/*.ts"]

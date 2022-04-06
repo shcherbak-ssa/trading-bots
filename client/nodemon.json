@@ -1,6 +1,0 @@
-{
-  "watch": ["client", "global"],
-  "ext": "ts,json",
-  "ignore": ["client/**/*.spec.ts"],
-  "exec": "ts-node --project ./client/tsconfig.json --require tsconfig-paths/register ./client/index.ts"
-}
