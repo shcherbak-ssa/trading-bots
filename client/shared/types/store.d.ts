@@ -1,1 +1,3 @@
-export interface StoreState {}
+export interface StoreState {
+  isAppMenuOpen: boolean;
+}

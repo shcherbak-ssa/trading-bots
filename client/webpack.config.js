@@ -99,6 +99,11 @@ module.exports = (env = {}) => {
     },
     resolve: {
       extensions: ['.ts', '.js', '.vue'],
+      plugins: [
+        new TsconfigPathsPlugin({
+          configFile: path.join(__dirname, 'tsconfig.json'),
+        }),
+      ],
     },
     plugins: [],
   };
@@ -110,9 +115,6 @@ module.exports = (env = {}) => {
     new MiniCssExtractPlugin({
       filename: path.join('styles', '[name].css'),
       chunkFilename: path.join('styles', '[id].css'),
-    }),
-    new TsconfigPathsPlugin({
-      configFile: path.join(__dirname, 'tsconfig.json'),
     }),
   );
 

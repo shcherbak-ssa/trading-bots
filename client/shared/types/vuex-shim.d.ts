@@ -5,9 +5,7 @@ import { StoreState } from './store';
 
 
 declare module '@vue/runtime-core' {
-  interface State extends StoreState {}
-
   interface ComponentCustomProperties {
-    $store: Store<State>
+    $store: Store<StoreState>
   }
 }

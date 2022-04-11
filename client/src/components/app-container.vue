@@ -1,9 +1,20 @@
 <template>
-  <div></div>
+  <div class="app-container flex full">
+    <app-menu />
+
+    <router-view />
+  </div>
 </template>
 
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import AppMenu from './app-menu.vue';
+
+</script>
 
 
-<style scoped></style>
+<style scoped>
+.app-container {
+  background: var(--colors-background-app);
+}
+</style>
