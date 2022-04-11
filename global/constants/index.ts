@@ -35,10 +35,6 @@ export enum BrokerList {
   CURRENCY_COM = 'Currency.com',
 }
 
-export enum RouterPathname {
-  API = '/api',
-}
-
-export enum RoutePathname {
-  API_BOTS = '/bots/(:id)?'
+export enum ServerEndpoint {
+  API_BOTS = '/api/bots/(:id)?'
 }

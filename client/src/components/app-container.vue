@@ -6,12 +6,10 @@
   </div>
 </template>
 
-
 <script setup lang="ts">
 import AppMenu from './app-menu.vue';
 
 </script>
-
 
 <style scoped>
 .app-container {

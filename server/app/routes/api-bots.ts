@@ -1,11 +1,11 @@
 import type { App, Bots } from 'shared/types';
-import { RequestMethod, RoutePathname, StatusCode } from 'global/constants';
+import { RequestMethod, ServerEndpoint, StatusCode } from 'global/constants';
 
 import { botsController } from '../controllers/bots';
 
 
 export const apiBotsRoutes = {
-  pathname: RoutePathname.API_BOTS,
+  pathname: ServerEndpoint.API_BOTS,
   routes: [
     {
       method: RequestMethod.GET,

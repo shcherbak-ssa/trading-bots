@@ -1,4 +1,5 @@
-export const ENTRY_POINT_PATHNAME: string = '/';
+export const ROOT_PATHNAME: string = '/';
+export const ENTRY_POINT_PATHNAME: string = '*';
 
 
 export const ONE_HUNDRED: number = 100;

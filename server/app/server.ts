@@ -3,8 +3,8 @@ import express from 'express';
 import bodyParser from 'body-parser';
 
 import type { App } from 'shared/types';
-import { RequestMethod, RouterPathname, StatusCode } from 'global/constants';
-import { ENTRY_POINT_PATHNAME } from 'shared/constants';
+import { RequestMethod, StatusCode } from 'global/constants';
+import { ENTRY_POINT_PATHNAME, ROOT_PATHNAME } from 'shared/constants';
 
 import { apiRoutes } from './routes';
 
@@ -66,6 +66,8 @@ export async function runServer(): Promise<express.Application> {
   setupApiRouter(app);
   setupEntryPoint(app);
 
+  app.use(responseMiddleware);
+
   return app;
 }
 
@@ -77,17 +79,21 @@ function setupStaticServe(app: express.Application): void {
 
 function setupApiRouter(app: express.Application): void {
   for (const routes of apiRoutes) {
-    app.use(RouterPathname.API, Router.createRouter(routes), responseMiddleware);
+    app.use(ROOT_PATHNAME, Router.createRouter(routes));
   }
 }
 
 function setupEntryPoint(app: express.Application): void {
-  app.use(ENTRY_POINT_PATHNAME, entryPointMiddleware, responseMiddleware);
+  app.use(ENTRY_POINT_PATHNAME, entryPointMiddleware);
 }
 
 
 // Middlewares
 function entryPointMiddleware(request: express.Request, response: express.Response, next: express.NextFunction): void {
+  if (response.result) {
+    return next();
+  }
+
   if (request.method === RequestMethod.GET) {
     response.result = {
       status: StatusCode.SUCCESS,
@@ -103,6 +109,7 @@ function entryPointMiddleware(request: express.Request, response: express.Respon
 }
 
 function responseMiddleware(request: express.Request, response: express.Response): void {
+  console.log(request.method, request.url);
   const { result } = response;
 
   if (result?.filename) {

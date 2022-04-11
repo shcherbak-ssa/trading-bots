@@ -1,6 +1,7 @@
 import type { Bots } from 'shared/types';
 
 
+// @TODO: convert methods to static
 class BotsController {
   async create(payload: Bots.CreatePayload): Promise<Bots.CreateResult> {
     throw new Error('not implemented');
