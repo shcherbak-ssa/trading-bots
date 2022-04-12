@@ -1,3 +1,3 @@
-import dotenv from 'dotenv-safe';
+const env = require('dotenv-flow').config();
 
-dotenv.config({ example: '.env.sample', path: '.env' });
+export default { env: env.parsed };

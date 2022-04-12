@@ -1,0 +1,84 @@
+td, th {
+  user-select: none;
+}
+
+.p-column-title, .p-datatable-tbody td {
+  font: 400 .79rem/1rem 'DM Sans';
+}
+
+.p-datatable-thead th {
+  padding-bottom: 15px;
+}
+
+.p-datatable-tbody td {
+  padding: 12px 0;
+}
+
+.base-table {
+  &.section {
+    .p-datatable-thead tr {
+      border-bottom: 1px solid var(--colors-text-005);
+    }
+
+    .p-datatable-tbody tr {
+      &:nth-child(even) {
+        background: var(--colors-background-app-05);
+      }
+    }
+
+    .p-datatable-tbody td {
+      border-radius: 5px;
+    }
+
+    td:first-child, th:first-child {
+      padding-left: 20px;
+    }
+
+    td:last-child, th:last-child {
+      padding-right: 20px;
+    }
+  }
+
+  &.page {
+    .p-datatable-tbody tr {
+      border-radius: var(--sizes-border-radius-default);
+    }
+
+    td:first-child, th:first-child {
+      padding-left: 25px;
+    }
+
+    td:last-child, th:last-child {
+      padding-right: 25px;
+    }
+  }
+}
+
+.base-table-actions-group {
+  gap: 12px;
+}
+
+.base-table-action {
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  width: 30px;
+  height: 30px;
+
+  &.edit {
+    background: var(--colors-primary-01);
+    color: var(--colors-primary);
+  }
+
+  &.delete {
+    background: var(--colors-secondary-01);
+    color: var(--colors-secondary);
+  }
+
+  .base-icon {
+    width: 16px;
+    height: 16px;
+  }
+}

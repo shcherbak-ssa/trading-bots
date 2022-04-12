@@ -1,17 +1,17 @@
-import { BrokerList } from 'global/constants';
+import { BrokerName } from 'global/constants';
 import type { BotBroker as Broker, BotBrokerAccount, BotBrokerMarket, BotPosition, BotSettings } from 'modules/bot/types';
 
 import type { ActiveParsedPosition, ClosedParsedPosition } from './lib/types';
+import { OrderSide } from './lib/constants';
 import { PositionApi } from './lib/position';
 import { RestApi } from './lib/rest-api';
 
-import { OrderSide } from './constants';
 import { BotMarket } from './bot-market';
 import { BotAccount } from './bot-account';
 
 
 export class BotBroker implements Broker {
-  name: string = BrokerList.CURRENCY_COM;
+  name: string = BrokerName.CURRENCY_COM;
   market: BotBrokerMarket;
   account: BotBrokerAccount;
 

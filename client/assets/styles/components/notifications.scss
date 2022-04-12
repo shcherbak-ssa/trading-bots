@@ -1,0 +1,36 @@
+.p-toast-message {
+  background: #fff;
+  border-left: 6px solid;
+  border-radius: 5px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  padding: 1rem;
+  margin-top: 10px;
+
+  &-error {
+    border-left-color: var(--colors-secondary);
+    color: var(--colors-secondary);
+  }
+
+  &-info {
+    border-left-color: var(--colors-primary);
+    color: var(--colors-primary);
+  }
+
+  &-success {
+    border-left-color: var(--colors-accent);
+    color: var(--colors-accent);
+  }
+}
+
+.p-toast-message-content {
+  position: relative;
+}
+
+.p-toast-summary {
+  font: 500 1.125rem/1.465rem 'DM Sans';
+  margin-bottom: 5px;
+}
+
+.p-toast-icon-close {
+  display: none !important;
+}

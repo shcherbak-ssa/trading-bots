@@ -1,10 +1,10 @@
-import { BrokerAccountType } from 'global/constants';
+import { BrokerAccountType, BrokerName } from 'global/constants';
 
 
 // Bot
 export type BotSettings = {
-  id: string;
-  brokerName: string;
+  botId: string;
+  brokerName: BrokerName;
   brokerApiKeys: string[];
   brokerMarketSymbol: string;
   brokerAccountId: string;

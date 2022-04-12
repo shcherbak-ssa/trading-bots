@@ -1,7 +1,7 @@
-import type { BotSignal } from 'modules/bot/types';
-import { ProcessError } from 'shared/exceptions';
 import { StatusCode } from 'global/constants';
+import { ProcessError } from 'shared/exceptions';
 
+import type { BotSignal } from './types';
 import type { Bot } from './bot';
 import { BotManager } from './bot-manager';
 

@@ -58,7 +58,7 @@ export class Bot {
 
     await this.broker.closePosition(this.currentPosition);
 
-    BotEvents.processPositionClosing(this.settings.id, this.currentPosition);
+    BotEvents.processPositionClosing(this.settings.botId, this.currentPosition);
 
     this.currentPosition = null;
   }
@@ -79,7 +79,7 @@ export class Bot {
         return await this.closeOpenPosition();
       }
     } catch (err: any) {
-      BotEvents.processAliveError(this.settings.id, AliveBotErrorPlace.POSITION_CLOSE, err.message);
+      BotEvents.processAliveError(this.settings.botId, AliveBotErrorPlace.POSITION_CLOSE, err.message);
     }
   }
 

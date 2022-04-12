@@ -1,6 +1,0 @@
-{
-  "watch": ["server", "global"],
-  "ext": "ts,json",
-  "ignore": ["server/**/*.spec.ts"],
-  "exec": "npx ts-node --project ./server/tsconfig.json --require tsconfig-paths/register ./server/index.ts"
-}

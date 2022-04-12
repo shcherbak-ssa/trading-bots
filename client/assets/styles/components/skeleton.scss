@@ -1,0 +1,17 @@
+.p-skeleton {
+  background-color: #dee2e6;
+  border-radius: 6px;
+
+  &::after {
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0));
+  }
+
+  &.text {
+    width: 50% !important;
+  }
+
+  &.button-flow {
+    width: 240px !important;
+    height: 46px !important;
+  }
+}

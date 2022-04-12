@@ -1,0 +1,30 @@
+@import "reset";
+@import "theme";
+
+
+html {
+  font-size: 16px;
+}
+
+body {
+  color: var(--colors-text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  font-weight: 400;
+  position: relative;
+  overflow: hidden;
+}
+
+
+@import "shorts";
+
+@import "components/actions";
+@import "components/button";
+@import "components/confirm-popup";
+@import "components/form";
+@import "components/icon";
+@import "components/notifications";
+@import "components/progress-spinner";
+@import "components/skeleton";
+@import "components/table";
+@import "components/tooltip";
