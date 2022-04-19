@@ -1,0 +1,212 @@
+// Input
+.base-input {
+  margin: 20px 0;
+
+  &.is-error {
+    .input-container {
+      background: var(--colors-secondary-01);
+    }
+
+    .input-help {
+      color: var(--colors-secondary);
+    }
+  }
+}
+
+.input-container {
+  background: var(--colors-background-input);
+  border-radius: var(--sizes-border-radius-default);
+  color: var(--colors-text);
+  display: flex;
+  align-items: center;
+  //font-size: .79rem;
+  font: inherit; // @TODO: maybe refactor
+  line-height: 1rem;
+  padding: 0 20px;
+  width: 100%;
+  height: 50px;
+}
+
+.input-icon {
+  border-radius: 100%;
+  width: 24px;
+  height: 24px;
+  margin-right: 5px;
+}
+
+.input-label {
+  font: 500 1rem/1.301875rem 'DM Sans';
+  margin-bottom: 8px;
+}
+
+.input-placeholder {
+  opacity: .5;
+}
+
+.input-help {
+  font: 400 .79rem/1rem 'DM Sans';
+  margin-top: 5px;
+}
+
+
+// Input Date
+.p-calendar {
+  &.input-container {
+    padding: 0 0 0 20px;
+  }
+
+  .p-inputtext {
+    background: transparent;
+    //font-size: .79rem;
+    font: inherit;
+    line-height: 1rem;
+    width: 100%;
+    height: 100%;
+  }
+
+  .p-button {
+    background: transparent;
+    color: var(--colors-primary);
+    font-size: 1.2rem;
+    padding: 0;
+    width: 3rem;
+  }
+}
+
+.p-datepicker-mask {
+  background: #030229;
+  opacity: 0.2;
+}
+
+.p-datepicker {
+  background: #fff;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  border-radius: var(--sizes-border-radius-default);
+  padding: 0.5rem;
+
+  td, th {
+    padding: 0.5rem;
+  }
+
+  td.p-datepicker-today > span {
+    background: #ced4da;
+    color: #495057;
+    border-color: transparent;
+  }
+
+  td > span {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 50%;
+    transition: box-shadow 0.2s;
+    border: 1px solid transparent;
+
+    &.p-disabled {
+      opacity: .6;
+    }
+
+    &.p-highlight {
+      background: var(--colors-primary-01);
+      color: var(--colors-primary);
+    }
+  }
+
+  .p-datepicker-header {
+    padding: 0.5rem;
+    color: #495057;
+    background: #ffffff;
+    font-weight: 600;
+    margin: 0;
+    border-bottom: 1px solid #dee2e6;
+    border-top-right-radius: 6px;
+    border-top-left-radius: 6px;
+
+    .p-datepicker-title button {
+      color: #495057;
+      font: 600 1rem 'DM Sans';
+      transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+      padding: 0.5rem;
+    }
+
+    .p-datepicker-prev,
+    .p-datepicker-next {
+      width: 2rem;
+      height: 2rem;
+      color: #6c757d;
+      border: 0 none;
+      background: transparent;
+      border-radius: 50%;
+      transition: background-color 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+
+    .p-datepicker-prev:enabled:hover,
+    .p-datepicker-next:enabled:hover {
+      color: #343a40;
+      border-color: transparent;
+      background: #e9ecef;
+    }
+  }
+
+
+  .p-yearpicker, .p-monthpicker {
+    margin: 0.5rem 0;
+  }
+
+  .p-monthpicker .p-monthpicker-month,
+  .p-yearpicker .p-yearpicker-year {
+    padding: 0.5rem;
+    transition: box-shadow 0.2s;
+    border-radius: 6px;
+  }
+
+  &:not(.p-disabled) table td span:not(.p-highlight):not(.p-disabled):hover,
+  &:not(.p-disabled) .p-yearpicker .p-yearpicker-year:not(.p-disabled):not(.p-highlight):hover,
+  &:not(.p-disabled) .p-monthpicker .p-monthpicker-month:not(.p-disabled):not(.p-highlight):hover {
+    background: #e9ecef;
+  }
+}
+
+
+// Dropdown
+.p-dropdown.input-container {
+  padding: 0 0 0 20px;
+}
+
+.p-dropdown .p-dropdown-trigger {
+  background: transparent;
+  color: #6c757d;
+  width: 3rem;
+  border-top-right-radius: 6px;
+  border-bottom-right-radius: 6px;
+}
+
+.p-dropdown-items-wrapper {
+  background: var(--colors-background-section);
+  border-radius: var(--sizes-border-radius-default);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+
+.p-dropdown-items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.dropdown-value,
+.dropdown-option {
+  color: var(--colors-text);
+  display: flex;
+  align-items: center;
+}
+
+.dropdown-option {
+  border-radius: var(--sizes-border-radius-default);
+  height: 50px;
+  transition: .2s;
+  padding: 0 10px;
+
+  &:hover {
+    background: var(--colors-primary-01);
+  }
+}

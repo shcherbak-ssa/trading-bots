@@ -1,4 +1,4 @@
-import { AccountStatus, AccountType } from '../../constants';
+import { AccountStatus, AccountType } from '../constants';
 
 
 // Custom Models

@@ -1,6 +1,6 @@
-import { PositionCloseRejectReason, PositionCloseState, PositionCloseType } from '../../constants';
-import { PositionSource, PositionState, PositionStatus } from '../../constants';
-import { OrderSide, OrderStatus, OrderTimeInForce, OrderType } from '../../constants';
+import { PositionCloseRejectReason, PositionCloseState, PositionCloseType } from '../constants';
+import { PositionSource, PositionState, PositionStatus } from '../constants';
+import { OrderSide, OrderStatus, OrderTimeInForce, OrderType } from '../constants';
 
 
 // Custom Models

@@ -18,7 +18,9 @@ export enum StatusCode {
   FORBIDDEN = 403,
   NOT_FOUND = 404,
   METHOD_NOT_ALLOWED = 405,
+  UNPROCESSABLE_ENTITY = 422,
   INTERNAL_SERVER_ERROR = 500,
+  NOT_IMPLEMENTED = 501,
 }
 
 export enum BrokerAccountType {
@@ -31,14 +33,13 @@ export enum SignalType {
   SHORT = 'SHORT',
 }
 
-export enum BrokerList {
-  CURRENCY_COM = 'Currency.com',
+export enum BrokerName {
+  CURRENCY_COM = 'currency_com',
+  CAPITAL_COM = 'capital_com',
 }
 
-export enum RouterPathname {
-  API = '/api',
-}
-
-export enum RoutePathname {
-  API_BOTS = '/bots/(:id)?'
+export enum ServerEndpoint {
+  API_BOTS = '/api/bots/:id',
+  API_BROKERS = '/api/brokers',
+  API_BROKERS_WITH_ID = '/api/brokers/:id',
 }

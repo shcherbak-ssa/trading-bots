@@ -1,0 +1,22 @@
+:root {
+  --colors-primary: #3A36DB;
+  --colors-primary-01: rgba(58, 54, 219, 0.1);
+  --colors-primary-005: rgba(58, 54, 219, 0.05);
+  --colors-secondary: #FF69B4;
+  --colors-secondary-01: rgba(255, 105, 180, 0.1);
+  --colors-secondary-005: rgba(255, 105, 180, 0.05);
+  --colors-accent: #03A89E;
+  --colors-accent-01: rgba(3, 168, 158, 0.1);
+  --colors-neutral: #FFF;
+  --colors-background-app: #F1F4FA;
+  --colors-background-app-05: rgba(241, 244, 250, 0.5);
+  --colors-background-section: #FFF;
+  --colors-background-input: #F1F4FA;
+  --colors-text: #06152B;
+  --colors-text-005: rgba(6, 21, 43, 0.05);
+  --colors-text-light: #99B2C6;
+
+  --sizes-space-default: 30px;
+  --sizes-space-y: 35px;
+  --sizes-border-radius-default: 10px;
+}

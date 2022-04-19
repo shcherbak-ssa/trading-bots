@@ -3,8 +3,7 @@ import { ProcessError } from 'shared/exceptions';
 
 import type { AccountItem, AccountResponse, EmptyRequest, ParsedAccount } from './types';
 import type { RestApi } from './rest-api';
-
-import { Endpoint } from '../constants';
+import { Endpoint } from './constants';
 
 
 export class AccountApi {

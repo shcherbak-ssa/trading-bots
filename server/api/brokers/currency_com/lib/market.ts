@@ -2,13 +2,12 @@ import { StatusCode } from 'global/constants';
 import { ProcessError } from 'shared/exceptions';
 import { getFractionDigits, roundNumber } from 'shared/utils';
 
-import { Endpoint, EndpointSubscription, MarketFilter, Subscription } from '../constants';
-
 import type { ExchangeInfo, ExchangeSymbolInfo, ExchangeSymbolLotSizeFilter } from './types';
 import type { Market, MarketLeverageRequest, MarketLeverageResponse } from './types';
 import type { MarketPrice, MarketPriceRequest, MarketPriceResponse } from './types';
 import type { MarketPriceSubscribePayload, MarketPriceSubscribeResponsePayload, WsSubscribeResponse } from './types';
 import type { RestApi } from './rest-api';
+import { Endpoint, EndpointSubscription, MarketFilter, Subscription } from './constants';
 import { WsApi } from './ws-api';
 
 

@@ -22,7 +22,7 @@ export class BotMarket implements BotBrokerMarket {
   ) {}
 
 
-  static async setup({ id: botId, brokerMarketSymbol }: BotSettings, restApi: RestApi): Promise<BotMarket> {
+  static async setup({ botId, brokerMarketSymbol }: BotSettings, restApi: RestApi): Promise<BotMarket> {
     const api: MarketApi = await MarketApi.setup(botId, restApi);
     const market: Market = await api.loadMarketData(brokerMarketSymbol);
 
