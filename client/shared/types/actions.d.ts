@@ -8,4 +8,5 @@ export type ActionsObject = { [p in ActionType]: ActionFunction; }
 export type Action<Payload> = {
   type: ActionType;
   payload: Payload;
+  callback?: () => void;
 }

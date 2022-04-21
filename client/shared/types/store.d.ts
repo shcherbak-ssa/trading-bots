@@ -1,15 +1,32 @@
-import type { BrokerClientInfo, ErrorItem } from 'global/types';
-import { ActionSectionComponent } from 'shared/constants';
+import type { BotClientInfo, Broker, BrokerAccount, BrokerMarket, BrokerMarketLeverages } from 'global/types';
+
+import { SectionComponent } from 'shared/constants';
 
 
 export interface StoreState {
-  isAppMenuOpen: boolean;
-  isActionSectionActive: boolean;
-  actionSectionComponent: ActionSectionComponent;
-  notification: null | StoreNotification;
-  errors: { [p: string]: ErrorItem[]; };
+  app: {
+    isMenuOpen: boolean;
+    notification: null | StoreNotification;
+  };
+  actionSection: {
+    isActive: boolean;
+    component: SectionComponent;
+    selectedBroker: Broker | null;
+    selectedBot: BotClientInfo | null;
+  };
+  itemSection: {
+    isActive: boolean;
+    component: SectionComponent;
+    selectedBotId: string | null;
+  };
   user: {
-    brokers: BrokerClientInfo[];
+    brokers: Broker[];
+    bots: BotClientInfo[];
+  };
+  broker: {
+    accounts: BrokerAccount[];
+    markets: BrokerMarket[];
+    marketLeverage: Omit<BrokerMarketLeverages, 'dataType'>;
   };
 }
 
@@ -19,8 +36,4 @@ export type StoreNotification = {
   detail: string;
   life: number;
   group: 'notification';
-}
-
-export interface StoreService {
-  setError(key: string, errors: ErrorItem[]): void;
 }

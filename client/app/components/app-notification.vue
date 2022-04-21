@@ -3,11 +3,11 @@
     <template #message="{ message }">
       <div class="flex relative w-full">
         <div class="notification-icon">
-          <base-icon v-if="message.severity === 'error'" :icon="errorIcon" class="base-icon" />
+          <base-icon v-if="message.severity === 'error'" type="mi" :icon="errorIcon" />
 
-          <base-icon v-if="message.severity === 'info'" :icon="infoIcon" class="base-icon" />
+          <base-icon v-if="message.severity === 'info'" type="mi" :icon="infoIcon" />
 
-          <base-icon v-if="message.severity === 'success'" :icon="successIcon" class="base-icon" />
+          <base-icon v-if="message.severity === 'success'" type="mi" :icon="successIcon" />
         </div>
 
         <div>
@@ -16,7 +16,7 @@
         </div>
 
         <div class="notification-close-icon absolute cursor-pointer" @click="closeNotification">
-          <base-icon :icon="addIcon" class="base-icon" />
+          <base-icon type="pi" icon="times" />
         </div>
       </div>
     </template>
@@ -38,25 +38,24 @@ import PrimeVueToast from 'primevue/toast';
 const { state: storeState, commit }: Store = useStore();
 const notifications = useToast();
 
-const addIcon = IconList.ADD;
 const errorIcon = IconList.NOTIFICATION_ERROR;
 const infoIcon = IconList.NOTIFICATION_INFO;
 const successIcon = IconList.NOTIFICATION_SUCCESS;
 
-watch(() => storeState.notification, () => {
-  if (storeState.notification) {
-    notifications.add(storeState.notification);
+watch(() => storeState.app.notification, () => {
+  if (storeState.app.notification) {
+    notifications.add(storeState.app.notification);
   }
 });
 
 
 // Methods
 function closeNotification(): void {
-  if (storeState.notification) {
-    notifications.removeGroup(storeState.notification.group);
+  if (storeState.app.notification) {
+    notifications.removeGroup(storeState.app.notification.group);
 
     commit({
-      type: StoreMutation.HIDE_NOTIFICATION,
+      type: StoreMutation.APP_HIDE_NOTIFICATION,
     });
   }
 }
@@ -66,7 +65,7 @@ function closeNotification(): void {
 .notification-icon {
   margin-right: 14px;
 
-  .base-icon {
+  .base-mi-icon {
     width: 28px;
     height: 28px;
   }
@@ -75,9 +74,5 @@ function closeNotification(): void {
 .notification-close-icon {
   top: -3px;
   right: -3px;
-
-  .base-icon {
-    transform: rotate(45deg);
-  }
 }
 </style>

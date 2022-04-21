@@ -1,26 +1,48 @@
-import { BrokerName } from 'global/constants';
+import type { BrokerAccount, BrokerMarket, UpdateBrokerPayload } from 'global/types';
+import { BrokerAccountType, BrokerName } from 'global/constants';
 
-import { CreationDocument } from 'shared/types/database';
+import { CreationDocument } from './database';
 
 
 // Api Database
 export type BrokersDatabaseDocument = {
   id: string;
   name: BrokerName;
-  expiresDate: Date;
+  expiresAt: Date;
   apiKeys: {
     [p: string]: string;
   };
 }
 
 export interface BrokersDatabaseCollection {
+  getBroker(id: string): Promise<BrokersDatabaseDocument>;
   getBrokers(): Promise<BrokersDatabaseDocument[]>;
-  saveBroker(broker: CreationDocument<BrokersDatabaseDocument>): Promise<BrokersDatabaseDocument>;
+  createBroker(broker: CreationDocument<BrokersDatabaseDocument>): Promise<BrokersDatabaseDocument>;
+  updateBroker(id: string, updates: UpdateBrokerPayload['updates']): Promise<void>;
   deleteBroker(id: string): Promise<void>;
 }
 
 
 // Api Brokers
+export type BrokersApiPayload = {
+  accountType: BrokerAccountType;
+  apiKeys: { [p: string]: string };
+  brokerName: BrokerName;
+  accountCurrency?: string,
+  marketSymbol?: string;
+}
+
+export type BrokerApiLeverageResponse = {
+  current: number;
+  available: number[];
+}
+
 export interface BrokersApiKeys {
-  check(brokerName: BrokerName, apiKeys: { [p: string]: string }): Promise<void>;
+  check(payload: BrokersApiPayload): Promise<void>;
+}
+
+export interface BrokersDataApi {
+  getAccounts(payload: BrokersApiPayload): Promise<BrokerAccount[]>;
+  getMarkets(payload: BrokersApiPayload): Promise<BrokerMarket[]>;
+  getMarketLeverages(payload: BrokersApiPayload): Promise<BrokerApiLeverageResponse>;
 }

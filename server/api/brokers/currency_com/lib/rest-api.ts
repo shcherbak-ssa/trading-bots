@@ -1,8 +1,10 @@
 import fetch from 'node-fetch';
 
-import { QUERY_URL_SEPARATOR, RequestMethod, StatusCode } from 'global/constants';
-import { AppError } from 'shared/exceptions';
+import { BrokerName, QUERY_URL_SEPARATOR, RequestMethod } from 'global/constants';
+
+import { BrokerApiError } from 'shared/exceptions';
 import { generateHmacSignature, stringifyPayload } from 'shared/utils';
+
 import { BrokerRestApi } from 'api/brokers/lib/broker-rest-api';
 
 import type { ResponseError } from './types';
@@ -53,10 +55,7 @@ export class RestApi extends BrokerRestApi {
     const { msg, code } = await response.json() as ResponseError;
     console.error(`error: [API] Currency.com - ${response.status} ${msg} [${code}]`);
 
-    throw new AppError(
-      code === -1025 ? StatusCode.BAD_REQUEST : StatusCode.INTERNAL_SERVER_ERROR,
-      { message: msg },
-    );
+    throw new BrokerApiError(msg, BrokerName.CURRENCY_COM);
   }
 
   private preparingUrl<Payload>(endpoint: Endpoint, payload: Payload): string {

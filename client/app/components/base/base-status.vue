@@ -1,11 +1,11 @@
 <template>
   <div
+      v-tooltip.bottom="props.tooltip || ''"
       class="base-status select-none"
       :class="{
         [props.status]: true,
         'with-label flex-center': !!props.label,
       }"
-      v-tooltip.bottom="props.tooltip"
   >
     <div v-if="props.label">
       {{ props.label }}
@@ -17,7 +17,7 @@
 // Types
 type ComponentProps = {
   label?: string | number;
-  tooltip: string;
+  tooltip?: string;
   status: 'success' | 'info' | 'warning' | 'danger';
 }
 
@@ -32,14 +32,14 @@ const props = defineProps<ComponentProps>();
   height: 14px;
   width: 14px;
 
-
   &.with-label {
     border-radius: var(--sizes-border-radius-default);
+    display: inline-flex;
     font-size: .875rem;
     line-height: 1.125rem;
-    width: auto;
     height: 28px;
-    padding: 0 7px;
+    padding: 0 20px;
+    width: auto;
   }
 
   &.success {
@@ -66,6 +66,15 @@ const props = defineProps<ComponentProps>();
 
     &.with-label {
       background: var(--colors-secondary-01);
+    }
+  }
+
+  &.neutral {
+    background: var(--colors-text-light);
+    color: var(--colors-text-light);
+
+    &.with-label {
+      background: var(--colors-text-light-02);
     }
   }
 }

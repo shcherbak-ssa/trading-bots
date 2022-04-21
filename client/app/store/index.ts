@@ -1,21 +1,32 @@
 import type { InjectionKey } from 'vue';
-import { createStore, useStore as baseUseStore, Store as BaseStore } from 'vuex';
+import { createStore, useStore as baseUseStore, Store as BaseStore, CommitOptions } from 'vuex';
 
 import type { StoreState } from 'shared/types';
 import { initialStoreState } from 'shared/constants';
 
-import { mutations } from './mutations';
+import { getters, Getters } from './getters';
+import { mutations, Mutations } from './mutations';
 
 
-export type Store = BaseStore<StoreState>;
+export type Store = Omit<BaseStore<StoreState>, 'getters' | 'commit'> & {
+  getters: {
+    [K in keyof Getters]: ReturnType<Getters[K]>;
+  };
+
+  commit<K extends keyof Mutations, P extends Parameters<Mutations[K]>[1] & { type: K }>(
+    payloadWithType: P,
+    options?: CommitOptions
+  ): void;
+};
 
 export const storeKey: InjectionKey<Store> = Symbol();
 
-export const store = createStore<StoreState>({
+export const store = createStore({
   state() {
     return initialStoreState;
   },
 
+  getters,
   mutations,
 });
 

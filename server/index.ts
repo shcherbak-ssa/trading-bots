@@ -1,3 +1,5 @@
+console.log('\n#################### Setup server [BEGIN] ####################');
+
 import env from 'shared/utils/dotenv';
 
 import type { UsersDatabaseCollection, UsersDatabaseDocument } from 'shared/types';
@@ -16,13 +18,13 @@ setupServer().catch(console.error);
 
 
 async function setupServer() {
-  console.log('\n#################### Setup server [BEGIN] ####################');
+  console.log('\n mode:', process.env.NODE_ENV);
+  console.log(env.env);
 
-  console.log('\nmode:', process.env.NODE_ENV);
-  console.log('environment:', env.env);
+  console.log('\n - setup environment');
 
   setupDatabase();
-  console.log('\n - setup database');
+  console.log(' - setup database');
 
   if (process.env.NODE_ENV === 'development') {
     await setupDevUser();

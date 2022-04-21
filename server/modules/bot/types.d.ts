@@ -13,8 +13,6 @@ export type BotSettings = {
   riskPercent: number;
   useTakeProfit: boolean;
   takeProfitPL: number;
-  closeAtDayEnd: boolean;
-  closeAtWeekEnd: boolean;
 }
 
 export type BotSignal = {

@@ -8,7 +8,7 @@ import 'primeicons/fonts/primeicons.woff';
 import '../assets';
 
 import { createApp } from 'vue';
-import { Icon, addIcon } from '@iconify/vue';
+import { addIcon } from '@iconify/vue';
 
 import PrimeVue from 'primevue/config';
 import PrimeVueTooltip from 'primevue/tooltip';
@@ -17,11 +17,11 @@ import PrimeVueToastService from 'primevue/toastservice';
 import PrimeVueConfirmationService from 'primevue/confirmationservice';
 
 import PrimeVueSpeedDial from 'primevue/speeddial';
-import PrimeVueDropdown from 'primevue/dropdown';
 import PrimeVueProgressSpinner from 'primevue/progressspinner';
 import PrimeVueDataTable from 'primevue/datatable';
 import PrimeVueColumn from 'primevue/column';
 import PrimeVueSkeleton from 'primevue/skeleton';
+import PrimeVueScrollPanel from 'primevue/scrollpanel';
 
 import roundDashboard from '@iconify-icons/ic/round-dashboard';
 import roundSmartToy from '@iconify-icons/ic/round-smart-toy';
@@ -30,18 +30,20 @@ import roundInsertChart from '@iconify-icons/ic/round-insert-chart';
 import baselineSettings from '@iconify-icons/ic/baseline-settings';
 import roundMenu from '@iconify-icons/ic/round-menu';
 import roundMenuOpen from '@iconify-icons/ic/round-menu-open';
-import roundAdd from '@iconify-icons/ic/round-add';
 import roundReportGmailerrorred from '@iconify-icons/ic/round-report-gmailerrorred';
 import outlineInfo from '@iconify-icons/ic/outline-info';
 import roundCheckCircleOutline from '@iconify-icons/ic/round-check-circle-outline';
-import roundEdit from '@iconify-icons/ic/round-edit';
-import roundDelete from '@iconify-icons/ic/round-delete';
 
 import { IconList } from 'shared/constants';
 
+import BaseIcon from 'components/base/base-icon.vue';
 import BaseButton from 'components/base/base-button.vue';
+import BaseCheckbox from 'components/base/base-checkbox.vue';
 import BaseInput from 'components/base/base-input.vue';
-import AppContainer from 'components/app-container.vue';
+import BaseDropdown from 'components/base/base-dropdown.vue';
+import BaseStatus from 'components/base/base-status.vue';
+import BaseMessage from 'components/base/base-message.vue';
+import AppLayout from 'components/app-layout.vue';
 
 import { router } from './router';
 import { store, storeKey } from './store';
@@ -51,7 +53,7 @@ drawApp();
 
 
 function drawApp() {
-  const app = createApp(AppContainer);
+  const app = createApp(AppLayout);
 
   app.use(router);
   app.use(store, storeKey);
@@ -63,15 +65,19 @@ function drawApp() {
   app.directive('tooltip', PrimeVueTooltip);
 
   app.component('base-actions', PrimeVueSpeedDial);
-  app.component('base-dropdown', PrimeVueDropdown);
   app.component('base-progress-spinner', PrimeVueProgressSpinner);
   app.component('base-table', PrimeVueDataTable);
   app.component('base-table-column', PrimeVueColumn);
   app.component('base-skeleton', PrimeVueSkeleton);
+  app.component('base-scroll-panel', PrimeVueScrollPanel);
 
-  app.component('base-icon', Icon);
+  app.component('base-icon', BaseIcon);
   app.component('base-button', BaseButton);
+  app.component('base-checkbox', BaseCheckbox);
   app.component('base-input', BaseInput);
+  app.component('base-dropdown', BaseDropdown);
+  app.component('base-status', BaseStatus);
+  app.component('base-message', BaseMessage);
 
   setupIcons();
 
@@ -87,10 +93,6 @@ function setupIcons() {
 
   addIcon(IconList.MENU_CLOSE, roundMenu);
   addIcon(IconList.MENU_OPEN, roundMenuOpen);
-
-  addIcon(IconList.ADD, roundAdd);
-  addIcon(IconList.EDIT, roundEdit);
-  addIcon(IconList.DELETE, roundDelete);
 
   addIcon(IconList.NOTIFICATION_ERROR, roundReportGmailerrorred);
   addIcon(IconList.NOTIFICATION_INFO, outlineInfo);

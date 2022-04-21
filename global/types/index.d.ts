@@ -2,13 +2,15 @@ export * from './bots';
 export * from './brokers';
 
 
+export type EmptyResponse = {}
+
 export type ErrorPayload = {
+  heading?: string;
   errors: ErrorItem[];
 }
 
 export type ErrorItem = {
   message: string;
-  path?: string;
 }
 
 export type OnlyIdPayload = {

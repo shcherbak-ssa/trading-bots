@@ -1,4 +1,5 @@
-import { StatusCode } from 'global/constants';
+import { BrokerAccountType, StatusCode } from 'global/constants';
+
 import { AppError } from 'shared/exceptions';
 
 import type { AccountResponse } from './lib/types';
@@ -9,6 +10,8 @@ import { AccountApi } from './lib/account';
 export class ApiKeys {
   static async check({ apiKey, secretKey }: { [p: string]: string }): Promise<void> {
     const api: RestApi = new RestApi(apiKey, secretKey);
+    api.setAccountType(BrokerAccountType.REAL);
+
     const accountApi: AccountApi = new AccountApi(api);
 
     const { canTrade }: AccountResponse = await accountApi.loadAccountsInfo(true);

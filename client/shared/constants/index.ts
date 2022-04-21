@@ -1,28 +1,42 @@
-import type { InputState, StoreState } from 'shared/types'
+import { BrokerAccountType, BrokerName } from 'global/constants';
+
+import type { InputState, StoreState, BotActionState } from 'shared/types'
 
 
 export const NOTIFICATION_LIFE_TIME: number = 5000;
 
 
 export enum ActionType {
-  BROKERS_GET = 'brokers/get',
+  BOTS_LOAD = 'bots/load',
+  BOTS_CREATE = 'bots/create',
+  BOTS_UPDATE = 'bots/update',
+  BOTS_DELETE = 'bots/delete',
+
+  BROKERS_LOAD = 'brokers/load',
+  BROKERS_GET_DATA = 'brokers/get-data',
   BROKERS_CONNECT = 'brokers/connect',
+  BROKERS_UPDATE = 'brokers/update',
   BROKERS_DELETE = 'brokers/delete',
 }
 
 export enum StoreMutation {
-  TOGGLE_MENU = 'toggle-menu',
+  APP_TOGGLE_MENU = 'app/toggle-menu',
+  APP_SHOW_NOTIFICATION = 'app/show-notification',
+  APP_HIDE_NOTIFICATION = 'app/hide-notification',
 
-  ADD_ERROR = 'add-error',
-  REMOVE_ERROR = 'remove-error',
+  ACTION_SECTION_OPEN = 'action-section/open',
+  ACTION_SECTION_CLOSE = 'action-section/close',
 
-  OPEN_ACTION_SECTION = 'open-action-section',
-  CLOSE_ACTION_SECTION = 'close-action-section',
+  ITEM_SECTION_OPEN = 'item-section/open',
+  ITEM_SECTION_CLOSE = 'item-section/close',
 
-  SHOW_NOTIFICATION = 'show-notification',
-  HIDE_NOTIFICATION = 'hide-notification',
+  USER_UPDATE_BROKERS = 'user/update-brokers',
+  USER_UPDATE_BOTS = 'user/update-bots',
 
-  UPDATE_USER = 'update-user',
+  BROKER_RESET = 'broker/reset',
+  BROKER_UPDATE_ACCOUNTS = 'broker/update-accounts',
+  BROKER_UPDATE_MARKETS = 'broker/update-markets',
+  BROKER_UPDATE_MARKET_LEVERAGE = 'broker/update-market-leverage',
 }
 
 export enum IconList {
@@ -35,10 +49,6 @@ export enum IconList {
   MENU_OPEN = 'menu-open',
   MENU_CLOSE = 'menu-close',
 
-  ADD = 'add',
-  EDIT = 'edit',
-  DELETE = 'delete',
-
   NOTIFICATION_ERROR = 'notification-error',
   NOTIFICATION_INFO = 'notification-info',
   NOTIFICATION_SUCCESS = 'notification-success',
@@ -47,14 +57,13 @@ export enum IconList {
 export enum Route {
   DASHBOARD = '/',
   BOTS = '/bots',
-  ANALYTICS = '/analytics',
   SETTINGS = '/settings',
 }
 
-export enum ActionSectionComponent {
+export enum SectionComponent {
   DEFAULT = 'default',
-  CONNECT_BROKER = 'connect-broker',
-  CREATE_BOT = 'create-bot',
+  BROKER = 'broker',
+  BOT = 'bot',
 }
 
 
@@ -64,13 +73,55 @@ export const initialInputState: InputState = {
   isError: false,
 };
 
+export const initialBotActionState: BotActionState = {
+  active: false,
+  name: '',
+  brokerId: '',
+  brokerName: BrokerName.CURRENCY_COM,
+  brokerAccountId: '',
+  brokerAccountType: BrokerAccountType.REAL,
+  brokerAccountCurrency: '',
+  brokerMarketSymbol: '',
+  brokerMarketName: '',
+  tradeRiskPercent: 2,
+  tradeMaxLossPercent: 25,
+  tradeCapitalPercent: 100,
+  tradeWithTakeProfit: false,
+  tradeTakeProfitPL: 2,
+  tradeWithCustomMarketLeverage: false,
+  tradeMarketLeverage: 0,
+  tradeCloseAtEndDay: false,
+  tradeCloseAtEndWeek: false,
+}
+
+export const initialStoreBrokerMarketLeverageState = {
+  current: 0,
+  available: [],
+};
+
 export const initialStoreState: StoreState = {
-  isAppMenuOpen: true,
-  isActionSectionActive: false,
-  actionSectionComponent: ActionSectionComponent.DEFAULT,
-  notification: null,
-  errors: {},
+  app: {
+    isMenuOpen: false, // @TODO: change to 'true'
+    notification: null,
+  },
+  actionSection: {
+    isActive: false,
+    component: SectionComponent.DEFAULT,
+    selectedBot: null,
+    selectedBroker: null,
+  },
+  itemSection: {
+    isActive: false,
+    component: SectionComponent.DEFAULT,
+    selectedBotId: null,
+  },
   user: {
     brokers: [],
+    bots: [],
+  },
+  broker: {
+    accounts: [],
+    markets: [],
+    marketLeverage: { ...initialStoreBrokerMarketLeverageState },
   },
 };

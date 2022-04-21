@@ -1,7 +1,7 @@
 <template>
   <div class="section-container">
-    <div v-if="props.title" class="section-title">
-      {{ props.title }}
+    <div v-if="props.heading" class="section-heading">
+      {{ props.heading }}
     </div>
 
     <slot />
@@ -11,7 +11,7 @@
 <script setup lang="ts">
 // Types
 type ComponentProps = {
-  title?: string;
+  heading?: string;
 }
 
 
@@ -26,7 +26,7 @@ const props = defineProps<ComponentProps>();
   padding: 25px;
 }
 
-.section-title {
+.section-heading {
   font: 500 1.1875rem/1.5rem 'DM Sans';
   margin-bottom: 25px;
   opacity: 0.7;

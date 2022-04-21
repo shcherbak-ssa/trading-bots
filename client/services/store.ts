@@ -1,54 +1,90 @@
-import type { BrokerClientInfo, ErrorItem } from 'global/types';
+import type { Broker, BotClientInfo, BrokerAccount, BrokerMarket, BrokerMarketLeverages } from 'global/types';
 
-import type { StoreService, BrokersStore } from 'shared/types';
+import type { BotsStore, BotUpdatePayload, BrokersStore } from 'shared/types';
 import { StoreMutation } from 'shared/constants';
 
 import { store } from 'app/store';
 
 
-class Store implements
-  StoreService,
-  BrokersStore
-{
-  // StoreService
-  setError(key: string, errors: ErrorItem[]): void {
+export class Store implements BotsStore, BrokersStore {
+
+  // BotsStore
+  setBots(bots: BotClientInfo[]): void {
     store.commit({
-      type: StoreMutation.ADD_ERROR,
-      key,
-      errors,
+      type: StoreMutation.USER_UPDATE_BOTS,
+      bots,
     });
   }
+
+  addBot(bot: BotClientInfo): void {
+    const userBots = [ ...store.state.user.bots ];
+    userBots.push(bot);
+
+    this.setBots(userBots);
+  }
+
+  updateBot(botId: string, updates: BotUpdatePayload['updates']): void {
+    const updatedBots = store.state.user.bots.map((bot) => {
+      return bot.id === botId ? { ...bot, ...updates } : bot;
+    });
+
+    this.setBots(updatedBots);
+  }
+
+  deleteBot(deletingId: string): void {
+    const updatedBots = store.state.user.bots.filter(({ id }) => id !== deletingId);
+
+    this.setBots(updatedBots);
+  }
+
 
   // BrokersStore
-  loadBrokers(brokers: BrokerClientInfo[]) {
+  setBrokers(brokers: Broker[]) {
     store.commit({
-      type: StoreMutation.UPDATE_USER,
-      key: 'brokers',
-      value: brokers,
+      type: StoreMutation.USER_UPDATE_BROKERS,
+      brokers,
     });
   }
 
-  addBroker(broker: BrokerClientInfo): void {
+  addBroker(broker: Broker): void {
     const userBrokers = [ ...store.state.user.brokers ];
     userBrokers.push(broker);
 
+    this.setBrokers(userBrokers);
+  }
+
+  updateBroker(brokerId: string, expiresAt: Date): void {
+    const updatedBrokers = store.state.user.brokers.map((broker) => {
+      return broker.id === brokerId ? { ...broker, expiresAt } : broker;
+    });
+
+    this.setBrokers(updatedBrokers);
+  }
+
+  updateBrokerAccounts(accounts: BrokerAccount[]): void {
     store.commit({
-      type: StoreMutation.UPDATE_USER,
-      key: 'brokers',
-      value: userBrokers,
+      type: StoreMutation.BROKER_UPDATE_ACCOUNTS,
+      accounts,
+    });
+  }
+
+  updateBrokerMarkets(markets: BrokerMarket[]): void {
+    store.commit({
+      type: StoreMutation.BROKER_UPDATE_MARKETS,
+      markets,
+    });
+  }
+
+  updateBrokerMarketLeverage(marketLeverage: Omit<BrokerMarketLeverages, 'dataType'>): void {
+    store.commit({
+      type: StoreMutation.BROKER_UPDATE_MARKET_LEVERAGE,
+      ...marketLeverage,
     });
   }
 
   deleteBroker(deletingId: string) {
     const updatedBrokers = store.state.user.brokers.filter(({ id }) => id !== deletingId);
 
-    store.commit({
-      type: StoreMutation.UPDATE_USER,
-      key: 'brokers',
-      value: updatedBrokers,
-    });
+    this.setBrokers(updatedBrokers);
   }
 }
-
-
-export const storeService: Store = new Store();

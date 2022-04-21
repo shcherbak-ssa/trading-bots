@@ -1,10 +1,12 @@
 import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
+import queryString from 'query-string';
 
-import { RequestMethod, StatusCode } from 'global/constants';
+import { QUERY_URL_SEPARATOR, RequestMethod, StatusCode } from 'global/constants';
 
-import type { ServerRequestPayload, ServerResponsePayload, ServerResponseResult, ServerRouteHandler } from 'shared/types';
+import type { ServerRequestPayload, ServerResponsePayload } from 'shared/types';
+import type { ServerResponseResult, ServerRouteHandler } from 'shared/types';
 import { ENTRY_POINT_PATHNAME, API_PATHNAME, Validation } from 'shared/constants';
 import { validate } from 'shared/validation';
 
@@ -30,7 +32,10 @@ const entryPointFilename: string = path.join(staticDirname, 'index.html'); // @T
 
 export async function runServer(): Promise<void> {
   const app: express.Application = express();
+  app.disable('query parser');
+
   app.use(bodyParser.json());
+  app.use(queryParserMiddleware);
 
   setupApiRouter(app);
 
@@ -75,6 +80,15 @@ function setupEntryPoint(app: express.Application): void {
 
 
 // Middlewares
+function queryParserMiddleware(request: express.Request, response: express.Response, next: express.NextFunction): void {
+  const query: string = request.originalUrl.split(QUERY_URL_SEPARATOR)[1];
+
+  // @ts-ignore
+  request.query = queryString.parse(query, { parseBooleans: true, parseNumbers: true });
+
+  next();
+}
+
 function authMiddleware() {
   if (process.env.NODE_ENV === 'development') {
     return (request: express.Request, response: express.Response, next: express.NextFunction) => {
@@ -90,10 +104,10 @@ function authMiddleware() {
 }
 
 function loggerMiddleware(request: express.Request, response: express.Response, next: express.NextFunction): void {
-  const { userId, method, url, params, query, body } = request;
+  const { userId, method, baseUrl, url, params, query, body } = request;
   const data = { ...params, ...query, ...body };
 
-  console.info(`\ninfo: [request] ${method} ${url} - ${JSON.stringify(data)}`);
+  console.info(`\ninfo: [request] ${method} ${baseUrl + url} - ${JSON.stringify(data)}`);
 
   next();
 }
@@ -104,7 +118,8 @@ function routeMiddleware(validation: Validation, handler: ServerRouteHandler) {
       const { userId, params, query, body } = request;
       const requestPayload: ServerRequestPayload = { ...params, ...query, ...body };
 
-      validate(validation, requestPayload); // @TODO: validation error processing
+      validate(validation, requestPayload);
+
       const responsePayload: ServerResponsePayload = await handler(userId || '', requestPayload);
 
       response.result = {
@@ -112,10 +127,11 @@ function routeMiddleware(validation: Validation, handler: ServerRouteHandler) {
         payload: responsePayload || {},
       };
     } catch (err: any) {
+      console.log(err);
       response.result = {
         status: err.status || StatusCode.INTERNAL_SERVER_ERROR,
         payload: {
-          ...( err.payload || { message: err.message } ),
+          ...( err.payload || { errors: [{ message: err.message }] } ),
         },
       };
     } finally {
@@ -152,9 +168,16 @@ function responseMiddleware(request: express.Request, response: express.Response
   }
 
   if (result?.payload) {
-    console.info(`info: [response] ${result.status} ${JSON.stringify(result.payload)}`);
-
     response.status(result.status).json(result.payload);
+
+    let payloadString: string = JSON.stringify(result.payload);
+
+    if (payloadString.length > 500) {
+      payloadString = payloadString.slice(0, 500) + '...';
+    }
+
+    console.info(`info: [response] ${result.status} ${payloadString}`);
+
     return;
   }
 

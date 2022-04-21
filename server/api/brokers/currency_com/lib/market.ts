@@ -12,10 +12,17 @@ import { WsApi } from './ws-api';
 
 
 export class MarketApi {
-  constructor(
-    private restApi: RestApi,
-    private wsApi: WsApi,
-  ) {}
+  private restApi: RestApi;
+  private wsApi: WsApi | undefined;
+
+
+  constructor(restApi: RestApi, wsApi?: WsApi) {
+    this.restApi = restApi;
+
+    if (wsApi) {
+      this.wsApi = wsApi;
+    }
+  }
 
 
   static async setup(botId: string, restApi: RestApi): Promise<MarketApi> {
@@ -26,6 +33,12 @@ export class MarketApi {
     });
   }
 
+
+  async loadMarkets(): Promise<ExchangeSymbolInfo[]> {
+    const { symbols }: ExchangeInfo = await this.loadExchangeInfo();
+
+    return symbols;
+  }
 
   async loadMarketData(marketSymbol: string): Promise<Market> {
     const { symbols }: ExchangeInfo = await this.loadExchangeInfo();
@@ -41,7 +54,7 @@ export class MarketApi {
   async loadMarketLeverage(marketSymbol: string): Promise<MarketLeverageResponse> {
     return this.restApi.get<MarketLeverageRequest, MarketLeverageResponse>(Endpoint.MARKET_LEVERAGE, {
       symbol: marketSymbol,
-      timestamp: Date.now(),
+      timestamp: Date.now() - 500, // @TODO: fix
     });
   }
 
@@ -56,6 +69,8 @@ export class MarketApi {
   }
 
   subscribeToMarketPriceUpdates(marketSymbol: string, callback: (marketPrice: MarketPrice) => void): void {
+    if (!this.wsApi) return; // @TODO: process error
+
     this.wsApi.subscribe<MarketPriceSubscribePayload, MarketPriceSubscribeResponsePayload>(
       EndpointSubscription.MARKET_PRICE,
       { symbols: [marketSymbol] },

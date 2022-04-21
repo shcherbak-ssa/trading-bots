@@ -5,9 +5,7 @@ export class BrokerRestApi {
   protected accountType: BrokerAccountType = BrokerAccountType.DEMO;
 
 
-  setAccountType(accountType: BrokerAccountType): BrokerRestApi {
+  setAccountType(accountType: BrokerAccountType): void {
     this.accountType = accountType;
-
-    return this;
   }
 }

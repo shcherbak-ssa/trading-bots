@@ -1,4 +1,11 @@
-import type { BrokerClientInfo, ErrorPayload, NewBroker } from 'global/types';
+import type {
+  Broker,
+  UpdateBrokerPayload,
+  GetBrokerDataPayload,
+  GetBrokerDataResult,
+  LoadBrokersPayload,
+  NewBroker
+} from 'global/types';
 import { ServerEndpoint } from 'global/constants';
 
 import type { BrokersApi } from 'shared/types';
@@ -7,24 +14,40 @@ import { Api } from './lib/api';
 
 
 export class Brokers implements BrokersApi {
-  async getBrokers(): Promise<BrokerClientInfo[] | ErrorPayload> {
+  async loadBrokers(payload: LoadBrokersPayload): Promise<Broker[]> {
     return await Api.get({
       endpoint: ServerEndpoint.API_BROKERS,
       params: {},
-      body: {},
+      body: payload,
     });
   }
 
-  async connectBroker(newBroker: NewBroker): Promise<BrokerClientInfo | ErrorPayload> {
+  async getBrokerData({ id, ...payload }: GetBrokerDataPayload): Promise<GetBrokerDataResult> {
+    return await Api.get({
+      endpoint: ServerEndpoint.API_BROKERS_WITH_ID,
+      params: { id },
+      body: payload,
+    });
+  }
+
+  async connectBroker(newBroker: NewBroker): Promise<Broker> {
     return await Api.post({
       endpoint: ServerEndpoint.API_BROKERS,
       params: {},
-      body: { ...newBroker },
+      body: newBroker,
     });
   }
 
-  async deleteBroker(id: string): Promise<{} | ErrorPayload> {
-    return await Api.delete({
+  async updateBroker({ id, name, updates }: UpdateBrokerPayload): Promise<void> {
+    await Api.put({
+      endpoint: ServerEndpoint.API_BROKERS_WITH_ID,
+      params: { id },
+      body: { name, updates },
+    });
+  }
+
+  async deleteBroker(id: string): Promise<void> {
+    await Api.delete({
       endpoint: ServerEndpoint.API_BROKERS_WITH_ID,
       params: { id },
       body: {},

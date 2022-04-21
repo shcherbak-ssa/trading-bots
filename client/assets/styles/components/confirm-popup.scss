@@ -19,6 +19,10 @@
   color: var(--colors-primary);
 }
 
-.p-confirm-popup-accept.delete {
+.p-confirm-popup-accept.danger {
   background: var(--colors-secondary);
+}
+
+.p-confirm-popup-accept.confirm {
+  background: var(--colors-primary);
 }

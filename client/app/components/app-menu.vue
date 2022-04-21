@@ -21,7 +21,7 @@
             }"
             @click="handleMenuItemClick(item)"
         >
-          <base-icon :icon="item.icon" class="base-icon menu-icon" />
+          <base-icon type="mi" class="menu-icon" :icon="item.icon" />
 
           <div v-if="isMenuOpen" class="menu-label">
             {{ item.label }}
@@ -31,8 +31,9 @@
 
       <div class="menu-toggle flex-center">
         <base-icon
+            type="mi"
+            class="menu-icon cursor-pointer"
             :icon="isMenuOpen ? openMenuIcon : closeMenuIcon"
-            class="base-icon menu-icon cursor-pointer"
             @click="toggleMenu"
         />
       </div>
@@ -46,8 +47,9 @@ import { useRouter } from 'vue-router';
 
 import type { AppMenuItem } from 'shared/types';
 import { IconList, StoreMutation } from 'shared/constants';
-import { appMenuItems } from 'shared/content';
+import { appMenuItems } from 'shared/config';
 
+import { useCloseActionSection, useCloseItemSection } from 'app/hooks';
 import { Store, useStore } from 'app/store';
 
 
@@ -55,7 +57,10 @@ import { Store, useStore } from 'app/store';
 const { state: storeState, commit }: Store = useStore();
 const router = useRouter();
 
-const isMenuOpen = computed<boolean>(() => storeState.isAppMenuOpen);
+const closeActionSection = useCloseActionSection();
+const closeItemSection = useCloseItemSection();
+
+const isMenuOpen = computed<boolean>(() => storeState.app.isMenuOpen);
 const openMenuIcon = IconList.MENU_OPEN;
 const closeMenuIcon = IconList.MENU_CLOSE;
 const menuItems = appMenuItems;
@@ -71,14 +76,13 @@ function handleMenuItemClick(item: AppMenuItem): void {
 
   router.push(item.to);
 
-  commit({
-    type: StoreMutation.CLOSE_ACTION_SECTION,
-  });
+  closeActionSection();
+  closeItemSection();
 }
 
 function toggleMenu(): void {
   commit({
-    type: StoreMutation.TOGGLE_MENU,
+    type: StoreMutation.APP_TOGGLE_MENU,
   });
 }
 </script>
@@ -86,7 +90,6 @@ function toggleMenu(): void {
 <style lang="scss" scoped>
 .app-menu {
   transition: .2s;
-
 
   &.is-open {
     padding: 0;
@@ -111,7 +114,6 @@ function toggleMenu(): void {
     }
   }
 }
-
 
 .menu {
   justify-content: space-between;

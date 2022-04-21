@@ -4,6 +4,7 @@
 
 html {
   font-size: 16px;
+  overflow: hidden;
 }
 
 body {
@@ -16,15 +17,21 @@ body {
 }
 
 
+.actions-group {
+  display: flex;
+  gap: 12px;
+}
+
+
 @import "shorts";
 
-@import "components/actions";
 @import "components/button";
 @import "components/confirm-popup";
 @import "components/form";
-@import "components/icon";
 @import "components/notifications";
+@import "components/overlay-panel";
 @import "components/progress-spinner";
+@import "components/scroll-panel";
 @import "components/skeleton";
 @import "components/table";
 @import "components/tooltip";

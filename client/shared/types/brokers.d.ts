@@ -1,24 +1,41 @@
-import type { BrokerClientInfo, NewBroker, ErrorPayload } from 'global/types';
+import type {
+  Broker,
+  NewBroker,
+  LoadBrokersPayload,
+  ErrorPayload,
+  UpdateBrokerPayload, BrokerAccount, BrokerMarket, BrokerMarketLeverages
+} from 'global/types';
+import { GetBrokerDataPayload, GetBrokerDataResult } from 'global/types';
 import { BrokerName } from 'global/constants';
 
 import { InputConfig } from './form';
 
 
-export type Broker = {
+export type BrokerConnectConfig = {
+  id: string;
   name: BrokerName;
-  label: string;
-  logo: string;
   inputs: InputConfig[];
 }
 
+export type BrokerDeletePayload = {
+  id: string;
+  name: BrokerName;
+}
+
 export interface BrokersStore {
-  loadBrokers(brokers: BrokerClientInfo[]): void;
-  addBroker(broker: BrokerClientInfo): void;
+  setBrokers(brokers: Broker[]): void;
+  addBroker(broker: Broker): void;
+  updateBroker(id: string, expiresAt: Date): void;
+  updateBrokerAccounts(accounts: BrokerAccount[]): void;
+  updateBrokerMarkets(markets: BrokerMarket[]): void;
+  updateBrokerMarketLeverage(marketLeverage: Omit<BrokerMarketLeverages, 'dataType'>): void;
   deleteBroker(id: string): void;
 }
 
 export interface BrokersApi {
-  getBrokers(): Promise<BrokerClientInfo[] | ErrorPayload>;
-  connectBroker(payload: NewBroker): Promise<BrokerClientInfo | ErrorPayload>;
-  deleteBroker(id: string): Promise<{} | ErrorPayload>;
+  loadBrokers(payload: LoadBrokersPayload): Promise<Broker[]>;
+  getBrokerData(payload: GetBrokerDataPayload): Promise<GetBrokerDataResult>;
+  connectBroker(payload: NewBroker): Promise<Broker>;
+  updateBroker(payload: UpdateBrokerPayload): Promise<void>;
+  deleteBroker(id: string): Promise<void>;
 }

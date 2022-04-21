@@ -1,11 +1,13 @@
 import type { Action, ActionFunction, ActionsObject } from 'shared/types';
 
+import { botsActions } from './bots';
 import { brokersActions } from './brokers';
 
 
 const actions: ActionsObject = {
+  ...botsActions,
   ...brokersActions,
-}
+};
 
 
 export async function runAction<Payload, Result>({ type, userId, payload }: Action<Payload>): Promise<Result> {
