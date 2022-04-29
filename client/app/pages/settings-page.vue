@@ -1,15 +1,15 @@
 <template>
-  <page-container title="Settings">
+  <page-container heading="Settings">
     <div class="settings-container">
-      <section-brokers-settings />
+      <brokers-settings />
     </div>
   </page-container>
 </template>
 
 <script setup lang="ts">
 // Components
-import PageContainer from 'components/page-container.vue';
-import SectionBrokersSettings from 'components/sections/section-brokers-settings.vue';
+import PageContainer from 'components/containers/page-container.vue';
+import BrokersSettings from 'components/sections/brokers-settings.vue';
 </script>
 
 <style lang="scss" scoped>

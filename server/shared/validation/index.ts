@@ -3,23 +3,21 @@ import Joi from 'joi';
 
 import type { ServerRequestPayload } from 'shared/types';
 import { Validation } from 'shared/constants';
+import { ValidationError } from 'shared/exceptions';
 
 import { brokersValidation } from './brokers';
+import { botsValidation } from './bots';
 
 
 const validations: { [p in Validation]: Schema } = {
-  [Validation.EMPTY]: Joi.object(),
+  [Validation.EMPTY]: Joi.object({}),
 
-  [Validation.ID]: Joi.object({
-    id: Joi.string(),
+  [Validation.ONLY_ID]: Joi.object({
+    id: Joi.string().required(),
   }),
 
   ...brokersValidation,
-
-  'bots/create': Joi.object(),
-  'bots/read': Joi.object(),
-  'bots/update': Joi.object(),
-  'bots/delete': Joi.object()
+  ...botsValidation,
 };
 
 
@@ -28,8 +26,13 @@ export function validate(validation: Validation, payload: ServerRequestPayload):
 
   const validationResult = schema.validate(payload);
 
-  // @TODO: error processing
   if (validationResult.error) {
     console.error(`error: [validation] - ${JSON.stringify(validationResult.error)}`);
+
+    throw new ValidationError(
+      ...validationResult.error.details.map(({ message }) => {
+        return { message };
+      })
+    );
   }
 }

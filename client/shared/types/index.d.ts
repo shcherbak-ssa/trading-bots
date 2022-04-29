@@ -3,6 +3,7 @@ import { IconList, Route } from 'shared/constants';
 
 
 export * from './actions';
+export * from './bots';
 export * from './brokers';
 export * from './form';
 export * from './store';

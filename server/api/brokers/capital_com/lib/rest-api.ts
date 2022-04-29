@@ -1,7 +1,9 @@
 import fetch from 'node-fetch';
 
-import { RequestMethod } from 'global/constants';
-import { ProcessError } from 'shared/exceptions';
+import { BrokerName, RequestMethod } from 'global/constants';
+
+import { BrokerApiError } from 'shared/exceptions';
+
 import { BrokerRestApi } from 'api/brokers/lib/broker-rest-api';
 
 import type { Endpoint } from './constants';
@@ -45,7 +47,7 @@ export class RestApi extends BrokerRestApi {
       return await response.json() as ResponsePayload;
     }
 
-    throw new ProcessError('TODO: add error interface');
+    throw new BrokerApiError('TODO', BrokerName.CAPITAL_COM);
   }
 
   private preparingUrl(endpoint: Endpoint): string {

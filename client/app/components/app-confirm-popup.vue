@@ -1,8 +1,8 @@
 <template>
-  <prime-vue-confirm-popup group="delete">
+  <prime-vue-confirm-popup group="danger">
     <template #message="{ message }">
       <div class="confirm-popup-icon flex-align-center">
-        <base-icon :icon="deleteIcon" class="base-icon flex-shrink-0" />
+        <base-icon type="mi" class="flex-shrink-0" :icon="deleteIcon" />
         <span>Attention</span>
       </div>
 
@@ -12,8 +12,9 @@
 
   <prime-vue-confirm-popup group="confirm">
     <template #message="{ message }">
-      <div class="confirm-popup-icon">
-        <base-icon :icon="confirmIcon" class="base-icon flex-shrink-0" />
+      <div class="confirm-popup-icon flex-align-center">
+        <base-icon type="mi" class="flex-shrink-0" :icon="confirmIcon" />
+        <span>Confirm action</span>
       </div>
 
       <div class="p-confirm-popup-message" v-html="message.message" />
@@ -39,7 +40,7 @@ const confirmIcon = IconList.NOTIFICATION_INFO;
   font-weight: 500;
   margin-bottom: 14px;
 
-  .base-icon {
+  .base-mi-icon {
     width: 28px;
     height: 28px;
     margin-right: 10px;

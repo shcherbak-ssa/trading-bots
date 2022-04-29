@@ -1,4 +1,5 @@
 import { BrokerAccountType } from 'global/constants';
+
 import { REAL_ACCOUNT_API_URL, DEMO_ACCOUNT_API_URL } from './constants';
 
 

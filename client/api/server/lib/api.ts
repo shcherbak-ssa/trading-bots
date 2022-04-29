@@ -1,24 +1,24 @@
-import type { ErrorPayload } from 'global/types';
+import type { ErrorPayload, EmptyResponse } from 'global/types';
 import { QUERY_URL_SEPARATOR, RequestMethod, ServerEndpoint, StatusCode } from 'global/constants';
 
 import type { ServerApiRequest } from 'shared/types';
-import { Notifications } from 'services/notifications';
+import { AppError } from 'shared/exceptions';
 
 
 export class Api {
-  static async get<Params, Body, Response>(request: ServerApiRequest<Params, Body>): Promise<Response | ErrorPayload> {
+  static async get<Params, Body, Response>(request: ServerApiRequest<Params, Body>): Promise<Response> {
     return await Api.send(RequestMethod.GET, request);
   }
 
-  static async post<Params, Body, Response>(request: ServerApiRequest<Params, Body>): Promise<Response | ErrorPayload> {
+  static async post<Params, Body, Response>(request: ServerApiRequest<Params, Body>): Promise<Response> {
     return await Api.send(RequestMethod.POST, request);
   }
 
-  static async put<Params, Body>(request: ServerApiRequest<Params, Body>): Promise<ErrorPayload | {}> {
+  static async put<Params, Body>(request: ServerApiRequest<Params, Body>): Promise<EmptyResponse> {
     return await Api.send(RequestMethod.PUT, request);
   }
 
-  static async delete<Params, Body>(request: ServerApiRequest<Params, Body>): Promise<ErrorPayload | {}> {
+  static async delete<Params, Body>(request: ServerApiRequest<Params, Body>): Promise<EmptyResponse> {
     return await Api.send(RequestMethod.DELETE, request);
   }
 
@@ -26,7 +26,7 @@ export class Api {
   private static async send<Params, Body, Response>(
     method: RequestMethod,
     { endpoint, params, body }: ServerApiRequest<Params, Body>,
-  ): Promise<Response | ErrorPayload> {
+  ): Promise<Response> {
     const isGetRequest: boolean = method === RequestMethod.GET;
     let apiEndpoint: string = location.origin + Api.replaceParams(endpoint, params);
 
@@ -47,25 +47,20 @@ export class Api {
     if (response.ok) {
       const { status } = response;
 
-      if (status === StatusCode.DELETED || status === StatusCode.UPDATED) {
+      if (status === StatusCode.NO_CONTENT) {
         return {} as Response;
       }
 
       return await response.json() as Response;
     }
 
-    if (response.status >= StatusCode.INTERNAL_SERVER_ERROR) {
-      const { errors } = await response.json() as ErrorPayload;
-      const { status, statusText } = response;
+    const { heading, errors } = await response.json() as ErrorPayload;
+    const { status, statusText } = response;
 
-      const message: string = errors.map(({ message }) => message).join('');
+    const errorHeading: string = heading || `${status} ${statusText}`;
+    const errorMessage: string = errors.map(({ message }) => message).join('');
 
-      Notifications.showErrorNotification(`${status} ${statusText}`, message);
-
-      return { errors: [] };
-    }
-
-    return await response.json() as ErrorPayload;
+    throw new AppError(errorHeading, errorMessage);
   }
 
   private static replaceParams<Params>(endpoint: ServerEndpoint, params: Params): string {

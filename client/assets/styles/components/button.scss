@@ -11,6 +11,12 @@
   height: 40px;
   padding: 0 30px;
 
+  &.secondary {
+    background: transparent;
+    border: 1px solid var(--colors-primary-01);
+    color: var(--colors-primary);
+  }
+
   &.circle {
     border-radius: 100%;
     width: 40px;
@@ -27,4 +33,12 @@
     width: 240px;
     height: 46px;
   }
+
+  .button-label {
+    margin-left: 10px;
+  }
+}
+
+.p-button:disabled {
+  opacity: 0.5;
 }

@@ -1,42 +1,58 @@
-import type { BotsCreatePayload, BotsDeletePayload, BotsReadPayload, BotsUpdatePayload } from 'global/types';
-import type { BotsCreateResult, BotsReadResult } from 'global/types';
+import type { BotClientInfo, LoadBotsPayload, NewBot, OnlyIdPayload, UpdateBotPayload } from 'global/types';
 import { RequestMethod, ServerEndpoint } from 'global/constants';
 
-import type { ServerRequestPayload, ServerRoute } from 'shared/types';
-import { Validation } from 'shared/constants';
+import type { ServerRoute } from 'shared/types';
+import { ActionType, Validation } from 'shared/constants';
+import { runAction } from 'shared/actions';
 
 
 export const botsRoutes: ServerRoute[] = [
   {
     endpoint: ServerEndpoint.API_BOTS,
     method: RequestMethod.GET,
-    validation: Validation.BOTS_READ,
-    async handler(userId: string, payload: ServerRequestPayload<BotsReadPayload>): Promise<BotsReadResult> {
-      throw new Error('Not implemented');
+    validation: Validation.BOTS_LOAD,
+    async handler(userId: string, payload: LoadBotsPayload): Promise<BotClientInfo[]> {
+      return await runAction({
+        type: ActionType.BOTS_LOAD,
+        userId,
+        payload,
+      });
     },
   },
   {
     endpoint: ServerEndpoint.API_BOTS,
     method: RequestMethod.POST,
     validation: Validation.BOTS_CREATE,
-    async handler(userId: string, payload: ServerRequestPayload<BotsCreatePayload>): Promise<BotsCreateResult> {
-      throw new Error('Not implemented');
+    async handler(userId: string, payload: NewBot): Promise<BotClientInfo> {
+      return await runAction({
+        type: ActionType.BOTS_CREATE,
+        userId,
+        payload,
+      });
     },
   },
   {
-    endpoint: ServerEndpoint.API_BOTS,
+    endpoint: ServerEndpoint.API_BOTS_WITH_ID,
     method: RequestMethod.PUT,
     validation: Validation.BOTS_UPDATE,
-    async handler(userId: string, payload: ServerRequestPayload<BotsUpdatePayload>): Promise<void> {
-      throw new Error('Not implemented');
+    async handler(userId: string, payload: UpdateBotPayload): Promise<void> {
+      return await runAction({
+        type: ActionType.BOTS_UPDATE,
+        userId,
+        payload,
+      });
     },
   },
   {
-    endpoint: ServerEndpoint.API_BOTS,
+    endpoint: ServerEndpoint.API_BOTS_WITH_ID,
     method: RequestMethod.DELETE,
-    validation: Validation.BOTS_DELETE,
-    async handler(userId: string, payload: ServerRequestPayload<BotsDeletePayload>): Promise<void> {
-      throw new Error('Not implemented');
+    validation: Validation.ONLY_ID,
+    async handler(userId: string, payload: OnlyIdPayload): Promise<void> {
+      return await runAction({
+        type: ActionType.BOTS_DELETE,
+        userId,
+        payload,
+      });
     },
   },
 ];

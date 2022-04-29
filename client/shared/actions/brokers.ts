@@ -1,63 +1,92 @@
-import type { NewBroker, ErrorPayload, BrokerClientInfo, OnlyIdPayload } from 'global/types';
+import type {
+  Broker,
+  GetBrokerDataPayload,
+  GetBrokerDataResult,
+  LoadBrokersPayload,
+  NewBroker,
+  UpdateBrokerPayload
+} from 'global/types';
+import { BrokerDataType } from 'global/constants';
 
-import type { BrokersApi, BrokersStore } from 'shared/types';
+import type { BrokerDeletePayload, BrokersApi, BrokersStore } from 'shared/types';
 import { ActionType } from 'shared/constants';
+import { brokerConfigs } from 'shared/config';
 
 import { Notifications } from 'services/notifications';
-import { storeService } from 'services/store';
+import { Store } from 'services/store';
 
 import { Brokers } from 'api/server/brokers';
 
 
 export const brokersActions = {
-  async [ActionType.BROKERS_GET](): Promise<void> {
+  async [ActionType.BROKERS_LOAD](payload: LoadBrokersPayload): Promise<void> {
     const api: BrokersApi = new Brokers();
-    const brokers: BrokerClientInfo[] | ErrorPayload = await api.getBrokers();
+    const brokers: Broker[] = await api.loadBrokers(payload);
 
-    if ('errors' in brokers) return;
+    const brokersStore: BrokersStore = new Store();
+    brokersStore.setBrokers(brokers);
+  },
 
-    const brokersStore: BrokersStore = storeService;
-    brokersStore.loadBrokers(brokers);
+  async [ActionType.BROKERS_GET_DATA](payload: GetBrokerDataPayload): Promise<void> {
+    const api: BrokersApi = new Brokers();
+    const result: GetBrokerDataResult = await api.getBrokerData(payload);
+
+    const brokersStore: BrokersStore = new Store();
+
+    switch (result.dataType) {
+      case BrokerDataType.ACCOUNT:
+        const { real, demo } = result;
+
+        brokersStore.updateBrokerAccounts([ ...real, ...demo ]);
+        break;
+      case BrokerDataType.MARKET:
+        brokersStore.updateBrokerMarkets(result.markets);
+        break;
+      case BrokerDataType.MARKET_LEVERAGE:
+        const { dataType, ...marketLeverage } = result;
+
+        brokersStore.updateBrokerMarketLeverage(marketLeverage);
+        break;
+    }
   },
 
   async [ActionType.BROKERS_CONNECT](newBroker: NewBroker): Promise<void> {
     const api: BrokersApi = new Brokers();
-    const connectedBroker: BrokerClientInfo | ErrorPayload = await api.connectBroker(newBroker);
+    // @TODO: hide api keys values
+    const connectedBroker: Broker = await api.connectBroker(newBroker);
 
-    if ('errors' in connectedBroker) {
-      storeService.setError(ActionType.BROKERS_CONNECT, connectedBroker.errors);
-
-      return;
-    }
-
-    const brokersStore: BrokersStore = storeService;
+    const brokersStore: BrokersStore = new Store();
     brokersStore.addBroker(connectedBroker);
 
     Notifications.showSuccessNotification(
-      'Broker Connected',
-      `Broker [${connectedBroker.name}] connected successfully`,
+      'Broker connected',
+      `Broker "${brokerConfigs[connectedBroker.name].label}" connected successfully`,
     );
   },
 
-  async [ActionType.BROKERS_DELETE]({ id }: OnlyIdPayload): Promise<void> {
+  async [ActionType.BROKERS_UPDATE](payload: UpdateBrokerPayload): Promise<void> {
     const api: BrokersApi = new Brokers();
-    const deletionResult: {} | ErrorPayload = await api.deleteBroker(id);
+    await api.updateBroker(payload);
 
-    if ('errors' in deletionResult) {
-      Notifications.showErrorNotification(
-        'Deleting Error',
-        `Something went wrong while deleting the broker. Please, try again`,
-      );
+    const brokersStore: BrokersStore = new Store();
+    brokersStore.updateBroker(payload.id, payload.updates.expiresAt);
 
-      return;
-    }
+    Notifications.showSuccessNotification(
+      'Broker updated',
+      `Broker "${brokerConfigs[payload.name].label}" updated successfully`,
+    );
+  },
 
-    const brokersStore: BrokersStore = storeService;
+  async [ActionType.BROKERS_DELETE]({ id, name }: BrokerDeletePayload): Promise<void> {
+    const api: BrokersApi = new Brokers();
+    await api.deleteBroker(id);
+
+    const brokersStore: BrokersStore = new Store();
     brokersStore.deleteBroker(id);
 
     Notifications.showSuccessNotification(
-      'Broker Deleted',
-      `Broker deleted successfully`,
+      'Broker deleted',
+      `Broker "${brokerConfigs[name].label}" deleted successfully`,
     );
   },
 };

@@ -14,7 +14,7 @@ export class Notifications {
 
   private static showNotification(type: 'error' | 'info' | 'success', title: string, message: string): void {
     store.commit({
-      type: StoreMutation.SHOW_NOTIFICATION,
+      type: StoreMutation.APP_SHOW_NOTIFICATION,
       severity: type,
       summary: title,
       detail: message,

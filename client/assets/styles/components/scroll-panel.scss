@@ -1,0 +1,16 @@
+.p-scrollpanel-content {
+  padding: 0 !important;
+}
+
+.p-scrollpanel-bar-y {
+  width: 6px !important;
+}
+
+.p-scrollpanel-bar-x {
+  height: 6px !important;
+}
+
+.p-scrollpanel:hover .p-scrollpanel-bar,
+.p-scrollpanel:active .p-scrollpanel-bar {
+  opacity: 0.5 !important;
+}

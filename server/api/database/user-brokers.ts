@@ -1,32 +1,28 @@
 import mongoose from 'mongoose';
 
-import type { CreationDocument, BrokersDatabaseDocument, BrokersDatabaseCollection } from 'shared/types';
+import { StatusCode } from 'global/constants';
+
+import type { BrokersDatabaseCollection, BrokersDatabaseDocument, CreationDocument } from 'shared/types';
 import { DatabaseCollection } from 'shared/constants';
+import { AppError } from 'shared/exceptions';
 
-import type { MongoCollection } from './lib/types';
-import { Database } from './lib/database';
+import { UserCollection } from './lib/user-collection';
+import type { UpdateBrokerPayload } from 'global/types';
 
 
-const userDataBrokerSchema = new mongoose.Schema<BrokersDatabaseDocument>({
+const userBrokerSchema = new mongoose.Schema<BrokersDatabaseDocument>({
   name: { type: String, required: true },
-  expiresDate: { type: Date, required: true },
+  expiresAt: { type: Date, required: true },
   apiKeys: { type: Map, of: String, required: true },
 });
 
 
-export class UserBrokers implements BrokersDatabaseCollection {
-  constructor(
-    protected collection: MongoCollection<BrokersDatabaseDocument>,
-  ) {}
-
-
+export class UserBrokers extends UserCollection<BrokersDatabaseDocument> implements BrokersDatabaseCollection {
   static async connect(userId: string): Promise<BrokersDatabaseCollection> {
-    const userDatabaseName: string = process.env.MONGODB_USER_DATABASE_PREFIX + userId;
-
-    const collection = await Database.connectCollection(
-      userDatabaseName,
+    const collection = await UserBrokers.connectCollection<BrokersDatabaseDocument>(
+      userId,
       DatabaseCollection.USER_BROKERS,
-      userDataBrokerSchema,
+      userBrokerSchema
     );
 
     return new UserBrokers(collection);
@@ -34,16 +30,37 @@ export class UserBrokers implements BrokersDatabaseCollection {
 
 
   // Implementation
+  async getBroker(brokerId: string): Promise<BrokersDatabaseDocument> {
+    const broker = await this.collection.findOne({ _id: brokerId });
+
+    if (!broker) {
+      console.error(`error: [database] cannot found broker with id '${brokerId}'`);
+
+      throw new AppError(StatusCode.BAD_REQUEST, {
+        message: `Cannot found broker with id '${brokerId}'`,
+      });
+    }
+
+    // @ts-ignore
+    const parsedApiKeys = Object.fromEntries(broker.apiKeys.entries())
+
+    return { ...broker.toObject(), apiKeys: parsedApiKeys };
+  }
+
   async getBrokers(): Promise<BrokersDatabaseDocument[]> {
     const brokers = await this.collection.find();
 
-    return brokers.map(({ id, name, expiresDate, apiKeys }) => {
-      return { id, name, expiresDate, apiKeys };
-    });
+    return brokers.map((broker) => broker.toObject());
   }
 
-  async saveBroker(broker: CreationDocument<BrokersDatabaseDocument>): Promise<BrokersDatabaseDocument> {
-    return await this.collection.create(broker);
+  async createBroker(broker: CreationDocument<BrokersDatabaseDocument>): Promise<BrokersDatabaseDocument> {
+    const createdBroker = await this.collection.create(broker);
+
+    return createdBroker.toObject();
+  }
+
+  async updateBroker(id: string, updates: UpdateBrokerPayload['updates']): Promise<void> {
+    await this.collection.updateOne({ _id: id }, updates);
   }
 
   async deleteBroker(id: string): Promise<void> {

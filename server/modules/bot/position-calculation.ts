@@ -46,6 +46,8 @@ export class PositionCalculation {
       ? this.getPositionSizeWithoutCommission(position)
       : this.getPositionSizeWithCommission(position);
 
+    // @TODO: compare position size with min lot size
+
     const maxAmountSize: number = this.getMaxAmountSize();
     const positionAmount: number = this.getPositionAmount(positionSize);
 
@@ -83,7 +85,7 @@ export class PositionCalculation {
 
   // Helpers
   private getRiskSize(): number {
-    return this.getAccountTotalAmount() * this.botSettings.riskPercent / ONE_HUNDRED;
+    return this.getMaxAmountSize() * this.botSettings.riskPercent / ONE_HUNDRED;
   }
 
   private getMaxAmountSize(): number {
@@ -105,7 +107,7 @@ export class PositionCalculation {
 
     let roundedPositionSize: number = positionSize / marketMinPositionSize;
     roundedPositionSize = Math.floor(roundedPositionSize);
-    roundedPositionSize *= marketMinPositionSize;
+    roundedPositionSize = roundedPositionSize * marketMinPositionSize;
 
     return roundedPositionSize;
   }
