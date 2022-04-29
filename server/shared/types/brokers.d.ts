@@ -1,4 +1,4 @@
-import type { BrokerAccount, BrokerMarket, UpdateBrokerPayload } from 'global/types';
+import type { BrokerApiKeys, BrokerAccount, BrokerMarket, UpdateBrokerPayload } from 'global/types';
 import { BrokerAccountType, BrokerName } from 'global/constants';
 
 import { CreationDocument } from './database';
@@ -17,6 +17,7 @@ export type BrokersDatabaseDocument = {
 export interface BrokersDatabaseCollection {
   getBroker(id: string): Promise<BrokersDatabaseDocument>;
   getBrokers(): Promise<BrokersDatabaseDocument[]>;
+  getApiKeys(id: string): Promise<BrokerApiKeys>;
   createBroker(broker: CreationDocument<BrokersDatabaseDocument>): Promise<BrokersDatabaseDocument>;
   updateBroker(id: string, updates: UpdateBrokerPayload['updates']): Promise<void>;
   deleteBroker(id: string): Promise<void>;

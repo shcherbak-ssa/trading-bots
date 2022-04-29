@@ -1,10 +1,12 @@
 import type { Action, ActionFunction, ActionsObject } from 'shared/types';
 
+import { botManagerActions } from './bot-manager';
 import { botsActions } from './bots';
 import { brokersActions } from './brokers';
 
 
 const actions: ActionsObject = {
+  ...botManagerActions,
   ...botsActions,
   ...brokersActions,
 };

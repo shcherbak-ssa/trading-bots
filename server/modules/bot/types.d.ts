@@ -1,18 +1,10 @@
-import { BrokerAccountType, BrokerName } from 'global/constants';
+import type { Bot, BrokerApiKeys } from 'global/types';
+import { BrokerName } from 'global/constants';
 
 
 // Bot
-export type BotSettings = {
-  botId: string;
-  brokerName: BrokerName;
-  brokerApiKeys: string[];
-  brokerMarketSymbol: string;
-  brokerAccountId: string;
-  brokerAccountType: BrokerAccountType;
-  accountAmountPercentUseForBot: number;
-  riskPercent: number;
-  useTakeProfit: boolean;
-  takeProfitPL: number;
+export type BotSettings = Bot & {
+  brokerApiKeys: BrokerApiKeys;
 }
 
 export type BotSignal = {
@@ -45,10 +37,9 @@ export interface BotBrokerFactory {
 }
 
 export interface BotBroker {
-  name: string;
+  name: BrokerName;
   market: BotBrokerMarket;
   account: BotBrokerAccount;
-  isCorrectBroker(name: string): boolean;
   openPosition(position: BotPosition): Promise<void>;
   closePosition(position: BotPosition): Promise<void>;
 }
@@ -61,7 +52,6 @@ export interface BotBrokerMarket {
   commission: number;
   currentPrice: number;
   currentSpread: number;
-  isCorrectSymbol(marketSymbol: string): boolean;
   getCloseTime(): string;
   subscribeToPriceUpdates(callback: () => void): void;
   unsubscribeToPriceUpdates(): void;

@@ -3,9 +3,13 @@ import { BotState, BotUpdateType, BrokerAccountType, BrokerName } from 'global/c
 
 export type Bot = {
   id: string;
+  token: string;
   name: string;
-  active: boolean;
   state: BotState;
+  initialCapital: number;
+  active: boolean;
+  activeTotalTime: number;
+  activateAt: string;
   createdAt: string;
   brokerId: string;
   brokerName: BrokerName;
@@ -25,7 +29,10 @@ export type Bot = {
   tradeCloseAtEndWeek: boolean;
 }
 
-export type NewBot = Omit<Bot, 'id' | 'createdAt' | 'state'>;
+export type NewBot = Omit<
+  Bot,
+  'id' | 'token' | 'state' | 'initialCapital' | 'activeTotalTime' | 'activateAt' | 'createdAt'
+>;
 
 export type BotClientInfo = Bot & {
   brokerAccount?: {
@@ -43,7 +50,10 @@ export type UpdateBotPayload = {
   type: BotUpdateType;
   updates: {
     name?: string;
+    initialCapital?: number;
     active?: boolean;
+    activeTotalTime?: number;
+    activateAt?: string;
     state?: BotState;
     tradeRiskPercent?: number;
     tradeMaxLossPercent?: number;

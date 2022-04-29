@@ -4,13 +4,13 @@ import { BotManager } from './bot-manager';
 
 
 export class BotEvents {
-  static async processPositionClosing(botId: string, position: BotPosition): Promise<void> {
+  static async processPositionClosing(botToken: string, position: BotPosition): Promise<void> {
     throw new Error('Not implemented');
   }
 
-  static async processAliveError(botId: string, errorPlace: AliveBotErrorPlace, message: string): Promise<void> {
+  static async processAliveError(botToken: string, errorPlace: AliveBotErrorPlace, message: string): Promise<void> {
     if (BotEvents.isNeedToRestartBot(errorPlace)) {
-      return await BotManager.restartBot(botId);
+      return await BotManager.restartBot(botToken);
     }
 
     throw new Error('Not implemented');

@@ -22,6 +22,7 @@ export class Bot {
 
   static async create(settings: BotSettings): Promise<Bot> {
     const broker: BotBroker = await Bot.brokerFactory.setupBroker(settings);
+
     const calculation: PositionCalculation = new PositionCalculation(settings, broker);
     const check: PositionCheck = new PositionCheck(settings);
 
@@ -58,7 +59,7 @@ export class Bot {
 
     await this.broker.closePosition(this.currentPosition);
 
-    BotEvents.processPositionClosing(this.settings.botId, this.currentPosition);
+    BotEvents.processPositionClosing(this.settings.token, this.currentPosition);
 
     this.currentPosition = null;
   }
@@ -79,7 +80,7 @@ export class Bot {
         return await this.closeOpenPosition();
       }
     } catch (err: any) {
-      BotEvents.processAliveError(this.settings.botId, AliveBotErrorPlace.POSITION_CLOSE, err.message);
+      BotEvents.processAliveError(this.settings.token, AliveBotErrorPlace.POSITION_CLOSE, err.message);
     }
   }
 

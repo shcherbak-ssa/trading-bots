@@ -11,10 +11,10 @@ type OpenCallback = (api: WsApi) => void;
 export class WsApi {
   private wsClient: WebSocket;
   private correlationId: number = 0;
-  private readonly botId: string;
+  private readonly botToken: string;
 
-  constructor(botId: string, openCallback?: OpenCallback) {
-    this.botId = botId;
+  constructor(botToken: string, openCallback?: OpenCallback) {
+    this.botToken = botToken;
     this.setupWebSocket(openCallback);
   }
 
@@ -54,11 +54,11 @@ export class WsApi {
     };
 
     this.wsClient.onclose = (event) => {
-      BotEvents.processAliveError(this.botId, AliveBotErrorPlace.MARKET_WS_CLOSE, event.reason);
+      BotEvents.processAliveError(this.botToken, AliveBotErrorPlace.MARKET_WS_CLOSE, event.reason);
     };
 
     this.wsClient.onerror = (err) => {
-      BotEvents.processAliveError(this.botId, AliveBotErrorPlace.MARKET_WS_ERROR, err.message);
+      BotEvents.processAliveError(this.botToken, AliveBotErrorPlace.MARKET_WS_ERROR, err.message);
     };
   }
 

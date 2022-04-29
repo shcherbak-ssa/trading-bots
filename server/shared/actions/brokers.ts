@@ -1,8 +1,10 @@
 import type {
   Bot,
+  BotClientInfo,
   Broker,
   BrokerAccount,
   BrokerAccounts,
+  BrokerApiKeys,
   BrokerBot,
   BrokerMarket,
   GetBrokerDataPayload,
@@ -16,8 +18,8 @@ import type {
 import { BrokerAccountType, BrokerDataType, StatusCode } from 'global/constants';
 
 import type {
+  BotsDatabaseCollection,
   BotsDatabaseDocument,
-  BotsDeleteFilters,
   BotsGetFilters,
   BrokerApiLeverageResponse,
   BrokersApiKeys,
@@ -32,6 +34,7 @@ import { runAction } from 'shared/actions';
 
 import { ApiKeys, BrokersData } from 'api/brokers';
 import { UserBrokers } from 'api/database/user-brokers';
+import { UserBots } from 'api/database/user-bots';
 
 
 const brokersApiKeys: BrokersApiKeys = new ApiKeys();
@@ -138,7 +141,7 @@ export const brokersActions = {
   async [ActionType.BROKERS_GET_ACCOUNT](
     userId: string,
     { id: brokerId, ...filters }: GetBrokerDataPayload
-  ): Promise<BrokerAccount | undefined> {
+  ): Promise<BrokerAccount> {
     const brokersCollection: BrokersDatabaseCollection = await UserBrokers.connect(userId);
     const { name: brokerName, apiKeys }: BrokersDatabaseDocument = await brokersCollection.getBroker(brokerId);
 
@@ -148,7 +151,23 @@ export const brokersActions = {
       brokerName,
     });
 
-    return brokerAccounts.find(({ accountId }) => accountId === filters.accountId);
+    const foundBrokerAccount = brokerAccounts.find(({ accountId }) => accountId === filters.accountId);
+
+    if (!foundBrokerAccount) {
+      console.error(` - error: [database] cannot found broker account with id '${filters.accountId}'`);
+
+      throw new AppError(StatusCode.BAD_REQUEST, {
+        message: `Cannot found broker account with id '${brokerId}'`,
+      });
+    }
+
+    return foundBrokerAccount;
+  },
+
+  async [ActionType.BROKERS_GET_API_KEYS](userId: string, { id: brokerId }: OnlyIdPayload): Promise<BrokerApiKeys> {
+    const brokersCollection: BrokersDatabaseCollection = await UserBrokers.connect(userId);
+
+    return await brokersCollection.getApiKeys(brokerId);
   },
 
   async [ActionType.BROKERS_CONNECT](userId: string, newBroker: NewBroker): Promise<Broker> {
@@ -183,11 +202,20 @@ export const brokersActions = {
     const brokersCollection: BrokersDatabaseCollection = await UserBrokers.connect(userId);
     await brokersCollection.updateBroker(id, updates);
 
-    // @TODO: restart active bots
+    const botsCollection: BotsDatabaseCollection = await UserBots.connect(userId);
+    const activeBots: Bot[] = await botsCollection.getBots({ active: true });
+
+    for (const activeBot of activeBots) {
+      await runAction<Bot, void>({
+        type: ActionType.BOT_MANAGER_ACTIVATE_BOT,
+        userId,
+        payload: activeBot,
+      });
+    }
   },
 
   async [ActionType.BROKERS_DELETE](userId: string, { id: brokerId }: OnlyIdPayload): Promise<void> {
-    await runAction<BotsDeleteFilters, void>({
+    await runAction<BotsGetFilters, BotClientInfo[]>({
       type: ActionType.BOTS_DELETE,
       userId,
       payload: { brokerId },

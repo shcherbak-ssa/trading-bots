@@ -11,7 +11,7 @@ import { BotAccount } from './bot-account';
 
 
 export class BotBroker implements Broker {
-  name: string = BrokerName.CURRENCY_COM;
+  name: BrokerName = BrokerName.CURRENCY_COM;
   market: BotBrokerMarket;
   account: BotBrokerAccount;
 
@@ -23,7 +23,7 @@ export class BotBroker implements Broker {
 
 
   static async setup(botSettings: BotSettings): Promise<BotBroker> {
-    const [ apiKey, secretKey ] = botSettings.brokerApiKeys;
+    const { apiKey, secretKey } = botSettings.brokerApiKeys;
 
     const restApi: RestApi = new RestApi(apiKey, secretKey);
     restApi.setAccountType(botSettings.brokerAccountType);
@@ -39,10 +39,6 @@ export class BotBroker implements Broker {
 
 
   // Implementations
-  isCorrectBroker(name: string): boolean {
-    return name === this.name;
-  }
-
   async openPosition(position: BotPosition): Promise<void> {
     const { brokerAccountId, brokerMarketSymbol } = this.botSettings;
 
