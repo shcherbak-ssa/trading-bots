@@ -1,4 +1,5 @@
 import { StatusCode } from 'global/constants';
+
 import { ProcessError } from 'shared/exceptions';
 
 import type { BotSettings } from './types';
@@ -9,36 +10,41 @@ export class BotManager {
   private static bots: Map<string, Bot> = new Map([]);
 
 
-  static getBot(botId: string): Bot {
-    const bot: Bot | undefined = BotManager.bots.get(botId);
+  static getBot(botToken: string): Bot {
+    const bot: Bot | undefined = BotManager.bots.get(botToken);
 
     if (!bot) {
-      throw new ProcessError(`Bot with id '${botId}' does not exist`, StatusCode.BAD_REQUEST);
+      throw new ProcessError(`Bot with token '${botToken}' does not exist`, StatusCode.BAD_REQUEST);
     }
 
     return bot;
   }
 
   static async createBot(setting: BotSettings): Promise<void> {
+    if (BotManager.bots.has(setting.token)) {
+      await BotManager.deleteBot(setting.token);
+    }
+
     const createdBot: Bot = await Bot.create(setting);
 
-    BotManager.bots.set(setting.botId, createdBot);
+    BotManager.bots.set(setting.token, createdBot);
+
+    console.info(` - info: [bot manager] activate bot. Active bots - ${BotManager.bots.size}`);
   }
 
-  static async updateBot(settings: BotSettings): Promise<void> {
-    await BotManager.deleteBot(settings.botId);
-    await BotManager.createBot(settings);
-  }
+  static async deleteBot(botToken: string): Promise<void> {
+    const bot: Bot = BotManager.getBot(botToken);
 
-  static async deleteBot(id: string): Promise<void> {
-    const bot: Bot = BotManager.getBot(id);
     await bot.closeOpenPosition();
 
-    BotManager.bots.delete(id);
+    BotManager.bots.delete(botToken);
+
+    console.info(` - info: [bot manager] deactivate bot. Active bots - ${BotManager.bots.size}`);
   }
 
   static async restartBot(id: string): Promise<void> {
     const { settings: botSettings }: Bot = BotManager.getBot(id);
-    await BotManager.updateBot(botSettings);
+
+    await BotManager.createBot(botSettings);
   }
 }

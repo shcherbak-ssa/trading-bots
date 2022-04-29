@@ -34,13 +34,21 @@ export class AppUsers implements UsersDatabaseCollection {
 
 
   // Implementation
-  async findUserByEmail(email: string): Promise<UsersDatabaseDocument | null> {
-    const [ foundUser ] = await this.collection.find({ email });
+  async getUsers(): Promise<UsersDatabaseDocument[]> {
+    const users = await this.collection.find();
 
-    return foundUser || null;
+    return users.map((user) => user.toObject());
+  }
+
+  async findUserByEmail(email: string): Promise<UsersDatabaseDocument | null> {
+    const foundUser = await this.collection.findOne({ email });
+
+    return foundUser ? foundUser.toObject() : null;
   }
 
   async createUser(user: CreationDocument<UsersDatabaseDocument>): Promise<UsersDatabaseDocument> {
-    return await this.collection.create(user);
+    const createdUser = await this.collection.create(user);
+
+    return createdUser.toObject();
   }
 }

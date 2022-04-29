@@ -37,7 +37,7 @@ export class BotAccount implements BotBrokerAccount {
       this.availableAmount = availableAmount;
       this.totalAmount = totalAmount;
     } catch (err: any) {
-      BotEvents.processAliveError(this.botSettings.botId, AliveBotErrorPlace.ACCOUNT_AMOUNT_UPDATE, err.message);
+      BotEvents.processAliveError(this.botSettings.token, AliveBotErrorPlace.ACCOUNT_AMOUNT_UPDATE, err.message);
     }
   }
 }

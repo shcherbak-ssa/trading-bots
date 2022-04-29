@@ -22,8 +22,8 @@ export class BotMarket implements BotBrokerMarket {
   ) {}
 
 
-  static async setup({ botId, brokerMarketSymbol }: BotSettings, restApi: RestApi): Promise<BotMarket> {
-    const api: MarketApi = await MarketApi.setup(botId, restApi);
+  static async setup({ token, brokerMarketSymbol }: BotSettings, restApi: RestApi): Promise<BotMarket> {
+    const api: MarketApi = await MarketApi.setup(token, restApi);
     const market: Market = await api.loadMarketData(brokerMarketSymbol);
 
     const brokerMarket: BotMarket = new BotMarket(market, api);
@@ -55,10 +55,6 @@ export class BotMarket implements BotBrokerMarket {
 
 
   // Implementations
-  isCorrectSymbol(marketSymbol: string): boolean {
-    return marketSymbol === this.market.marketSymbol;
-  }
-
   getCloseTime(): string {
     throw new Error('TODO: implement');
   }

@@ -127,7 +127,8 @@ function routeMiddleware(validation: Validation, handler: ServerRouteHandler) {
         payload: responsePayload || {},
       };
     } catch (err: any) {
-      console.log(err);
+      console.error(err);
+
       response.result = {
         status: err.status || StatusCode.INTERNAL_SERVER_ERROR,
         payload: {
@@ -193,9 +194,8 @@ function getResponseStatus(request: express.Request): StatusCode {
     case RequestMethod.POST:
       return StatusCode.CREATED;
     case RequestMethod.PUT:
-      return StatusCode.UPDATED;
     case RequestMethod.DELETE:
-      return StatusCode.DELETED;
+      return StatusCode.NO_CONTENT;
     default:
       return StatusCode.SUCCESS;
   }

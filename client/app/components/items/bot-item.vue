@@ -6,7 +6,7 @@
     </div>
 
     <group-container heading="Signals URL">
-      @TODO
+      @TODO: {{ selectedBot.token }}
     </group-container>
 
     <group-container heading="Settings">

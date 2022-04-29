@@ -7,6 +7,10 @@ export const FRACTION_DIGITS_TO_HUNDREDTHS: number = 2;
 
 
 export enum ActionType {
+  BOT_MANAGER_SETUP_ACTIVE_BOTS = 'bot-manager/setup-active-bots',
+  BOT_MANAGER_ACTIVATE_BOT = 'bot-manager/activate-bot',
+  BOT_MANAGER_DEACTIVATE_BOT = 'bot-manager/deactivate-bot',
+
   BOTS_LOAD = 'bots/load',
   BOTS_CREATE = 'bots/create',
   BOTS_UPDATE = 'bots/update',
@@ -15,6 +19,7 @@ export enum ActionType {
   BROKERS_LOAD = 'brokers/load',
   BROKERS_GET_DATA = 'brokers/get-data',
   BROKERS_GET_ACCOUNT = 'brokers/get-account',
+  BROKERS_GET_API_KEYS = 'brokers/get-api-keys',
   BROKERS_CONNECT = 'brokers/connect',
   BROKERS_UPDATE = 'brokers/update',
   BROKERS_DELETE = 'brokers/delete',

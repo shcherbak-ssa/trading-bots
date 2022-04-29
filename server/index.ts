@@ -3,6 +3,8 @@ console.log('\n#################### Setup server [BEGIN] ####################');
 import env from 'shared/utils/dotenv';
 
 import type { UsersDatabaseCollection, UsersDatabaseDocument } from 'shared/types';
+import { ActionType } from 'shared/constants';
+import { runAction } from 'shared/actions';
 
 import { setupDatabase } from 'api/database';
 import { AppUsers } from 'api/database/app-users';
@@ -31,10 +33,21 @@ async function setupServer() {
     console.info(` - setup dev user with id '${process.env.DEV_USER_ID}'`);
   }
 
+  const activateBotsCount: number = await setupActiveBots();
+  console.log(` - setup active bots (${activateBotsCount})`);
+
   await runServer()
-  console.info(' - run server');
+  console.info('\n - run server');
 
   console.log('\n#################### Setup server [END] ####################\n');
+}
+
+async function setupActiveBots(): Promise<number> {
+  return await runAction({
+    type: ActionType.BOT_MANAGER_SETUP_ACTIVE_BOTS,
+    userId: '',
+    payload: {},
+  });
 }
 
 async function setupDevUser(): Promise<void> {

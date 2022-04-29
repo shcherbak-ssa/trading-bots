@@ -48,13 +48,14 @@ export class PositionCalculation {
 
     // @TODO: compare position size with min lot size
 
-    const maxAmountSize: number = this.getMaxAmountSize();
+    const capitalSize: number = this.getCapitalSize();
     const positionAmount: number = this.getPositionAmount(positionSize);
 
-    if (positionAmount > maxAmountSize) {
-      const { leverage: marketLeverage, currentPrice: marketCurrentPrice } = this.broker.market;
+    if (positionAmount > capitalSize) {
+      const { currentPrice: marketCurrentPrice } = this.broker.market;
+      const marketLeverage = this.getMarketLeverage();
 
-      positionSize = maxAmountSize * marketLeverage / marketCurrentPrice;
+      positionSize = capitalSize * marketLeverage / marketCurrentPrice;
       riskSize = positionSize * position.stopLossSize;
     }
 
@@ -63,7 +64,7 @@ export class PositionCalculation {
   }
 
   private calculateTakeProfit(position: BotPosition): void {
-    if (!this.botSettings.useTakeProfit) return;
+    if (!this.botSettings.tradeWithTakeProfit) return;
 
     const {
       currentPrice: marketCurrentPrice,
@@ -71,7 +72,7 @@ export class PositionCalculation {
       tickSize: marketTickSize,
     } = this.broker.market;
 
-    const takeProfitSize: number = position.stopLossSize * this.botSettings.takeProfitPL;
+    const takeProfitSize: number = position.stopLossSize * this.botSettings.tradeTakeProfitPL;
     const takeProfitSizeWithSpread: number = marketCurrentSpread + takeProfitSize;
 
     const takeProfitPrice: number = position.isLong
@@ -85,21 +86,26 @@ export class PositionCalculation {
 
   // Helpers
   private getRiskSize(): number {
-    return this.getMaxAmountSize() * this.botSettings.riskPercent / ONE_HUNDRED;
+    return this.getCapitalSize() * this.botSettings.tradeRiskPercent / ONE_HUNDRED;
   }
 
-  private getMaxAmountSize(): number {
-    return this.getAccountTotalAmount() * this.botSettings.accountAmountPercentUseForBot / ONE_HUNDRED;
+  private getCapitalSize(): number {
+    return this.broker.account.totalAmount * this.botSettings.tradeCapitalPercent / ONE_HUNDRED;
   }
 
   private getPositionAmount(positionSize: number): number {
-    const { leverage: marketLeverage, currentPrice: marketCurrentPrice } = this.broker.market;
+    const { currentPrice: marketCurrentPrice } = this.broker.market;
+    const marketLeverage = this.getMarketLeverage();
 
     return roundNumber(positionSize * marketCurrentPrice / marketLeverage, FRACTION_DIGITS_TO_HUNDREDTHS);
   }
 
-  private getAccountTotalAmount(): number {
-    return this.broker.account.totalAmount;
+  private getMarketLeverage(): number {
+    if (this.botSettings.tradeWithCustomMarketLeverage) {
+      return this.botSettings.tradeMarketLeverage;
+    }
+
+    return this.broker.market.leverage;
   }
 
   private roundPositionSize(positionSize: number): number {

@@ -53,7 +53,7 @@ export class RestApi extends BrokerRestApi {
     }
 
     const { msg, code } = await response.json() as ResponseError;
-    console.error(`error: [API] Currency.com - ${response.status} ${msg} [${code}]`);
+    console.error(` - error: [API] Currency.com - ${response.status} ${msg} [${code}]`);
 
     throw new BrokerApiError(msg, BrokerName.CURRENCY_COM);
   }

@@ -25,9 +25,9 @@ export class MarketApi {
   }
 
 
-  static async setup(botId: string, restApi: RestApi): Promise<MarketApi> {
+  static async setup(botToken: string, restApi: RestApi): Promise<MarketApi> {
     return new Promise((resolve, reject) => {
-      new WsApi(botId, (wsApi: WsApi) => {
+      new WsApi(botToken, (wsApi: WsApi) => {
         resolve(new MarketApi(restApi, wsApi));
       });
     });

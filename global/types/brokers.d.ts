@@ -17,9 +17,11 @@ export type BrokerBot = {
 export type NewBroker = {
   name: BrokerName;
   expiresAt: Date;
-  apiKeys: {
-    [p: string]: string;
-  };
+  apiKeys: BrokerApiKeys;
+}
+
+export type BrokerApiKeys = {
+  [p: string]: string;
 }
 
 export type UpdateBrokerPayload = {

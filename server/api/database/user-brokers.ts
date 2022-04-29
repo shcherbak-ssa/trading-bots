@@ -7,7 +7,7 @@ import { DatabaseCollection } from 'shared/constants';
 import { AppError } from 'shared/exceptions';
 
 import { UserCollection } from './lib/user-collection';
-import type { UpdateBrokerPayload } from 'global/types';
+import type { BrokerApiKeys, UpdateBrokerPayload } from 'global/types';
 
 
 const userBrokerSchema = new mongoose.Schema<BrokersDatabaseDocument>({
@@ -34,7 +34,7 @@ export class UserBrokers extends UserCollection<BrokersDatabaseDocument> impleme
     const broker = await this.collection.findOne({ _id: brokerId });
 
     if (!broker) {
-      console.error(`error: [database] cannot found broker with id '${brokerId}'`);
+      console.error(` - error: [database] cannot found broker with id '${brokerId}'`);
 
       throw new AppError(StatusCode.BAD_REQUEST, {
         message: `Cannot found broker with id '${brokerId}'`,
@@ -51,6 +51,12 @@ export class UserBrokers extends UserCollection<BrokersDatabaseDocument> impleme
     const brokers = await this.collection.find();
 
     return brokers.map((broker) => broker.toObject());
+  }
+
+  async getApiKeys(brokerId: string): Promise<BrokerApiKeys> {
+    const broker = await this.getBroker(brokerId);
+
+    return broker.apiKeys;
   }
 
   async createBroker(broker: CreationDocument<BrokersDatabaseDocument>): Promise<BrokersDatabaseDocument> {

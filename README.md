@@ -3,9 +3,9 @@
 
 ## Bot ##
 
-Settings `botId` field template:
+Bot `token` field template:
 ```dotenv
-[user_id]/[bot_id]
+[user_id]-[bot_id]
 ```
 
 ## Database ##

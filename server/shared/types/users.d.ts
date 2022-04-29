@@ -9,6 +9,7 @@ export type UsersDatabaseDocument = {
 
 
 export interface UsersDatabaseCollection {
+  getUsers(): Promise<UsersDatabaseDocument[]>;
   findUserByEmail(email: string): Promise<UsersDatabaseDocument | null>;
   createUser(user: CreationDocument<UsersDatabaseDocument>): Promise<UsersDatabaseDocument>;
 }
