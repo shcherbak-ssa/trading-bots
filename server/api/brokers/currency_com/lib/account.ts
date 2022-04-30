@@ -15,7 +15,7 @@ export class AccountApi {
   async loadAccountsInfo(showZeroBalance: boolean): Promise<AccountResponse> {
     return await this.restApi.get<AccountRequest, AccountResponse>(Endpoint.ACCOUNT, {
       showZeroBalance,
-      timestamp: Date.now() - 500, // @TODO: fix
+      timestamp: Date.now(),
     });
   }
 

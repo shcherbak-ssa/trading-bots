@@ -1,4 +1,5 @@
 export const API_PATHNAME: string = '/api';
+export const SIGNALS_PATHNAME: string = '/signals';
 export const ENTRY_POINT_PATHNAME: string = '*';
 
 
@@ -12,6 +13,7 @@ export enum ActionType {
   BOT_MANAGER_DEACTIVATE_BOT = 'bot-manager/deactivate-bot',
 
   BOTS_LOAD = 'bots/load',
+  BOTS_GET = 'bots/get',
   BOTS_CREATE = 'bots/create',
   BOTS_UPDATE = 'bots/update',
   BOTS_DELETE = 'bots/delete',
@@ -23,6 +25,10 @@ export enum ActionType {
   BROKERS_CONNECT = 'brokers/connect',
   BROKERS_UPDATE = 'brokers/update',
   BROKERS_DELETE = 'brokers/delete',
+
+  SIGNALS_PROCESS = 'signals/process',
+
+  USERS_GET = 'users/get',
 }
 
 export enum DatabaseCollection {
@@ -49,4 +55,17 @@ export enum Validation {
   BROKERS_GET_DATA = 'brokers/get-data',
   BROKERS_CONNECT = 'brokers/connect',
   BROKERS_UPDATE = 'brokers/update',
+
+  SIGNALS = 'signals',
+}
+
+export enum SignalType {
+  OPEN = 'OPEN',
+  UPDATE = 'UPDATE',
+  CLOSE = 'CLOSE',
+}
+
+export enum SignalDirection {
+  LONG = 'LONG',
+  SHORT = 'SHORT',
 }

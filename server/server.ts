@@ -1,4 +1,3 @@
-import path from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
 import queryString from 'query-string';
@@ -7,10 +6,11 @@ import { QUERY_URL_SEPARATOR, RequestMethod, StatusCode } from 'global/constants
 
 import type { ServerRequestPayload, ServerResponsePayload } from 'shared/types';
 import type { ServerResponseResult, ServerRouteHandler } from 'shared/types';
-import { ENTRY_POINT_PATHNAME, API_PATHNAME, Validation } from 'shared/constants';
+import { ENTRY_POINT_PATHNAME, API_PATHNAME, Validation, SIGNALS_PATHNAME } from 'shared/constants';
 import { validate } from 'shared/validation';
 
-import { routes } from './routes';
+import { apiRoutes, signalRoutes } from './routes';
+import { serverConfig } from './server-config';
 
 
 declare global {
@@ -26,10 +26,6 @@ declare global {
 }
 
 
-const staticDirname: string = path.join(process.cwd(), 'build', 'client'); // @TODO: config
-const entryPointFilename: string = path.join(staticDirname, 'index.html'); // @TODO: config
-
-
 export async function runServer(): Promise<void> {
   const app: express.Application = express();
   app.disable('query parser');
@@ -38,13 +34,14 @@ export async function runServer(): Promise<void> {
   app.use(queryParserMiddleware);
 
   setupApiRouter(app);
+  setupSignalsRouter(app);
 
   setupStaticServe(app);
   setupEntryPoint(app);
 
   app.use(responseMiddleware);
 
-  app.listen(3333, 'localhost'); // @TODO: config
+  app.listen(serverConfig.server.port, serverConfig.server.host);
 }
 
 
@@ -52,13 +49,13 @@ export async function runServer(): Promise<void> {
 function setupApiRouter(app: express.Application): void {
   const apiRouter: express.Router = express.Router();
 
-  for (const { endpoint, method, validation, handler } of routes) {
+  for (const { endpoint, method, validation, handler } of apiRoutes) {
     const pathname: string = endpoint.replace(API_PATHNAME, '');
 
     // @ts-ignore
     apiRouter[method.toLowerCase()](
       pathname,
-      routeMiddleware(validation, handler),
+      apiRouteMiddleware(validation, handler),
     );
   }
 
@@ -70,8 +67,24 @@ function setupApiRouter(app: express.Application): void {
   );
 }
 
+function setupSignalsRouter(app: express.Application): void {
+  const signalsRouter: express.Router = express.Router();
+
+  for (const { endpoint, method, validation, handler } of signalRoutes) {
+    const pathname: string = endpoint.replace(SIGNALS_PATHNAME, '');
+
+    // @ts-ignore
+    signalsRouter[method.toLowerCase()](
+      pathname,
+      signalsRouteMiddleware(validation, handler),
+    );
+  }
+
+  app.use(SIGNALS_PATHNAME, loggerMiddleware, signalsRouter);
+}
+
 function setupStaticServe(app: express.Application): void {
-  app.use(express.static(staticDirname));
+  app.use(express.static(serverConfig.staticDirname));
 }
 
 function setupEntryPoint(app: express.Application): void {
@@ -104,7 +117,7 @@ function authMiddleware() {
 }
 
 function loggerMiddleware(request: express.Request, response: express.Response, next: express.NextFunction): void {
-  const { userId, method, baseUrl, url, params, query, body } = request;
+  const { method, baseUrl, url, params, query, body } = request;
   const data = { ...params, ...query, ...body };
 
   console.info(`\ninfo: [request] ${method} ${baseUrl + url} - ${JSON.stringify(data)}`);
@@ -112,7 +125,7 @@ function loggerMiddleware(request: express.Request, response: express.Response, 
   next();
 }
 
-function routeMiddleware(validation: Validation, handler: ServerRouteHandler) {
+function apiRouteMiddleware(validation: Validation, handler: ServerRouteHandler) {
   return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
     try {
       const { userId, params, query, body } = request;
@@ -141,6 +154,27 @@ function routeMiddleware(validation: Validation, handler: ServerRouteHandler) {
   }
 }
 
+function signalsRouteMiddleware(validation: Validation, handler: ServerRouteHandler) {
+  return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+    try {
+      const { params, query, body } = request;
+      const requestPayload: ServerRequestPayload = { ...params, ...query, ...body };
+
+      validate(validation, requestPayload);
+
+      await handler('', requestPayload);
+    } catch (err: any) {
+      console.error(err);
+
+      // @TODO: process error
+    } finally {
+      response.result = { status: StatusCode.SUCCESS, payload: {}};
+
+      next();
+    }
+  }
+}
+
 function entryPointMiddleware(request: express.Request, response: express.Response, next: express.NextFunction): void {
   if (response.result) {
     return next();
@@ -149,7 +183,7 @@ function entryPointMiddleware(request: express.Request, response: express.Respon
   if (request.method === RequestMethod.GET) {
     response.result = {
       status: StatusCode.SUCCESS,
-      filename: entryPointFilename,
+      filename: serverConfig.entryPointFilename,
     };
   } else {
     response.result = {

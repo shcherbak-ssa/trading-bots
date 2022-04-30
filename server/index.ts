@@ -4,7 +4,8 @@ import env from 'shared/utils/dotenv';
 
 import type { UsersDatabaseCollection, UsersDatabaseDocument } from 'shared/types';
 import { ActionType } from 'shared/constants';
-import { runAction } from 'shared/actions';
+
+import { runAction } from 'services/actions';
 
 import { setupDatabase } from 'api/database';
 import { AppUsers } from 'api/database/app-users';
@@ -23,21 +24,21 @@ async function setupServer() {
   console.log('\n mode:', process.env.NODE_ENV);
   console.log(env.env);
 
-  console.log('\n - setup environment');
+  console.log('\n - info: [server] setup environment');
 
   setupDatabase();
-  console.log(' - setup database');
+  console.log(' - info: [server] setup database');
 
   if (process.env.NODE_ENV === 'development') {
     await setupDevUser();
-    console.info(` - setup dev user with id '${process.env.DEV_USER_ID}'`);
+    console.info(` - info: [server] setup dev user (${process.env.DEV_USER_ID})`);
   }
 
   const activateBotsCount: number = await setupActiveBots();
-  console.log(` - setup active bots (${activateBotsCount})`);
+  console.log(` - info: [server] setup active bots (${activateBotsCount})`);
 
   await runServer()
-  console.info('\n - run server');
+  console.info('\n - info: [server] run server');
 
   console.log('\n#################### Setup server [END] ####################\n');
 }

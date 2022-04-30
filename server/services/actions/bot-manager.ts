@@ -1,26 +1,30 @@
 import type { Bot, BrokerApiKeys, OnlyIdPayload } from 'global/types';
 
-import type { BotsDatabaseCollection, DeactivateBotPayload, UsersDatabaseCollection, UsersDatabaseDocument } from 'shared/types';
+import type { BotsGetFilters, DeactivateBotPayload, UsersDatabaseDocument } from 'shared/types';
 import { ActionType } from 'shared/constants';
-import { runAction } from 'shared/actions';
+
+import { runAction } from 'services/actions';
 
 import type { BotSettings } from 'modules/bot/types';
 import { BotManager } from 'modules/bot';
 
-import { AppUsers } from 'api/database/app-users';
-import { UserBots } from 'api/database/user-bots';
-
 
 export const botManagerActions = {
   async [ActionType.BOT_MANAGER_SETUP_ACTIVE_BOTS](): Promise<number> {
-    const appUsersCollection: UsersDatabaseCollection = await AppUsers.connect();
-    const users: UsersDatabaseDocument[] = await appUsersCollection.getUsers();
+    const users: UsersDatabaseDocument[] = await runAction({
+      type: ActionType.USERS_GET,
+      userId: '',
+      payload: {},
+    });
 
     let activateBotsCount: number = 0;
 
     for (const { id: userId } of users) {
-      const botsCollection: BotsDatabaseCollection = await UserBots.connect(userId);
-      const activeBots: Bot[] = await botsCollection.getBots({ active: true });
+      const activeBots = await runAction<BotsGetFilters, Bot[]>({
+        type: ActionType.BOTS_GET,
+        userId,
+        payload: { active: true },
+      });
 
       for (const activeBot of activeBots) {
         await runAction<Bot, void>({
@@ -43,10 +47,7 @@ export const botManagerActions = {
       payload: { id: bot.brokerId },
     });
 
-    const botSettings: BotSettings = {
-      brokerApiKeys,
-      ...bot,
-    };
+    const botSettings: BotSettings = { ...bot, brokerApiKeys };
 
     await BotManager.createBot(botSettings);
   },

@@ -3,10 +3,11 @@ import { RequestMethod, ServerEndpoint } from 'global/constants';
 
 import type { ServerRoute } from 'shared/types';
 import { ActionType, Validation } from 'shared/constants';
-import { runAction } from 'shared/actions';
+
+import { runAction } from 'services/actions';
 
 
-export const botsRoutes: ServerRoute[] = [
+export const apiBotsRoutes: ServerRoute[] = [
   {
     endpoint: ServerEndpoint.API_BOTS,
     method: RequestMethod.GET,

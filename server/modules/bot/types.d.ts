@@ -8,10 +8,7 @@ export type BotSettings = Bot & {
 }
 
 export type BotSignal = {
-  botId: string;
   isLong: boolean;
-  brokerName: string;
-  marketSymbol: string;
   stopLossPrice: number;
 }
 

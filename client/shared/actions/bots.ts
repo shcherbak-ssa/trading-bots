@@ -33,6 +33,8 @@ export const botsActions = {
   },
 
   async [ActionType.BOTS_UPDATE]({ id, type, botName, updates }: BotUpdatePayload): Promise<void> {
+    // @TODO: refactor client bot update
+
     const api: BotsApi = new Bots();
     await api.updateBot(id, type, updates);
 
