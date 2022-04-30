@@ -52,3 +52,12 @@ export class BrokerApiError extends AppError {
     };
   }
 }
+
+export class SignalError extends Error {
+  name = ErrorName.SIGNAL_ERROR;
+
+  // @TODO: add payload type
+  constructor(message: string, payload: {}) {
+    super(message);
+  }
+}

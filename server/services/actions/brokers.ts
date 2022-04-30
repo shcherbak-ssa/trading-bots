@@ -48,8 +48,8 @@ export const brokersActions = {
     const userBots: BotsDatabaseDocument[] = [];
 
     if (withBots) {
-      const bots: BotsDatabaseDocument[] = await runAction<BotsGetFilters, Bot[]>({
-        type: ActionType.BOTS_LOAD,
+      const bots = await runAction<BotsGetFilters, Bot[]>({
+        type: ActionType.BOTS_GET,
         userId,
         payload: {},
       });

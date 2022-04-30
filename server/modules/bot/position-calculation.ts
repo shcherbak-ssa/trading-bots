@@ -2,7 +2,6 @@ import { FRACTION_DIGITS_TO_HUNDREDTHS, ONE_HUNDRED } from 'shared/constants';
 import { getFractionDigits, roundNumber } from 'shared/utils';
 
 import type { BotBroker, BotPosition, BotSettings, BotSignal } from './types';
-import { TAKE_COMMISSION_TIMES, ZERO_COMMISSION } from './constants';
 import { Position } from './position';
 
 
@@ -15,9 +14,10 @@ export class PositionCalculation {
 
   calculatePosition({ isLong, stopLossPrice }: BotSignal): BotPosition {
     const position: BotPosition = new Position();
+    const { currentSpread: marketCurrentSpread } = this.broker.market;
 
     position.isLong = isLong;
-    position.stopLossPrice = stopLossPrice;
+    position.stopLossPrice = stopLossPrice + ( isLong ? 0 : marketCurrentSpread );
     position.marketSymbol = this.botSettings.brokerMarketSymbol;
 
     this.calculateStopLossSize(position);
@@ -30,61 +30,75 @@ export class PositionCalculation {
 
   // Calculations
   private calculateStopLossSize(position: BotPosition): void {
-    const { currentPrice: marketCurrentPrice, currentSpread: marketCurrentSpread } = this.broker.market;
+    const { tickSize: marketTickSize } = this.broker.market;
+    const openPrice: number = this.getOpenPrice(position);
 
-    const stopLossSizeWithoutSpread: number = position.isLong
-      ? marketCurrentPrice - position.stopLossPrice
-      : position.stopLossPrice - marketCurrentPrice;
+    const stopLossSize: number = position.isLong
+      ? openPrice - position.stopLossPrice
+      : position.stopLossPrice - openPrice;
 
-    position.stopLossSize = marketCurrentSpread + stopLossSizeWithoutSpread;
+    position.stopLossSize = roundNumber(stopLossSize, getFractionDigits(marketTickSize));
   }
 
   private calculatePositionSize(position: BotPosition): void {
+    const { commission: marketCommission, minPositionSize: marketMinPositionSize } = this.broker.market;
+
+    const openCommission: number = this.getOpenCommission(position);
+    const closeCommission: number = position.stopLossPrice * marketCommission / ONE_HUNDRED;
+    const totalCommission: number = openCommission + closeCommission;
+
     let riskSize: number = this.getRiskSize();
+    let positionSize: number = riskSize / ( position.stopLossSize + totalCommission );
 
-    let positionSize: number = this.broker.market.commission === ZERO_COMMISSION
-      ? this.getPositionSizeWithoutCommission(position)
-      : this.getPositionSizeWithCommission(position);
+    const capitalAmount: number = this.getCapitalSize();
+    const positionAmount: number = this.getPositionAmount(position, positionSize);
 
-    // @TODO: compare position size with min lot size
+    if (positionAmount >= capitalAmount) {
+      const openPrice: number = this.getOpenPrice(position);
+      const marketLeverage: number = this.getMarketLeverage();
 
-    const capitalSize: number = this.getCapitalSize();
-    const positionAmount: number = this.getPositionAmount(positionSize);
-
-    if (positionAmount > capitalSize) {
-      const { currentPrice: marketCurrentPrice } = this.broker.market;
-      const marketLeverage = this.getMarketLeverage();
-
-      positionSize = capitalSize * marketLeverage / marketCurrentPrice;
-      riskSize = positionSize * position.stopLossSize;
+      positionSize = capitalAmount * marketLeverage / ( openPrice + totalCommission );
     }
 
+    positionSize = this.roundPositionSize(positionSize);
+    riskSize = positionSize * ( position.stopLossSize + totalCommission );
+
     position.riskSize = roundNumber(riskSize, FRACTION_DIGITS_TO_HUNDREDTHS);
-    position.positionSize = this.roundPositionSize(positionSize);
+    position.positionSize = roundNumber(positionSize, getFractionDigits(marketMinPositionSize));
   }
 
   private calculateTakeProfit(position: BotPosition): void {
     if (!this.botSettings.tradeWithTakeProfit) return;
 
-    const {
-      currentPrice: marketCurrentPrice,
-      currentSpread: marketCurrentSpread,
-      tickSize: marketTickSize,
-    } = this.broker.market;
+    const { commission: marketCommission, tickSize: marketTickSize } = this.broker.market;
+    const commissionFactor: number = marketCommission / ONE_HUNDRED;
 
-    const takeProfitSize: number = position.stopLossSize * this.botSettings.tradeTakeProfitPL;
-    const takeProfitSizeWithSpread: number = marketCurrentSpread + takeProfitSize;
+    const openPrice: number = this.getOpenPrice(position);
+    const openCommission: number = this.getOpenCommission(position);
+    const closeCommissionFactor: number = position.isLong ? 1 - commissionFactor : 1 + commissionFactor;
+    const profitWithoutCommission: number = position.riskSize * this.botSettings.tradeTakeProfitPL;
+
+    const takeProfitSize: number
+      = ( profitWithoutCommission / position.positionSize + 2 * openCommission ) / closeCommissionFactor;
 
     const takeProfitPrice: number = position.isLong
-      ? takeProfitSizeWithSpread + marketCurrentPrice
-      : marketCurrentPrice - takeProfitSizeWithSpread;
+      ? openPrice + takeProfitSize
+      : openPrice - takeProfitSize;
 
-    position.takeProfitSize = takeProfitSize;
-    position.takeProfitPrice = roundNumber(takeProfitPrice, getFractionDigits(marketTickSize));
+    const tickFractionDigits: number = getFractionDigits(marketTickSize);
+
+    position.takeProfitSize = roundNumber(takeProfitSize, tickFractionDigits);
+    position.takeProfitPrice = roundNumber(takeProfitPrice, tickFractionDigits);
   }
 
 
   // Helpers
+  private getOpenPrice({ isLong }: BotPosition): number {
+    const { currentPrice: marketCurrentPrice, currentSpread: marketCurrentSpread } = this.broker.market;
+
+    return marketCurrentPrice + ( isLong ? marketCurrentSpread : 0 );
+  }
+
   private getRiskSize(): number {
     return this.getCapitalSize() * this.botSettings.tradeRiskPercent / ONE_HUNDRED;
   }
@@ -93,11 +107,11 @@ export class PositionCalculation {
     return this.broker.account.totalAmount * this.botSettings.tradeCapitalPercent / ONE_HUNDRED;
   }
 
-  private getPositionAmount(positionSize: number): number {
-    const { currentPrice: marketCurrentPrice } = this.broker.market;
-    const marketLeverage = this.getMarketLeverage();
+  private getPositionAmount(position: BotPosition, positionSize: number): number {
+    const openPrice: number = this.getOpenPrice(position);
+    const marketLeverage: number = this.getMarketLeverage();
 
-    return roundNumber(positionSize * marketCurrentPrice / marketLeverage, FRACTION_DIGITS_TO_HUNDREDTHS);
+    return roundNumber(positionSize * openPrice / marketLeverage, FRACTION_DIGITS_TO_HUNDREDTHS);
   }
 
   private getMarketLeverage(): number {
@@ -118,16 +132,9 @@ export class PositionCalculation {
     return roundedPositionSize;
   }
 
-  private getPositionSizeWithoutCommission({ stopLossSize }: BotPosition): number {
-    return this.getRiskSize() / stopLossSize;
-  }
+  private getOpenCommission(position: BotPosition): number {
+    const { commission: marketCommission } = this.broker.market;
 
-  private getPositionSizeWithCommission({ stopLossSize }: BotPosition): number {
-    const { currentPrice: marketCurrentPrice, commission: marketCommission } = this.broker.market;
-
-    return (
-      this.getRiskSize() /
-      (TAKE_COMMISSION_TIMES * marketCurrentPrice * marketCommission / ONE_HUNDRED + stopLossSize)
-    );
+    return this.getOpenPrice(position) * marketCommission / ONE_HUNDRED;
   }
 }

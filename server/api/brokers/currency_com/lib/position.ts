@@ -4,6 +4,7 @@ import type { ClosePositionRequest, CreateOrderRequest, CreateOrderResponse } fr
 import type { ClosedPositionsResponse, ClosePositionResponse } from './types';
 import type { Position, PositionListRequest, ActivePositionsResponse } from './types';
 import type { ActivePosition, ClosedPosition, ActiveParsedPosition, ClosedParsedPosition } from './types';
+
 import type { RestApi } from './rest-api';
 import { Endpoint, OrderType } from './constants';
 
@@ -18,11 +19,11 @@ export class PositionApi {
     const createdOrder = await this.restApi.post<CreateOrderRequest, CreateOrderResponse>(Endpoint.ORDER, {
       ...position,
       type: OrderType.MARKET,
-      timestamp: Date.now(),
+      timestamp: Date.now() - 500, // @TODO: fix
     });
 
     const { positions } = await this.restApi.get<PositionListRequest, ActivePositionsResponse>(Endpoint.POSITIONS, {
-      timestamp: Date.now(),
+      timestamp: Date.now() - 500, // @TODO: fix
     });
 
     const createdPosition: ActivePosition | undefined
@@ -41,12 +42,12 @@ export class PositionApi {
   async closePosition(positionId: string, marketSymbol: string): Promise<ClosedParsedPosition> {
     await this.restApi.post<ClosePositionRequest, ClosePositionResponse>(Endpoint.CLOSE_POSITION, {
       positionId,
-      timestamp: Date.now(),
+      timestamp: Date.now() - 500, // @TODO: fix
     });
 
     const { history } = await this.restApi.get<PositionListRequest, ClosedPositionsResponse>(Endpoint.POSITIONS_HISTORY, {
       symbol: marketSymbol,
-      timestamp: Date.now(),
+      timestamp: Date.now() - 500, // @TODO: fix
     });
 
     const closedPosition: ClosedPosition | undefined = history.find(({ positionId: id }) => id === positionId);

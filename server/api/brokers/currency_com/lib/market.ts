@@ -54,7 +54,7 @@ export class MarketApi {
   async loadMarketLeverage(marketSymbol: string): Promise<MarketLeverageResponse> {
     return this.restApi.get<MarketLeverageRequest, MarketLeverageResponse>(Endpoint.MARKET_LEVERAGE, {
       symbol: marketSymbol,
-      timestamp: Date.now(),
+      timestamp: Date.now() - 500, // @TODO: fix
     });
   }
 
@@ -107,7 +107,7 @@ export class MarketApi {
       leverage,
       price,
       spread,
-      commission: takerFee,
+      commission: takerFee || 0,
     };
   }
 

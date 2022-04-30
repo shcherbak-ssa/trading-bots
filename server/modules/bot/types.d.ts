@@ -13,7 +13,7 @@ export type BotSignal = {
 }
 
 export interface BotPosition {
-  id: string;
+  brokerPositionId: string;
   isLong: boolean;
   riskSize: number;
   marketSymbol: string;

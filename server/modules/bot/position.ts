@@ -2,7 +2,7 @@ import type { BotPosition } from './types';
 
 
 export class Position implements BotPosition {
-  id: string;
+  brokerPositionId: string;
   isLong: boolean;
   riskSize: number;
   marketSymbol: string;
