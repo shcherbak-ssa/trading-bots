@@ -13,12 +13,12 @@ export class PositionCalculation {
   ) {}
 
 
-  calculatePosition({ isLong, stopLossPrice, marketSymbol }: BotSignal): BotPosition {
+  calculatePosition({ isLong, stopLossPrice }: BotSignal): BotPosition {
     const position: BotPosition = new Position();
 
     position.isLong = isLong;
     position.stopLossPrice = stopLossPrice;
-    position.marketSymbol = marketSymbol;
+    position.marketSymbol = this.botSettings.brokerMarketSymbol;
 
     this.calculateStopLossSize(position);
     this.calculatePositionSize(position);

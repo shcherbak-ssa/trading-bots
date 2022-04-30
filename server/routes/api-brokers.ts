@@ -7,14 +7,16 @@ import type {
   NewBroker,
   OnlyIdPayload
 } from 'global/types';
+
 import { RequestMethod, ServerEndpoint } from 'global/constants';
 
 import type { ServerRequestPayload, ServerRoute } from 'shared/types';
 import { ActionType, Validation } from 'shared/constants';
-import { runAction } from 'shared/actions';
+
+import { runAction } from 'services/actions';
 
 
-export const brokersRoutes: ServerRoute[] = [
+export const apiBrokersRoutes: ServerRoute[] = [
   {
     endpoint: ServerEndpoint.API_BROKERS,
     method: RequestMethod.GET,

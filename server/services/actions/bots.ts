@@ -1,5 +1,4 @@
 import type { Bot, BotClientInfo, BrokerAccount, GetBrokerDataPayload, NewBot, UpdateBotPayload } from 'global/types';
-
 import { BotState, BotUpdateType, BrokerDataType } from 'global/constants';
 
 import type {
@@ -11,8 +10,9 @@ import type {
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
-import { runAction } from 'shared/actions';
 import { getTodayDateString, getTotalActivateTime } from 'shared/utils';
+
+import { runAction } from 'services/actions';
 
 import { UserBots } from 'api/database/user-bots';
 
@@ -40,6 +40,12 @@ export const botsActions = {
     return bots.map((bot, index) => {
       return { ...bot, brokerAccount: brokerAccounts[index] };
     });
+  },
+
+  async [ActionType.BOTS_GET](userId: string, filters: BotsGetFilters): Promise<Bot[]> {
+    const botsCollection: BotsDatabaseCollection = await UserBots.connect(userId);
+
+    return await botsCollection.getBots(filters);
   },
 
   async [ActionType.BOTS_CREATE](userId: string, newBot: NewBot): Promise<BotClientInfo> {

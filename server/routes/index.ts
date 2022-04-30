@@ -1,10 +1,12 @@
 import type { ServerRoute } from 'shared/types';
 
-import { botsRoutes } from './bots';
-import { brokersRoutes } from './brokers';
+import { apiBotsRoutes } from './api-bots';
+import { apiBrokersRoutes } from './api-brokers';
 
 
-export const routes: ServerRoute[] = [
-  ...botsRoutes,
-  ...brokersRoutes,
+export * from './signals';
+
+export const apiRoutes: ServerRoute[] = [
+  ...apiBotsRoutes,
+  ...apiBrokersRoutes,
 ];

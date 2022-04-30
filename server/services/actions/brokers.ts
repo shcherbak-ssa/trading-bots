@@ -18,7 +18,6 @@ import type {
 import { BrokerAccountType, BrokerDataType, StatusCode } from 'global/constants';
 
 import type {
-  BotsDatabaseCollection,
   BotsDatabaseDocument,
   BotsGetFilters,
   BrokerApiLeverageResponse,
@@ -30,11 +29,11 @@ import type {
 
 import { ActionType } from 'shared/constants';
 import { AppError } from 'shared/exceptions';
-import { runAction } from 'shared/actions';
+
+import { runAction } from 'services/actions';
 
 import { ApiKeys, BrokersData } from 'api/brokers';
 import { UserBrokers } from 'api/database/user-brokers';
-import { UserBots } from 'api/database/user-bots';
 
 
 const brokersApiKeys: BrokersApiKeys = new ApiKeys();
@@ -202,8 +201,11 @@ export const brokersActions = {
     const brokersCollection: BrokersDatabaseCollection = await UserBrokers.connect(userId);
     await brokersCollection.updateBroker(id, updates);
 
-    const botsCollection: BotsDatabaseCollection = await UserBots.connect(userId);
-    const activeBots: Bot[] = await botsCollection.getBots({ active: true });
+    const activeBots = await runAction<BotsGetFilters, Bot[]>({
+      type: ActionType.BOTS_GET,
+      userId,
+      payload: { active: true },
+    });
 
     for (const activeBot of activeBots) {
       await runAction<Bot, void>({

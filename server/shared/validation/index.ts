@@ -7,6 +7,7 @@ import { ValidationError } from 'shared/exceptions';
 
 import { brokersValidation } from './brokers';
 import { botsValidation } from './bots';
+import { signalsValidation } from './signals';
 
 
 const validations: { [p in Validation]: Schema } = {
@@ -18,6 +19,7 @@ const validations: { [p in Validation]: Schema } = {
 
   ...brokersValidation,
   ...botsValidation,
+  ...signalsValidation,
 };
 
 

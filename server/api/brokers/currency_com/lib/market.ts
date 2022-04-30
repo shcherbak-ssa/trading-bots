@@ -12,8 +12,8 @@ import { WsApi } from './ws-api';
 
 
 export class MarketApi {
-  private restApi: RestApi;
-  private wsApi: WsApi | undefined;
+  private readonly restApi: RestApi;
+  private readonly wsApi: WsApi | undefined;
 
 
   constructor(restApi: RestApi, wsApi?: WsApi) {
@@ -54,7 +54,7 @@ export class MarketApi {
   async loadMarketLeverage(marketSymbol: string): Promise<MarketLeverageResponse> {
     return this.restApi.get<MarketLeverageRequest, MarketLeverageResponse>(Endpoint.MARKET_LEVERAGE, {
       symbol: marketSymbol,
-      timestamp: Date.now() - 500, // @TODO: fix
+      timestamp: Date.now(),
     });
   }
 

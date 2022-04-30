@@ -36,20 +36,24 @@ export class Bot {
 
 
   async openPosition(signal: BotSignal): Promise<void> {
-    if (this.currentPosition !== null) {
-      await this.closeOpenPosition();
-    }
+    console.log('open', signal);
 
-    const position: BotPosition = this.calculation.calculatePosition(signal);
-    await this.broker.openPosition(position);
-
-    this.broker.market.subscribeToPriceUpdates(this.checkPosition.bind(this));
+    // if (this.currentPosition !== null) {
+    //   await this.closeOpenPosition();
+    // }
+    //
+    // const position: BotPosition = this.calculation.calculatePosition(signal);
+    // await this.broker.openPosition(position);
+    //
+    // this.broker.market.subscribeToPriceUpdates(this.checkPosition.bind(this));
   }
 
   async updateOpenPosition(signal: BotSignal): Promise<void> {
-    if (this.currentPosition === null) return;
+    console.log('update', signal);
 
-    this.currentPosition.stopLossPrice = signal.stopLossPrice;
+    // if (this.currentPosition === null) return;
+    //
+    // this.currentPosition.stopLossPrice = signal.stopLossPrice;
   }
 
   async closeOpenPosition(): Promise<void> {

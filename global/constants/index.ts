@@ -2,11 +2,6 @@ export const QUERY_URL_SEPARATOR: string = '?';
 export const BOT_TOKEN_SEPARATOR: string = '-';
 
 
-export enum SignalType {
-  LONG = 'LONG',
-  SHORT = 'SHORT',
-}
-
 export enum Currency {
   USD = 'USD',
 }
@@ -41,6 +36,8 @@ export enum ServerEndpoint {
   API_BOTS_WITH_ID = '/api/bots/:id',
   API_BROKERS = '/api/brokers',
   API_BROKERS_WITH_ID = '/api/brokers/:id',
+
+  SIGNALS = '/signals/',
 }
 
 

@@ -4,6 +4,7 @@
     "paths": {
       "global/*": ["../global/*"],
       "utils/*": ["utils/*"],
+      "services/*": ["services/*"],
       "shared/*": ["shared/*"],
       "modules/*": ["modules/*"],
       "api/*": ["api/*"]
