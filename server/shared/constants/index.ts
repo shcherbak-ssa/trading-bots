@@ -41,6 +41,7 @@ export enum ErrorName {
   PROCESS_ERROR = 'ProcessError',
   BROKER_API_ERROR = 'BrokerApiError',
   VALIDATION_ERROR = 'ValidationError',
+  SIGNAL_ERROR = 'SignalError',
 }
 
 export enum Validation {

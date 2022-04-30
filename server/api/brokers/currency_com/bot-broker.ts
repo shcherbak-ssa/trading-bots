@@ -49,14 +49,14 @@ export class BotBroker implements Broker {
       side: position.isLong ? OrderSide.BUY : OrderSide.SELL,
     });
 
-    position.id = openPosition.id;
+    position.brokerPositionId = openPosition.id;
     position.feeOpen = openPosition.fee;
   }
 
   async closePosition(position: BotPosition): Promise<void> {
-    const { id, marketSymbol } = position;
+    const { brokerPositionId, marketSymbol } = position;
 
-    const closedPosition: ClosedParsedPosition = await this.positionApi.closePosition(id, marketSymbol);
+    const closedPosition: ClosedParsedPosition = await this.positionApi.closePosition(brokerPositionId, marketSymbol);
 
     position.feeClose = closedPosition.fee;
     position.result = closedPosition.result;

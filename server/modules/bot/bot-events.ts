@@ -5,15 +5,17 @@ import { BotManager } from './bot-manager';
 
 export class BotEvents {
   static async processPositionClosing(botToken: string, position: BotPosition): Promise<void> {
-    throw new Error('Not implemented');
+    console.info(` - info: [bot] close position - ${JSON.stringify(position)}`);
   }
 
   static async processAliveError(botToken: string, errorPlace: AliveBotErrorPlace, message: string): Promise<void> {
-    if (BotEvents.isNeedToRestartBot(errorPlace)) {
-      return await BotManager.restartBot(botToken);
-    }
+    // if (BotEvents.isNeedToRestartBot(errorPlace)) {
+    //   return await BotManager.restartBot(botToken);
+    // }
 
-    throw new Error('Not implemented');
+    // @TODO: process error
+    console.error(` - error: [bot] ${errorPlace} - ${message}`);
+    throw new Error(message);
   }
 
 

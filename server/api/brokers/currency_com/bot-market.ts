@@ -63,7 +63,7 @@ export class BotMarket implements BotBrokerMarket {
     this.subscribeHandler = callback;
   }
 
-  unsubscribeToPriceUpdates() {
+  unsubscribeToPriceUpdates(): void {
     this.subscribeHandler = null;
   }
 }

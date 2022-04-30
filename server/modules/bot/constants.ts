@@ -1,7 +1,3 @@
-export const ZERO_COMMISSION: number = 0;
-export const TAKE_COMMISSION_TIMES: number = 2;
-
-
 export enum AliveBotErrorPlace {
   ACCOUNT_AMOUNT_UPDATE = 'ACCOUNT_AMOUNT_UPDATE',
   MARKET_WS_CLOSE = 'MARKET_WS_CLOSE',
