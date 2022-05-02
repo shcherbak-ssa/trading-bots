@@ -24,7 +24,8 @@ import type {
   BrokersApiKeys,
   BrokersDataApi,
   BrokersDatabaseCollection,
-  BrokersDatabaseDocument
+  BrokersDatabaseDocument,
+  RestartBotPayload
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
@@ -208,10 +209,13 @@ export const brokersActions = {
     });
 
     for (const activeBot of activeBots) {
-      await runAction<Bot, void>({
-        type: ActionType.BOT_MANAGER_ACTIVATE_BOT,
+      await runAction<RestartBotPayload, void>({
+        type: ActionType.BOT_MANAGER_RESTART_BOT,
         userId,
-        payload: activeBot,
+        payload: {
+          bot: activeBot,
+          closePosition: false,
+        },
       });
     }
   },

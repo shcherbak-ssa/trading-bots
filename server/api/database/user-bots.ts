@@ -22,8 +22,8 @@ const userBotSchema = new mongoose.Schema<BotsDatabaseDocument>({
   token: { type: String, required: true },
   initialCapital: { type: Number, required: true },
   active: { type: Boolean, required: true },
-  activeTotalTime: { type: Number, required: true },
   activateAt: { type: String, default: '' },
+  activations: [{ initialCapital: Number, start: String, end: String }],
   createdAt: { type: String, required: true },
   state: { type: String, required: true },
   brokerId: { type: String, required: true },
@@ -96,7 +96,13 @@ export class UserBots extends UserCollection<BotsDatabaseDocument> implements Bo
   }
 
   async updateBot(id: string, updates: UpdateBotPayload['updates']): Promise<void> {
-    await this.collection.updateOne({ _id: id }, updates);
+    const { activation, ...simpleUpdates } = updates;
+
+    await this.collection.updateOne({ _id: id }, simpleUpdates);
+
+    if (activation) {
+      await this.collection.updateOne({ _id: id }, { $push: { activations: activation } });
+    }
   }
 
   async deleteBots(filters: BotsDeleteFilters): Promise<void> {

@@ -34,6 +34,8 @@ export function getTodayDateString(): string {
   return new Date(Date.now()).toISOString();
 }
 
-export function getTotalActivateTime({ activeTotalTime, activateAt }: Bot): number {
-  return activeTotalTime + ( Date.now() - Number(new Date(activateAt)) );
+
+// Helpers
+export async function sleep(milliseconds: number): Promise<void> {
+  return new Promise(resolve => setTimeout(resolve, milliseconds));
 }

@@ -18,7 +18,7 @@ export class PositionCheck {
   }
 
   closeByTakeProfit({ isLong, takeProfitPrice }: BotPosition, currentMarketPrice: number): boolean {
-    if (takeProfitPrice === null) return false;
+    if (!this.botSettings.tradeWithTakeProfit) return false;
 
     if (takeProfitPrice === currentMarketPrice) return true;
 

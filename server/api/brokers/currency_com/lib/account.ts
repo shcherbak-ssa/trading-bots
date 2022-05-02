@@ -1,9 +1,11 @@
 import { StatusCode } from 'global/constants';
+
 import { ProcessError } from 'shared/exceptions';
 
-import type { AccountBalance, AccountRequest, AccountRequestSettings, AccountResponse, ParsedBalance } from './types';
+import type { AccountBalance, AccountRequest, AccountRequestSettings, AccountResponse, ParsedBalance } from '../types';
+import { Endpoint } from '../constants';
+
 import type { RestApi } from './rest-api';
-import { Endpoint } from './constants';
 
 
 export class AccountApi {
@@ -15,7 +17,6 @@ export class AccountApi {
   async loadAccountsInfo(showZeroBalance: boolean): Promise<AccountResponse> {
     return await this.restApi.get<AccountRequest, AccountResponse>(Endpoint.ACCOUNT, {
       showZeroBalance,
-      timestamp: Date.now() - 500, // @TODO: fix
     });
   }
 

@@ -1,4 +1,13 @@
-import type { Bot, BotClientInfo, BrokerAccount, GetBrokerDataPayload, NewBot, UpdateBotPayload } from 'global/types';
+import type {
+  Bot,
+  BotActivation,
+  BotClientInfo,
+  BrokerAccount,
+  GetBrokerDataPayload,
+  NewBot,
+  UpdateBotPayload
+} from 'global/types';
+
 import { BotState, BotUpdateType, BrokerDataType } from 'global/constants';
 
 import type {
@@ -6,11 +15,13 @@ import type {
   BotsDatabaseDocument,
   BotsDeleteFilters,
   BotsGetFilters,
-  DeactivateBotPayload
+  DeactivateBotPayload,
+  PositionDeleteFilters,
+  RestartBotPayload
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
-import { getTodayDateString, getTotalActivateTime } from 'shared/utils';
+import { getTodayDateString } from 'shared/utils';
 
 import { runAction } from 'services/actions';
 
@@ -68,7 +79,7 @@ export const botsActions = {
       ...newBot,
       token: userId,
       activateAt: newBot.active ? today : '',
-      activeTotalTime: 0,
+      activations: [],
       createdAt: today,
       state: BotState.ALIVE,
       initialCapital: newBot.active ? brokerAccount.amount : 0,
@@ -102,19 +113,27 @@ export const botsActions = {
 
     const today: string = getTodayDateString();
 
+    const activation: BotActivation = {
+      initialCapital: currentBot.initialCapital,
+      start: currentBot.activateAt,
+      end: today,
+    };
+
     switch (type) {
       case BotUpdateType.ACTIVATE:
+        updates = {
+          active: true,
+          activateAt: today,
+          initialCapital: brokerAccount.amount,
+        };
+
         await runAction<Bot, void>({
           type: ActionType.BOT_MANAGER_ACTIVATE_BOT,
           userId,
-          payload: { ...currentBot, initialCapital: brokerAccount.amount },
+          payload: { ...currentBot, ...updates },
         });
 
-        await botsCollection.updateBot(id, {
-          active: true,
-          activateAt: today,
-          initialCapital: brokerAccount.amount
-        });
+        await botsCollection.updateBot(id, updates);
 
         return;
       case BotUpdateType.DEACTIVATE:
@@ -127,46 +146,60 @@ export const botsActions = {
         await botsCollection.updateBot(id, {
           active: false,
           activateAt: '',
-          activeTotalTime: getTotalActivateTime(currentBot),
+          activation,
           initialCapital: 0,
         });
 
         return;
       case BotUpdateType.ARCHIVE:
+        updates = {
+          active: false,
+          activateAt: '',
+          state: BotState.ARCHIVE,
+          initialCapital: 0,
+        };
+
         if (currentBot.active) {
           await runAction<DeactivateBotPayload, void>({
             type: ActionType.BOT_MANAGER_DEACTIVATE_BOT,
             userId,
             payload: { botToken: currentBot.token },
           });
+
+          updates.activation = activation;
         }
 
-        await botsCollection.updateBot(id, {
-          active: false,
-          activateAt: '',
-          activeTotalTime: currentBot.active ? getTotalActivateTime(currentBot) : currentBot.activeTotalTime,
-          state: BotState.ARCHIVE,
-          initialCapital: 0,
-        });
+        await botsCollection.updateBot(id, updates);
 
         return;
       case BotUpdateType.UPDATE:
-        await botsCollection.updateBot(id, {
-          ...updates,
-          activateAt: currentBot.active ? today : '',
-          activeTotalTime: currentBot.active ? getTotalActivateTime(currentBot) : currentBot.activeTotalTime,
-          initialCapital: currentBot.active ? brokerAccount.amount : 0,
-        });
+        if (currentBot.active) {
+          const needToUpdateActivation: boolean = updates.tradeCapitalPercent !== undefined;
 
-        const updatedBot: BotsDatabaseDocument = await botsCollection.getBot(id);
+          if (needToUpdateActivation) {
+            updates.activateAt = today;
+            updates.initialCapital = brokerAccount.amount;
 
-        if (updatedBot.active) {
-          await runAction<Bot, void>({
-            type: ActionType.BOT_MANAGER_ACTIVATE_BOT,
+            currentBot.activations.push(activation);
+          }
+
+          await runAction<RestartBotPayload, void>({
+            type: ActionType.BOT_MANAGER_RESTART_BOT,
             userId,
-            payload: updatedBot,
+            payload: {
+              bot: { ...currentBot, ...updates },
+              closePosition: needToUpdateActivation,
+            },
           });
+
+          if (needToUpdateActivation) {
+            updates.activation = activation;
+          }
         }
+
+        await botsCollection.updateBot(id, updates);
+
+        return;
     }
   },
 
@@ -174,7 +207,9 @@ export const botsActions = {
     const botsCollection: BotsDatabaseCollection = await UserBots.connect(userId);
 
     if (filters.brokerId) {
-      const bots: BotsDatabaseDocument[] = await botsCollection.getBots(filters);
+      const bots: BotsDatabaseDocument[] = await botsCollection.getBots({
+        brokerId: filters.brokerId,
+      });
 
       for (const bot of bots) {
         if (bot.active) {
@@ -184,7 +219,21 @@ export const botsActions = {
             payload: { botToken: bot.token },
           });
         }
+
+        await runAction<PositionDeleteFilters, void>({
+          type: ActionType.POSITIONS_DELETE,
+          userId,
+          payload: { botId: bot.id },
+        });
       }
+    }
+
+    if (filters.id) {
+      await runAction<PositionDeleteFilters, void>({
+        type: ActionType.POSITIONS_DELETE,
+        userId,
+        payload: { botId: filters.id },
+      });
     }
 
     await botsCollection.deleteBots(filters);

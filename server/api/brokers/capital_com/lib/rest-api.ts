@@ -6,7 +6,8 @@ import { BrokerApiError } from 'shared/exceptions';
 
 import { BrokerRestApi } from 'api/brokers/lib/broker-rest-api';
 
-import type { Endpoint } from './constants';
+import type { Endpoint } from '../constants';
+
 import { getApiUrl } from './utils';
 
 

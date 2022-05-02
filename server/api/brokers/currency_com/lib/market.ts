@@ -1,13 +1,26 @@
 import { StatusCode } from 'global/constants';
+
 import { ProcessError } from 'shared/exceptions';
 import { getFractionDigits, roundNumber } from 'shared/utils';
 
-import type { ExchangeInfo, ExchangeSymbolInfo, ExchangeSymbolLotSizeFilter } from './types';
-import type { Market, MarketLeverageRequest, MarketLeverageResponse } from './types';
-import type { MarketPrice, MarketPriceRequest, MarketPriceResponse } from './types';
-import type { MarketPriceSubscribePayload, MarketPriceSubscribeResponsePayload, WsSubscribeResponse } from './types';
+import type {
+  ExchangeInfo,
+  ExchangeSymbolInfo,
+  ExchangeSymbolLotSizeFilter,
+  Market,
+  MarketLeverageRequest,
+  MarketLeverageResponse,
+  MarketPrice,
+  MarketPriceRequest,
+  MarketPriceResponse,
+  MarketPriceSubscribePayload,
+  MarketPriceSubscribeResponsePayload,
+  WsSubscribeResponse,
+} from '../types';
+
+import { Endpoint, EndpointSubscription, MarketFilter, Subscription } from '../constants';
+
 import type { RestApi } from './rest-api';
-import { Endpoint, EndpointSubscription, MarketFilter, Subscription } from './constants';
 import { WsApi } from './ws-api';
 
 
@@ -54,7 +67,6 @@ export class MarketApi {
   async loadMarketLeverage(marketSymbol: string): Promise<MarketLeverageResponse> {
     return this.restApi.get<MarketLeverageRequest, MarketLeverageResponse>(Endpoint.MARKET_LEVERAGE, {
       symbol: marketSymbol,
-      timestamp: Date.now() - 500, // @TODO: fix
     });
   }
 
@@ -102,7 +114,7 @@ export class MarketApi {
     return {
       marketSymbol: symbol,
       currency: quoteAsset,
-      minPositionSize: lotSize ? Number(lotSize.minQty) : 0,
+      minQuantity: lotSize ? Number(lotSize.minQty) : 0,
       tickSize,
       leverage,
       price,

@@ -1,10 +1,10 @@
 import type { BrokerApiKeys, BrokerAccount, BrokerMarket, UpdateBrokerPayload } from 'global/types';
-import { BrokerAccountType, BrokerName } from 'global/constants';
+import { BrokerName } from 'global/constants';
 
-import { CreationDocument } from './database';
+import { BrokersApiPayload, CreationDocument } from 'shared/types';
 
 
-// Api Database
+// Database Api
 export type BrokersDatabaseDocument = {
   id: string;
   name: BrokerName;
@@ -24,11 +24,8 @@ export interface BrokersDatabaseCollection {
 }
 
 
-// Api Brokers
-export type BrokersApiPayload = {
-  accountType: BrokerAccountType;
-  apiKeys: { [p: string]: string };
-  brokerName: BrokerName;
+// Brokers Api
+export type BrokersDataApiPayload = BrokersApiPayload & {
   accountCurrency?: string,
   marketSymbol?: string;
 }
@@ -43,7 +40,7 @@ export interface BrokersApiKeys {
 }
 
 export interface BrokersDataApi {
-  getAccounts(payload: BrokersApiPayload): Promise<BrokerAccount[]>;
-  getMarkets(payload: BrokersApiPayload): Promise<BrokerMarket[]>;
-  getMarketLeverages(payload: BrokersApiPayload): Promise<BrokerApiLeverageResponse>;
+  getAccounts(payload: BrokersDataApiPayload): Promise<BrokerAccount[]>;
+  getMarkets(payload: BrokersDataApiPayload): Promise<BrokerMarket[]>;
+  getMarketLeverages(payload: BrokersDataApiPayload): Promise<BrokerApiLeverageResponse>;
 }

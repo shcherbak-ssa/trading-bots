@@ -1,13 +1,14 @@
 import type { BotBrokerMarket, BotSettings } from 'modules/bot/types';
 
-import type { Market, MarketPrice } from './lib/types';
+import type { Market, MarketPrice } from './types';
+
 import type { RestApi } from './lib/rest-api';
 import { MarketApi } from './lib/market';
 
 
 export class BotMarket implements BotBrokerMarket {
   symbol: string;
-  minPositionSize: number;
+  minQuantity: number;
   tickSize: number;
   leverage: number;
   currentPrice: number;
@@ -28,7 +29,7 @@ export class BotMarket implements BotBrokerMarket {
 
     const brokerMarket: BotMarket = new BotMarket(market, api);
     brokerMarket.symbol = market.marketSymbol;
-    brokerMarket.minPositionSize = market.minPositionSize;
+    brokerMarket.minQuantity = market.minQuantity;
     brokerMarket.tickSize = market.tickSize;
     brokerMarket.leverage = market.leverage;
     brokerMarket.currentPrice = market.price;

@@ -1,9 +1,10 @@
 import { StatusCode } from 'global/constants';
 import { ProcessError } from 'shared/exceptions';
 
-import type { AccountItem, AccountResponse, EmptyRequest, ParsedAccount } from './types';
+import type { AccountItem, AccountResponse, EmptyRequest, ParsedAccount } from '../types';
+import { Endpoint } from '../constants';
+
 import type { RestApi } from './rest-api';
-import { Endpoint } from './constants';
 
 
 export class AccountApi {

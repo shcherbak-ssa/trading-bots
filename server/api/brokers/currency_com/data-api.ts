@@ -1,10 +1,11 @@
-import type { BrokerAccount, BrokerMarket } from 'global/types';
+import type { BrokerAccount, BrokerMarket, BrokerApiKeys } from 'global/types';
 import type { BrokerAccountType } from 'global/constants';
 
 import type { BrokerApiLeverageResponse } from 'shared/types';
 
-import type { ExchangeSymbolInfo, ParsedBalance, MarketLeverageResponse } from './lib/types';
-import { ExchangeMarketType } from './lib/constants';
+import type { ExchangeSymbolInfo, ParsedBalance, MarketLeverageResponse } from './types';
+import { ExchangeMarketType } from './constants';
+
 import { RestApi } from './lib/rest-api';
 import { AccountApi } from './lib/account';
 import { MarketApi } from './lib/market';
@@ -13,7 +14,7 @@ import { MarketApi } from './lib/market';
 export class DataApi {
   static async getAccounts(
     accountType: BrokerAccountType,
-    { apiKey, secretKey }: { [p: string]: string },
+    { apiKey, secretKey }: BrokerApiKeys,
   ): Promise<BrokerAccount[]> {
     const api: RestApi = new RestApi(apiKey, secretKey);
     api.setAccountType(accountType);
@@ -43,6 +44,7 @@ export class DataApi {
     const marketApi: MarketApi = new MarketApi(api);
     const markets: ExchangeSymbolInfo[] = await marketApi.loadMarkets();
 
+    // @TODO: add more filters
     return markets
       .filter(({ quoteAsset }) => {
         return quoteAsset === accountCurrency;

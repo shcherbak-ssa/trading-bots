@@ -1,14 +1,19 @@
 import type { Bot, LoadBotsPayload, UpdateBotPayload } from 'global/types';
 
-import type { CreationDocument } from './database';
+import type { CreationDocument } from 'shared/types';
 
 
 // Bot Manager
+export type RestartBotPayload = {
+  bot: Bot;
+  closePosition: boolean;
+}
+
 export type DeactivateBotPayload = {
   botToken: string;
 }
 
-// Api Database
+// Database Api
 export type BotsDatabaseDocument = Bot;
 
 export type BotsGetFilters = LoadBotsPayload & {

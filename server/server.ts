@@ -10,7 +10,7 @@ import { ENTRY_POINT_PATHNAME, API_PATHNAME, Validation, SIGNALS_PATHNAME } from
 import { validate } from 'shared/validation';
 
 import { apiRoutes, signalRoutes } from './routes';
-import { serverConfig } from './server-config';
+import { serverConfig } from './config';
 
 
 declare global {

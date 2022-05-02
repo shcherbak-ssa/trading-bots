@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 import type { UsersDatabaseCollection, UsersDatabaseDocument, CreationDocument } from 'shared/types';
 import { DatabaseCollection } from 'shared/constants';
 
-import type { MongoCollection } from './lib/types';
+import type { MongoCollection } from './types';
 import { Database } from './lib/database';
 
 

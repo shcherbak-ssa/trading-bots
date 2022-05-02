@@ -1,6 +1,5 @@
-import { StatusCode } from 'global/constants';
-
-import { ProcessError } from 'shared/exceptions';
+import type { OpenPosition } from 'shared/types';
+import { BotError } from 'shared/exceptions';
 
 import type { BotSettings } from './types';
 import { Bot } from './bot';
@@ -14,25 +13,25 @@ export class BotManager {
     const bot: Bot | undefined = BotManager.bots.get(botToken);
 
     if (!bot) {
-      throw new ProcessError(`Bot with token '${botToken}' does not exist`, StatusCode.BAD_REQUEST);
+      throw new BotError(`Bot with token '${botToken}' does not exist`);
     }
 
     return bot;
   }
 
-  static async createBot(setting: BotSettings): Promise<void> {
-    if (BotManager.bots.has(setting.token)) {
-      await BotManager.deleteBot(setting.token);
-    }
-
+  static async activateBot(setting: BotSettings, openPosition: OpenPosition | null): Promise<void> {
     const createdBot: Bot = await Bot.create(setting);
+
+    if (openPosition !== null) {
+      createdBot.setCurrentPosition(openPosition);
+    }
 
     BotManager.bots.set(setting.token, createdBot);
 
     console.info(` - info: [bot manager] activate bot. Active bots - ${BotManager.bots.size}`);
   }
 
-  static async deleteBot(botToken: string): Promise<void> {
+  static async deactivateBot(botToken: string): Promise<void> {
     const bot: Bot = BotManager.getBot(botToken);
 
     await bot.closeOpenPosition();
@@ -42,9 +41,10 @@ export class BotManager {
     console.info(` - info: [bot manager] deactivate bot. Active bots - ${BotManager.bots.size}`);
   }
 
-  static async restartBot(id: string): Promise<void> {
-    const { settings: botSettings }: Bot = BotManager.getBot(id);
+  static async restartBot(botToken: string): Promise<void> {
+    const bot: Bot = BotManager.getBot(botToken);
 
-    await BotManager.createBot(botSettings);
+    await BotManager.deactivateBot(botToken);
+    await BotManager.activateBot(bot.settings, null);
   }
 }

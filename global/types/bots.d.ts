@@ -8,8 +8,8 @@ export type Bot = {
   state: BotState;
   initialCapital: number;
   active: boolean;
-  activeTotalTime: number;
   activateAt: string;
+  activations: BotActivation[];
   createdAt: string;
   brokerId: string;
   brokerName: BrokerName;
@@ -29,9 +29,15 @@ export type Bot = {
   tradeCloseAtEndWeek: boolean;
 }
 
+export type BotActivation = {
+  initialCapital: number;
+  start: string;
+  end: string;
+}
+
 export type NewBot = Omit<
   Bot,
-  'id' | 'token' | 'state' | 'initialCapital' | 'activeTotalTime' | 'activateAt' | 'createdAt'
+  'id' | 'token' | 'state' | 'initialCapital' | 'activations' | 'activateAt' | 'createdAt'
 >;
 
 export type BotClientInfo = Bot & {
@@ -52,8 +58,8 @@ export type UpdateBotPayload = {
     name?: string;
     initialCapital?: number;
     active?: boolean;
-    activeTotalTime?: number;
     activateAt?: string;
+    activation?: BotActivation;
     state?: BotState;
     tradeRiskPercent?: number;
     tradeMaxLossPercent?: number;

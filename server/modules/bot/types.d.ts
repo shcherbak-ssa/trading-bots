@@ -13,17 +13,18 @@ export type BotSignal = {
 }
 
 export interface BotPosition {
-  brokerPositionId: string;
+  id: string;
+  brokerPositionIds: string[];
   isLong: boolean;
   riskSize: number;
   marketSymbol: string;
-  positionSize: number;
+  quantity: number;
   stopLossPrice: number;
-  stopLossSize: number
-  takeProfitPrice: number | null;
-  takeProfitSize: number | null;
-  feeOpen: number | null;
-  feeClose: number | null
+  stopLossSize: number;
+  takeProfitPrice: number;
+  takeProfitSize: number;
+  feeOpen: number;
+  feeClose: number;
   result: number;
 }
 
@@ -43,7 +44,7 @@ export interface BotBroker {
 
 export interface BotBrokerMarket {
   symbol: string;
-  minPositionSize: number;
+  minQuantity: number;
   tickSize: number;
   leverage: number;
   commission: number;

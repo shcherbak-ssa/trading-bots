@@ -1,7 +1,7 @@
-import { CreationDocument } from 'shared/types/database';
+import { CreationDocument } from 'shared/types';
 
 
-// Api Database
+// Database Api
 export type UsersDatabaseDocument = {
   id: string;
   email: string;
