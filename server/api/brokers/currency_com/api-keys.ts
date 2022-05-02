@@ -2,7 +2,7 @@ import { BrokerAccountType, StatusCode } from 'global/constants';
 
 import { AppError } from 'shared/exceptions';
 
-import type { AccountResponse } from './lib/types';
+import type { AccountResponse } from './types';
 import { RestApi } from './lib/rest-api';
 import { AccountApi } from './lib/account';
 

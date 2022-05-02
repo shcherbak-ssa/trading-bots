@@ -21,7 +21,7 @@ export class PositionCalculation {
     position.marketSymbol = this.botSettings.brokerMarketSymbol;
 
     this.calculateStopLossSize(position);
-    this.calculatePositionSize(position);
+    this.calculateQuantity(position);
     this.calculateTakeProfit(position);
 
     return position;
@@ -40,31 +40,31 @@ export class PositionCalculation {
     position.stopLossSize = roundNumber(stopLossSize, getFractionDigits(marketTickSize));
   }
 
-  private calculatePositionSize(position: BotPosition): void {
-    const { commission: marketCommission, minPositionSize: marketMinPositionSize } = this.broker.market;
+  private calculateQuantity(position: BotPosition): void {
+    const { commission: marketCommission, minQuantity: marketMinQuantity } = this.broker.market;
 
     const openCommission: number = this.getOpenCommission(position);
     const closeCommission: number = position.stopLossPrice * marketCommission / ONE_HUNDRED;
     const totalCommission: number = openCommission + closeCommission;
 
     let riskSize: number = this.getRiskSize();
-    let positionSize: number = riskSize / ( position.stopLossSize + totalCommission );
+    let quantity: number = riskSize / ( position.stopLossSize + totalCommission );
 
     const capitalAmount: number = this.getCapitalSize();
-    const positionAmount: number = this.getPositionAmount(position, positionSize);
+    const positionAmount: number = this.getPositionAmount(position, quantity);
 
     if (positionAmount >= capitalAmount) {
       const openPrice: number = this.getOpenPrice(position);
       const marketLeverage: number = this.getMarketLeverage();
 
-      positionSize = capitalAmount * marketLeverage / ( openPrice + totalCommission );
+      quantity = capitalAmount * marketLeverage / ( openPrice + totalCommission );
     }
 
-    positionSize = this.roundPositionSize(positionSize);
-    riskSize = positionSize * ( position.stopLossSize + totalCommission );
+    quantity = this.roundQuantity(quantity);
+    riskSize = quantity * ( position.stopLossSize + totalCommission );
 
     position.riskSize = roundNumber(riskSize, FRACTION_DIGITS_TO_HUNDREDTHS);
-    position.positionSize = roundNumber(positionSize, getFractionDigits(marketMinPositionSize));
+    position.quantity = roundNumber(quantity, getFractionDigits(marketMinQuantity));
   }
 
   private calculateTakeProfit(position: BotPosition): void {
@@ -76,10 +76,10 @@ export class PositionCalculation {
     const openPrice: number = this.getOpenPrice(position);
     const openCommission: number = this.getOpenCommission(position);
     const closeCommissionFactor: number = position.isLong ? 1 - commissionFactor : 1 + commissionFactor;
-    const profitWithoutCommission: number = position.riskSize * this.botSettings.tradeTakeProfitPL;
+    const profitWithoutCommission: number = this.getRiskSize() * this.botSettings.tradeTakeProfitPL;
 
     const takeProfitSize: number
-      = ( profitWithoutCommission / position.positionSize + 2 * openCommission ) / closeCommissionFactor;
+      = ( profitWithoutCommission / position.quantity + 2 * openCommission ) / closeCommissionFactor;
 
     const takeProfitPrice: number = position.isLong
       ? openPrice + takeProfitSize
@@ -122,14 +122,14 @@ export class PositionCalculation {
     return this.broker.market.leverage;
   }
 
-  private roundPositionSize(positionSize: number): number {
-    const { minPositionSize: marketMinPositionSize } = this.broker.market;
+  private roundQuantity(quantity: number): number {
+    const { minQuantity: marketMinQuantity } = this.broker.market;
 
-    let roundedPositionSize: number = positionSize / marketMinPositionSize;
-    roundedPositionSize = Math.floor(roundedPositionSize);
-    roundedPositionSize = roundedPositionSize * marketMinPositionSize;
+    let roundedQuantity: number = quantity / marketMinQuantity;
+    roundedQuantity = Math.floor(roundedQuantity);
+    roundedQuantity = roundedQuantity * marketMinQuantity;
 
-    return roundedPositionSize;
+    return roundedQuantity;
   }
 
   private getOpenCommission(position: BotPosition): number {

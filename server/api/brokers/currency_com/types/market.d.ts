@@ -2,7 +2,7 @@
 export type Market = {
   marketSymbol: string;
   currency: string;
-  minPositionSize: number;
+  minQuantity: number;
   tickSize: number;
   leverage: number;
   price: number;
@@ -35,7 +35,6 @@ export type MarketPriceSubscribeResponsePayload = {
 export type MarketLeverageRequest = {
   recvWindow?: number;
   symbol: string;
-  timestamp: number;
 }
 
 export type MarketPriceRequest = {

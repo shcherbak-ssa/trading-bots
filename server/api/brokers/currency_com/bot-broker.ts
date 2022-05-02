@@ -1,8 +1,10 @@
 import { BrokerName } from 'global/constants';
+
 import type { BotBroker as Broker, BotBrokerAccount, BotBrokerMarket, BotPosition, BotSettings } from 'modules/bot/types';
 
-import type { ActiveParsedPosition, ClosedParsedPosition } from './lib/types';
-import { OrderSide } from './lib/constants';
+import type { ActiveParsedPositions, ClosedParsedPositions } from './types';
+import { OrderSide } from './constants';
+
 import { PositionApi } from './lib/position';
 import { RestApi } from './lib/rest-api';
 
@@ -42,23 +44,23 @@ export class BotBroker implements Broker {
   async openPosition(position: BotPosition): Promise<void> {
     const { brokerAccountId, brokerMarketSymbol } = this.botSettings;
 
-    const openPosition: ActiveParsedPosition = await this.positionApi.openPosition({
+    const openPosition: ActiveParsedPositions = await this.positionApi.openPosition({
       accountId: brokerAccountId,
-      quantity: position.positionSize,
+      quantity: position.quantity,
       symbol: brokerMarketSymbol,
       side: position.isLong ? OrderSide.BUY : OrderSide.SELL,
     });
 
-    position.brokerPositionId = openPosition.id;
-    position.feeOpen = openPosition.fee;
+    position.brokerPositionIds = openPosition.ids;
+    position.feeOpen = openPosition.totalFee;
   }
 
   async closePosition(position: BotPosition): Promise<void> {
-    const { brokerPositionId, marketSymbol } = position;
+    const { brokerPositionIds, marketSymbol } = position;
 
-    const closedPosition: ClosedParsedPosition = await this.positionApi.closePosition(brokerPositionId, marketSymbol);
+    const closedPosition: ClosedParsedPositions = await this.positionApi.closePosition(brokerPositionIds, marketSymbol);
 
-    position.feeClose = closedPosition.fee;
+    position.feeClose = closedPosition.totalFee;
     position.result = closedPosition.result;
   }
 }

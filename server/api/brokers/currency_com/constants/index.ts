@@ -5,6 +5,8 @@ export const WS_API_URL: string = 'wss://api-adapter.backend.currency.com/connec
 
 export const ACCOUNT_UPDATE_INTERVAL: number = 60000;
 export const WS_PING_DELAY: number = 5000;
+export const POSITION_HISTORY_LIMIT: number = 10;
+export const POSITION_ACTION_SLEEP_TIME: number = 2000;
 
 
 export enum MarketFilter {

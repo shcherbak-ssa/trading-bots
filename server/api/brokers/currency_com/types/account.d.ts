@@ -16,7 +16,6 @@ export type ParsedBalance = {
 export type AccountRequest = {
   recvWindow?: number;
   showZeroBalance?: boolean;
-  timestamp: number;
 }
 
 

@@ -2,7 +2,8 @@ import type mongoose from 'mongoose';
 
 import type { DatabaseCollection } from 'shared/constants';
 
-import type { MongoCollection } from './types';
+import type { MongoCollection } from '../types';
+
 import { Database } from './database';
 
 

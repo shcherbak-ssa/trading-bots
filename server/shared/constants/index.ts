@@ -11,6 +11,7 @@ export enum ActionType {
   BOT_MANAGER_SETUP_ACTIVE_BOTS = 'bot-manager/setup-active-bots',
   BOT_MANAGER_ACTIVATE_BOT = 'bot-manager/activate-bot',
   BOT_MANAGER_DEACTIVATE_BOT = 'bot-manager/deactivate-bot',
+  BOT_MANAGER_RESTART_BOT = 'bot-manager/restart-bot',
 
   BOTS_LOAD = 'bots/load',
   BOTS_GET = 'bots/get',
@@ -26,6 +27,14 @@ export enum ActionType {
   BROKERS_UPDATE = 'brokers/update',
   BROKERS_DELETE = 'brokers/delete',
 
+  OPEN_POSITIONS_GET = 'open-positions/get',
+  OPEN_POSITIONS_CREATE = 'open-positions/create',
+  OPEN_POSITIONS_UPDATE = 'open-positions/update',
+  OPEN_POSITIONS_DELETE = 'open-positions/delete',
+
+  POSITIONS_CREATE = 'positions/create',
+  POSITIONS_DELETE = 'positions/delete',
+
   SIGNALS_PROCESS = 'signals/process',
 
   USERS_GET = 'users/get',
@@ -35,6 +44,8 @@ export enum DatabaseCollection {
   APP_USERS = 'users',
   USER_BOTS = 'bots',
   USER_BROKERS = 'brokers',
+  USER_OPEN_POSITIONS = 'open-positions',
+  USER_POSITIONS = 'positions',
 }
 
 export enum ErrorName {
@@ -42,6 +53,8 @@ export enum ErrorName {
   BROKER_API_ERROR = 'BrokerApiError',
   VALIDATION_ERROR = 'ValidationError',
   SIGNAL_ERROR = 'SignalError',
+  BOT_ERROR = 'BotError',
+  POSITION_ERROR = 'PositionError',
 }
 
 export enum Validation {

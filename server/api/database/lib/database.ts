@@ -2,8 +2,8 @@ import mongoose from 'mongoose';
 
 import type { DatabaseCollection } from 'shared/constants';
 
-import type { DatabaseName, MongoCollection, MongoSchema, MongoConnection } from './types';
-import { DATABASE_URL, DATABASE_URL_QUERY } from './constants';
+import type { DatabaseName, MongoCollection, MongoSchema, MongoConnection } from '../types';
+import { DATABASE_URL, DATABASE_URL_QUERY } from '../constants';
 
 
 export class Database {

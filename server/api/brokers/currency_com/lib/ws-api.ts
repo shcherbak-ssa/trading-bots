@@ -1,8 +1,8 @@
 import WebSocket from 'ws';
-import { AliveBotErrorPlace, BotEvents } from 'modules/bot';
+import { BotErrorPlace, BotEvents } from 'modules/bot';
 
-import type { WsSubscribeResponse } from './types';
-import { EndpointSubscription, WS_API_URL, WS_PING_DELAY } from './constants';
+import type { WsSubscribeResponse } from '../types';
+import { EndpointSubscription, WS_API_URL, WS_PING_DELAY } from '../constants';
 
 
 type OpenCallback = (api: WsApi) => void;
@@ -54,11 +54,23 @@ export class WsApi {
     };
 
     this.wsClient.onclose = (event) => {
-      BotEvents.processAliveError(this.botToken, AliveBotErrorPlace.MARKET_WS_CLOSE, event.reason);
+      console.error(` - error: [WS API] Currency.com - onclose`, event);
+
+      BotEvents.processError(
+        this.botToken,
+        BotErrorPlace.MARKET_WS_CLOSE,
+        new Error(event.reason)
+      );
     };
 
     this.wsClient.onerror = (err) => {
-      BotEvents.processAliveError(this.botToken, AliveBotErrorPlace.MARKET_WS_ERROR, err.message);
+      console.error(` - error: [WS API] Currency.com - onerror`, err);
+
+      BotEvents.processError(
+        this.botToken,
+        BotErrorPlace.MARKET_WS_ERROR,
+        new Error(err.message)
+      );
     };
   }
 

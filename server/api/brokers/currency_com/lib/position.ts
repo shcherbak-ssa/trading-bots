@@ -1,12 +1,24 @@
-import { ProcessError } from 'shared/exceptions';
+import { PositionError } from 'shared/exceptions';
+import { sleep } from 'shared/utils';
 
-import type { ClosePositionRequest, CreateOrderRequest, CreateOrderResponse } from './types';
-import type { ClosedPositionsResponse, ClosePositionResponse } from './types';
-import type { Position, PositionListRequest, ActivePositionsResponse } from './types';
-import type { ActivePosition, ClosedPosition, ActiveParsedPosition, ClosedParsedPosition } from './types';
+import type {
+  ClosedParsedPositions,
+  ClosePositionRequest,
+  CreateOrderRequest,
+  CreateOrderResponse,
+  ClosedPositionsResponse,
+  ClosePositionResponse,
+  ClosedPosition,
+  Position,
+  PositionListRequest,
+  ActivePositionsResponse,
+  ActivePosition,
+  ActiveParsedPositions,
+} from '../types';
+
+import { Endpoint, OrderType, POSITION_ACTION_SLEEP_TIME, POSITION_HISTORY_LIMIT } from '../constants';
 
 import type { RestApi } from './rest-api';
-import { Endpoint, OrderType } from './constants';
 
 
 export class PositionApi {
@@ -15,50 +27,132 @@ export class PositionApi {
   ) {}
 
 
-  async openPosition(position: Position): Promise<ActiveParsedPosition> {
-    const createdOrder = await this.restApi.post<CreateOrderRequest, CreateOrderResponse>(Endpoint.ORDER, {
-      ...position,
-      type: OrderType.MARKET,
-      timestamp: Date.now() - 500, // @TODO: fix
-    });
+  async openPosition(position: Position): Promise<ActiveParsedPositions> {
+    const { orderId: createdOrderId, rejectMessage }
+      = await this.restApi.post<CreateOrderRequest, CreateOrderResponse>(
+        Endpoint.ORDER,
+        { ...position, type: OrderType.MARKET },
+      );
 
-    const { positions } = await this.restApi.get<PositionListRequest, ActivePositionsResponse>(Endpoint.POSITIONS, {
-      timestamp: Date.now() - 500, // @TODO: fix
-    });
+    if (rejectMessage !== undefined) {
+      console.error(` - error: [position] open positions - ${rejectMessage}`);
 
-    const createdPosition: ActivePosition | undefined
-      = positions.find(({ orderId }) => orderId === createdOrder.orderId);
-
-    if (createdPosition) {
-      return {
-        id: createdPosition.id,
-        fee: createdPosition.fee,
-      };
+      throw new PositionError(
+        {
+          message: `Something went wrong with open position. Reason: ${rejectMessage}.`
+        }, {
+          message: `Please, check position in broker system.`,
+        },
+      );
     }
 
-    throw new ProcessError(`Something went wrong with open position. Please, check position in broker system.`);
+    await sleep(POSITION_ACTION_SLEEP_TIME);
+
+    const { positions }
+      = await this.restApi.get<PositionListRequest, ActivePositionsResponse>(Endpoint.POSITIONS, {});
+
+    const createdPositions: ActivePosition[] = positions.filter(({ orderId }) => orderId === createdOrderId);
+
+    if (!createdPositions.length) {
+      console.error(` - error: [position] open positions - no open positions found`);
+
+      throw new PositionError(
+        {
+          message: `Something went wrong with open position. Reason: no open positions found.`
+        }, {
+          message: `Please, check position in broker system.`,
+        },
+      );
+    }
+
+    const openQuantity: number = createdPositions.reduce((total, position) => {
+      return total + position.openQuantity;
+    }, 0);
+
+    if (Math.abs(openQuantity) !== position.quantity) {
+      const reasonMessage: string = `quantity compare (open: ${Math.abs(openQuantity)}, must: ${position.quantity})`;
+
+      console.error(` - error: [position] open positions - ${reasonMessage}`);
+
+      throw new PositionError(
+        {
+          message: `Something went wrong with open position. Reason: ${reasonMessage}.`
+        }, {
+          message: `Please, check position in broker system.`,
+        },
+      );
+    }
+
+    return createdPositions
+      .reduce((result, position) => {
+        result.ids.push(position.id);
+        result.totalFee += position.fee;
+
+        return result;
+      }, { totalFee: 0, ids: [] } as ActiveParsedPositions);
   }
 
-  async closePosition(positionId: string, marketSymbol: string): Promise<ClosedParsedPosition> {
-    await this.restApi.post<ClosePositionRequest, ClosePositionResponse>(Endpoint.CLOSE_POSITION, {
-      positionId,
-      timestamp: Date.now() - 500, // @TODO: fix
-    });
+  async closePosition(positionIds: string[], marketSymbol: string): Promise<ClosedParsedPositions> {
+    for (const id of positionIds) {
+      const { request: [{ rejectReason }] } = await this.restApi.post<ClosePositionRequest, ClosePositionResponse>(
+        Endpoint.CLOSE_POSITION,
+        { positionId: id }
+      );
 
-    const { history } = await this.restApi.get<PositionListRequest, ClosedPositionsResponse>(Endpoint.POSITIONS_HISTORY, {
-      symbol: marketSymbol,
-      timestamp: Date.now() - 500, // @TODO: fix
-    });
+      if (rejectReason !== undefined) {
+        console.error(` - error: [position] close positions (${positionIds.length}) - ${rejectReason}`);
 
-    const closedPosition: ClosedPosition | undefined = history.find(({ positionId: id }) => id === positionId);
-
-    if (closedPosition) {
-      return {
-        fee: closedPosition.fee,
-        result: closedPosition.rpl,
-      };
+        throw new PositionError(
+          {
+            message: `Something went wrong with position closing. Reason: ${rejectReason}.`
+          }, {
+            message: `Please, check position in broker system.`,
+          },
+        );
+      }
     }
 
-    throw new ProcessError(`Something went wrong with position closing. Please, check position in broker system.`);
+    await sleep(POSITION_ACTION_SLEEP_TIME);
+
+    const closedPositions: ClosedPosition[] = await this.getClosedPositions(positionIds, marketSymbol);
+
+    if (closedPositions.length !== positionIds.length) {
+      console.error(` - error: [position] close positions (${positionIds.length}) - invalid history positions length`);
+
+      throw new PositionError(
+        {
+          message: `Something went wrong with position closing.`
+        }, {
+          message: `Please, check position in broker system.`,
+        },
+      );
+    }
+
+    return this.parseClosedPositions(closedPositions);
+  }
+
+
+  async getClosedPositions(positionIds: string[], marketSymbol: string): Promise<ClosedPosition[]> {
+    const { history } = await this.restApi.get<PositionListRequest, ClosedPositionsResponse>(
+      Endpoint.POSITIONS_HISTORY,
+      {
+        symbol: marketSymbol,
+        limit: POSITION_HISTORY_LIMIT + positionIds.length,
+      },
+    );
+
+    return history.filter(({ positionId: id }) => {
+      return positionIds.includes(id);
+    });
+  }
+
+  parseClosedPositions(closedPositions: ClosedPosition[]): ClosedParsedPositions {
+    return closedPositions
+      .reduce((result, position) => {
+        result.totalFee += position.fee;
+        result.result += position.rpl;
+
+        return result;
+      }, { totalFee: 0, result: 0 } as ClosedParsedPositions);
   }
 }

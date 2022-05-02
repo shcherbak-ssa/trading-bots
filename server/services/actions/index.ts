@@ -3,6 +3,8 @@ import type { Action, ActionFunction, ActionsObject } from 'shared/types';
 import { botManagerActions } from './bot-manager';
 import { botsActions } from './bots';
 import { brokersActions } from './brokers';
+import { openPositionsActions } from './open-positions';
+import { positionsActions } from './positions';
 import { signalsActions } from './signals';
 import { usersActions } from './users';
 
@@ -11,6 +13,8 @@ const actions: ActionsObject = {
   ...botManagerActions,
   ...botsActions,
   ...brokersActions,
+  ...openPositionsActions,
+  ...positionsActions,
   ...signalsActions,
   ...usersActions,
 };

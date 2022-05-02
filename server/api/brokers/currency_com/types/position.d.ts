@@ -1,6 +1,15 @@
-import { PositionCloseRejectReason, PositionCloseState, PositionCloseType } from '../constants';
-import { PositionSource, PositionState, PositionStatus } from '../constants';
-import { OrderSide, OrderStatus, OrderTimeInForce, OrderType } from '../constants';
+import {
+  PositionCloseRejectReason,
+  PositionCloseState,
+  PositionCloseType,
+  PositionSource,
+  PositionState,
+  PositionStatus,
+  OrderSide,
+  OrderStatus,
+  OrderTimeInForce,
+  OrderType,
+} from '../constants';
 
 
 // Custom Models
@@ -11,13 +20,13 @@ export type Position = {
   side: OrderSide;
 }
 
-export type ActiveParsedPosition = {
-  id: string;
-  fee: number;
+export type ActiveParsedPositions = {
+  ids: string[];
+  totalFee: number;
 }
 
-export type ClosedParsedPosition = {
-  fee: number;
+export type ClosedParsedPositions = {
+  totalFee: number;
   result: number;
 }
 
@@ -91,7 +100,6 @@ export type CreateOrderRequest = {
   symbol: string;
   side: OrderSide;
   type: OrderType; // MARKET
-  timestamp: number;
   expireTimestamp?: number;
   guaranteedStopLoss?: boolean;
   leverage?: number;
@@ -104,12 +112,11 @@ export type CreateOrderRequest = {
 
 export type PositionListRequest = {
   symbol?: string;
-  timestamp: number;
+  limit?: number;
 }
 
 export type ClosePositionRequest = {
   positionId: string;
-  timestamp: number;
   recvWindow?: number;
 }
 
@@ -123,7 +130,7 @@ export type CreateOrderResponse = {
   orderId: string;
   origQty: string;
   price: string;
-  rejectMessage: string;
+  rejectMessage?: string;
   side: OrderSide;
   status: OrderStatus;
   stopLoss: number;
@@ -150,7 +157,7 @@ export type ClosePositionResponse = {
     instrumentId: number;
     orderId: string;
     positionId: string;
-    rejectReason: PositionCloseRejectReason;
+    rejectReason?: PositionCloseRejectReason;
     rqBody: string;
     rqType: PositionCloseType;
     state: PositionCloseState;

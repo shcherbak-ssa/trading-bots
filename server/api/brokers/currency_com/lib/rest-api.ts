@@ -7,8 +7,9 @@ import { generateHmacSignature, stringifyPayload } from 'shared/utils';
 
 import { BrokerRestApi } from 'api/brokers/lib/broker-rest-api';
 
-import type { ResponseError } from './types';
-import type { Endpoint } from './constants';
+import type { ResponseError } from '../types';
+import type { Endpoint } from '../constants';
+
 import { getApiUrl } from './utils';
 
 
@@ -66,11 +67,13 @@ export class RestApi extends BrokerRestApi {
   }
 
   private preparingPayload<Payload>(payload: Payload): string {
+    const timestamp: number = Date.now() - 500; // @TODO: fix timestamp
+
     const signature: string = generateHmacSignature(
       this.secretKey,
-      stringifyPayload(payload),
+      stringifyPayload({ ...payload, timestamp }),
     );
 
-    return stringifyPayload({ ...payload, signature });
+    return stringifyPayload({ ...payload, timestamp, signature });
   }
 }

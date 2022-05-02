@@ -20,7 +20,7 @@ export class AppError extends Error {
   status: StatusCode;
 
   constructor(status: StatusCode, ...errors: ErrorItem[]) {
-    super();
+    super(errors.map(({ message }) => message).join('\n'));
 
     this.payload = { errors };
     this.status = status;
@@ -59,5 +59,31 @@ export class SignalError extends Error {
   // @TODO: add payload type
   constructor(message: string, payload: {}) {
     super(message);
+  }
+}
+
+export class BotError extends AppError {
+  name = ErrorName.BOT_ERROR;
+
+  constructor(message: string) {
+    super(StatusCode.INTERNAL_SERVER_ERROR, { message });
+
+    this.payload = {
+      heading: 'Bot error',
+      errors: [{ message }],
+    }
+  }
+}
+
+export class PositionError extends AppError {
+  name = ErrorName.POSITION_ERROR;
+
+  constructor(...errors: ErrorItem[]) {
+    super(StatusCode.INTERNAL_SERVER_ERROR, ...errors);
+
+    this.payload = {
+      heading: 'Position error',
+      errors,
+    }
   }
 }
