@@ -22,7 +22,7 @@ export class BotAccount implements BotBrokerAccount {
     const api: AccountApi = new AccountApi(restApi);
     const brokerAccount: BotAccount = new BotAccount(botSettings, api);
 
-    await brokerAccount.updateCurrentAccount();
+    await brokerAccount.updateCurrentAccount(); // @TODO: add to job
     setInterval(brokerAccount.updateCurrentAccount.bind(brokerAccount), ACCOUNT_UPDATE_INTERVAL);
 
     return brokerAccount;

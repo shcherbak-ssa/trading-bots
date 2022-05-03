@@ -2,6 +2,10 @@ export const API_PATHNAME: string = '/api';
 export const SIGNALS_PATHNAME: string = '/signals';
 export const ENTRY_POINT_PATHNAME: string = '*';
 
+export const JOB_TIMEZONE: string = 'Europe/London';
+
+export const DATE_STRING_27_DAYS: string = '27 days';
+
 
 export const ONE_HUNDRED: number = 100;
 export const FRACTION_DIGITS_TO_HUNDREDTHS: number = 2;
@@ -82,4 +86,8 @@ export enum SignalType {
 export enum SignalDirection {
   LONG = 'LONG',
   SHORT = 'SHORT',
+}
+
+export enum JobExpression {
+  CHECK_BOTS_RESTART = '0 1 * * SAT',
 }
