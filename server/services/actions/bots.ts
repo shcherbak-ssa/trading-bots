@@ -8,7 +8,7 @@ import type {
   UpdateBotPayload
 } from 'global/types';
 
-import { BotState, BotUpdateType, BrokerDataType } from 'global/constants';
+import { BotRestartMode, BotState, BotUpdateType, BrokerDataType } from 'global/constants';
 
 import type {
   BotsDatabaseCollection,
@@ -17,11 +17,12 @@ import type {
   BotsGetFilters,
   DeactivateBotPayload,
   PositionDeleteFilters,
-  RestartBotPayload
+  RestartBotPayload,
+  UsersDatabaseDocument
 } from 'shared/types';
 
-import { ActionType } from 'shared/constants';
-import { calculateProportion, getTodayDateString } from 'shared/utils';
+import { ActionType, DATE_STRING_27_DAYS } from 'shared/constants';
+import { calculateProportion, convertDateStringToNumber, getMilliseconds, getTodayDateString } from 'shared/utils';
 
 import { runAction } from 'services/actions';
 
@@ -265,5 +266,43 @@ export const botsActions = {
     await botsCollection.deleteBots(filters);
   },
 
-  async [ActionType.BOTS_CHECK_RESTART](): Promise<void> {},
+  async [ActionType.BOTS_CHECK_RESTART](): Promise<void> {
+    const users: UsersDatabaseDocument[] = await runAction({
+      type: ActionType.USERS_GET,
+      userId: '',
+      payload: {},
+    });
+
+    for (const { id: userId } of users) {
+      const activeBots = await runAction<BotsGetFilters, Bot[]>({
+        type: ActionType.BOTS_GET,
+        userId,
+        payload: { active: true, withBrokerAccount: false },
+      });
+
+      for (const { id, restartEnable, restartMode, activateAt } of activeBots) {
+        if (!restartEnable) continue;
+
+        const needToRestart: boolean = (
+          restartMode === BotRestartMode.WEEK ||
+          (
+            restartMode === BotRestartMode.MONTH &&
+            Date.now() - convertDateStringToNumber(activateAt) > getMilliseconds(DATE_STRING_27_DAYS)
+          )
+        );
+
+        if (needToRestart) {
+          await runAction<UpdateBotPayload, void>({
+            type: ActionType.BOTS_UPDATE,
+            userId,
+            payload: {
+              id,
+              type: BotUpdateType.RESTART,
+              updates: {},
+            },
+          });
+        }
+      }
+    }
+  },
 };

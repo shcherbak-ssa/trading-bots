@@ -3,6 +3,8 @@ import querystring from 'querystring';
 
 import { ONE_HUNDRED } from 'shared/constants';
 
+const ms = require('ms');
+
 
 // Math
 export function getFractionDigits(num: string | number): number {
@@ -36,6 +38,14 @@ export function stringifyPayload<Payload>(payload: Payload): string {
 // Date
 export function getTodayDateString(): string {
   return new Date(Date.now()).toISOString();
+}
+
+export function getMilliseconds(date: string): number {
+  return ms(date);
+}
+
+export function convertDateStringToNumber(date: string): number {
+  return Number(new Date(date));
 }
 
 

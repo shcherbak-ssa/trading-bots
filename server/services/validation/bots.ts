@@ -52,7 +52,7 @@ export const botsValidation = {
     tradeMarketLeverage: Joi.number().required(),
     tradeCloseAtEndDay: Joi.boolean().required(),
     tradeCloseAtEndWeek: Joi.boolean().required(),
-    restart: Joi.boolean().required(),
+    restartEnable: Joi.boolean().required(),
     restartMode: Joi.string()
       .valid(
         BotRestartMode.NONE,
@@ -92,7 +92,7 @@ export const botsValidation = {
       tradeMarketLeverage: Joi.number(),
       tradeCloseAtEndDay: Joi.boolean(),
       tradeCloseAtEndWeek: Joi.boolean(),
-      restart: Joi.boolean(),
+      restartEnable: Joi.boolean(),
       restartMode: Joi.string()
         .valid(
           BotRestartMode.NONE,

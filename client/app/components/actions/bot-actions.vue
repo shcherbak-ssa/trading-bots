@@ -223,12 +223,12 @@
         <base-checkbox
             label="Enable restart"
             checkboxId="restart-bot"
-            :value="state.bot.restart"
-            @change="(value) => state.bot.restart = value"
+            :value="state.bot.restartEnable"
+            @change="(value) => state.bot.restartEnable = value"
         />
 
         <base-dropdown
-            v-if="state.bot.restart"
+            v-if="state.bot.restartEnable"
             label="Restart mode"
             placeholder="Select restart mode"
             optionLabel="label"
@@ -458,7 +458,7 @@ const validationRules = computed(() => {
     },
   };
 
-  if (state.bot.restart) {
+  if (state.bot.restartEnable) {
     rules.bot.restartMode = {
       required: (value: string) => value !== '' && value !== BotRestartMode.NONE,
     };
@@ -518,7 +518,7 @@ async function setBrokerDataForCurrentBot(): Promise<void> {
     state.selectedBrokerMarketLeverageOption = { value: actionState.tradeMarketLeverage.toString() };
   }
 
-  if (selectedBot.restart) {
+  if (selectedBot.restartEnable) {
     const selectedRestartModeOption: DropdownRestartModeOption | undefined
       = botCreateSettings.restartMode.options.find(({ mode }) => mode === selectedBot.restartMode);
 

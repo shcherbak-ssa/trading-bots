@@ -27,7 +27,7 @@ export type Bot = {
   tradeMarketLeverage: number;
   tradeCloseAtEndDay: boolean;
   tradeCloseAtEndWeek: boolean;
-  restart: boolean;
+  restartEnable: boolean;
   restartMode: BotRestartMode;
 }
 
@@ -72,7 +72,7 @@ export type UpdateBotPayload = {
     tradeMarketLeverage?: number;
     tradeCloseAtEndDay?: boolean;
     tradeCloseAtEndWeek?: boolean;
-    restart?: boolean;
+    restartEnable?: boolean;
     restartMode?: BotRestartMode;
   };
 }
