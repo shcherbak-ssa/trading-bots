@@ -228,12 +228,21 @@
             @change="(value) => state.bot.active = value"
         />
 
-        <base-message v-if="otherBotsForUpdate.length" type="error">
-          You updated {{ otherBotsForUpdate.length }} bot(s). They will be restarted and their open positions will be closed if they are active.
+        <base-message v-if="storeGetters.isBotSelected && state.bot.active" type="info">
+          After the update, the bot will restart.
         </base-message>
 
-        <base-message v-if="storeGetters.isBotSelected && state.bot.active" type="error">
-          After the update, the bot will restart and its open positions will be closed
+        <base-message
+            v-if="botUpdates !== null && botUpdates.tradeCapitalPercent !== undefined && state.bot.active"
+            type="danger"
+        >
+          You updated important settings.
+          Open position will be closed before restart.
+        </base-message>
+
+        <base-message v-if="otherBotsForUpdate.length" type="danger">
+          You updated other bots ({{ otherBotsForUpdate.length }}).
+          They will be restarted and their open positions will be closed if they are active.
         </base-message>
 
         <base-button
@@ -266,10 +275,10 @@ import type {
 
 import { ActionType, initialBotActionState, StoreMutation } from 'shared/constants';
 import { botCreateConfigs, botCreateSettings } from 'shared/config';
-import { runAction } from 'shared/actions';
 import { formDate } from 'shared/utils';
 
 import { Notifications } from 'services/notifications';
+import { runAction } from 'services/actions';
 
 import { useCloseActionSection, useLoadBrokers } from 'app/hooks';
 import { Store, useStore } from 'app/store';
@@ -640,6 +649,15 @@ async function runBotAction(): Promise<void> {
 
   const { selectedBot } = storeState.actionSection;
 
+  const actionCallbacks = {
+    callback: () => {
+      updateOtherBots();
+    },
+    errorCallback: () => {
+      state.isCreationProcessing = false;
+    },
+  };
+
   if (selectedBot && botUpdates.value) {
     await runAction<BotUpdatePayload>({
       type: ActionType.BOTS_UPDATE,
@@ -649,22 +667,15 @@ async function runBotAction(): Promise<void> {
         botName: selectedBot.name,
         updates: botUpdates.value,
       },
-      callback: () => {
-        updateOtherBots();
-      },
+      ...actionCallbacks,
     });
   } else {
     await runAction<BotActionState>({
       type: ActionType.BOTS_CREATE,
       payload: { ...state.bot },
-      callback: () => {
-        updateOtherBots();
-      },
+      ...actionCallbacks,
     });
   }
-
-  // @TODO: loading
-  state.isCreationProcessing = false;
 }
 
 async function updateOtherBots(): Promise<void> {

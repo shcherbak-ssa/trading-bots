@@ -7,6 +7,14 @@ import { Api } from './lib/api';
 
 
 export class Bots implements BotsApi {
+  async getBot(id: string): Promise<BotClientInfo> {
+    return await Api.get({
+      endpoint: ServerEndpoint.API_BOTS_WITH_ID,
+      params: { id },
+      body: {},
+    });
+  }
+
   async loadBots(payload: LoadBotsPayload): Promise<BotClientInfo[]> {
     return await Api.get({
       endpoint: ServerEndpoint.API_BOTS,

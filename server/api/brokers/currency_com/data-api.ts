@@ -4,7 +4,7 @@ import type { BrokerAccountType } from 'global/constants';
 import type { BrokerApiLeverageResponse } from 'shared/types';
 
 import type { ExchangeSymbolInfo, ParsedBalance, MarketLeverageResponse } from './types';
-import { ExchangeMarketType } from './constants';
+import { ExchangeMarketAssetType, ExchangeMarketType } from './constants';
 
 import { RestApi } from './lib/rest-api';
 import { AccountApi } from './lib/account';
@@ -36,7 +36,7 @@ export class DataApi {
   static async getMarkets(
     accountType: BrokerAccountType,
     accountCurrency: string,
-    { apiKey, secretKey }: { [p: string]: string },
+    { apiKey, secretKey }: BrokerApiKeys,
   ): Promise<BrokerMarket[]> {
     const api: RestApi = new RestApi(apiKey, secretKey);
     api.setAccountType(accountType);
@@ -44,13 +44,15 @@ export class DataApi {
     const marketApi: MarketApi = new MarketApi(api);
     const markets: ExchangeSymbolInfo[] = await marketApi.loadMarkets();
 
-    // @TODO: add more filters
     return markets
-      .filter(({ quoteAsset }) => {
-        return quoteAsset === accountCurrency;
-      })
-      .filter(({ marketType }) => {
-        return marketType === ExchangeMarketType.LEVERAGE;
+      .filter(({ assetType, quoteAsset, marketType }) => {
+        return (
+          quoteAsset === accountCurrency &&
+          marketType === ExchangeMarketType.LEVERAGE &&
+          assetType !== ExchangeMarketAssetType.BOND &&
+          assetType !== ExchangeMarketAssetType.INTEREST_RATE &&
+          assetType !== ExchangeMarketAssetType.REAL_ESTATE
+        );
       })
       .filter((value, index, self) => {
         return index === self.findIndex((t) => t.name === value.name);
@@ -67,7 +69,7 @@ export class DataApi {
   static async getMarketLeverages(
     accountType: BrokerAccountType,
     marketSymbol: string,
-    { apiKey, secretKey }: { [p: string]: string },
+    { apiKey, secretKey }: BrokerApiKeys,
   ): Promise<BrokerApiLeverageResponse> {
     const api: RestApi = new RestApi(apiKey, secretKey);
     api.setAccountType(accountType);

@@ -114,11 +114,9 @@ import type { Broker, BrokerBot } from 'global/types';
 import { BotState } from 'global/constants';
 
 import { SectionComponent, ActionType } from 'shared/constants';
-import { brokerConfigs } from 'shared/config';
-import { runAction } from 'shared/actions';
 import { formDate } from 'shared/utils';
 
-import { Notifications } from 'services/notifications';
+import { runAction } from 'services/actions';
 
 import { useOpenActionSection, useLoadBrokers } from 'app/hooks';
 import { Store, useStore } from 'app/store';

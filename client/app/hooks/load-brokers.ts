@@ -1,7 +1,8 @@
 import type { LoadBrokersPayload } from 'global/types';
 
 import { ActionType } from 'shared/constants';
-import { runAction } from 'shared/actions';
+
+import { runAction } from 'services/actions';
 
 
 export function useLoadBrokers(withBots: boolean) {

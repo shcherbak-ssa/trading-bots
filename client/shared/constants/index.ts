@@ -42,16 +42,11 @@ export enum StoreMutation {
 export enum IconList {
   DASHBOARD = 'dashboard',
   BOTS = 'bots',
-  BROKERS = 'brokers',
   ANALYTICS = 'analytics',
   SETTINGS = 'settings',
 
   MENU_OPEN = 'menu-open',
   MENU_CLOSE = 'menu-close',
-
-  NOTIFICATION_ERROR = 'notification-error',
-  NOTIFICATION_INFO = 'notification-info',
-  NOTIFICATION_SUCCESS = 'notification-success',
 }
 
 export enum Route {

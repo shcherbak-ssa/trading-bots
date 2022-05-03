@@ -1,13 +1,13 @@
 <template>
   <i
       v-if="props.type === 'pi'"
-      class="base-pi-icon pi"
+      class="base-icon base-pi-icon pi"
       :class="`pi-${props.icon}`"
   />
 
   <icon
       v-else-if="props.type === 'mi'"
-      class="base-mi-icon"
+      class="base-icon base-mi-icon"
       :icon="props.icon"
   />
 </template>

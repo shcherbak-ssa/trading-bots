@@ -43,9 +43,9 @@ import type { Broker } from 'global/types';
 import type { BrokerConnectConfig, DropdownBrokerOption } from 'shared/types';
 import { ActionType } from 'shared/constants';
 import { brokerConnectConfigs } from 'shared/config';
-import { runAction } from 'shared/actions';
 
 import { Notifications } from 'services/notifications';
+import { runAction } from 'services/actions';
 
 import { useCloseActionSection } from 'app/hooks';
 import { Store, useStore } from 'app/store';
@@ -114,7 +114,7 @@ onMounted(() => {
 function selectBroker({ brokerName, status }: DropdownBrokerOption): void {
   if (status) {
     state.selectedBroker = null;
-    state.message = 'Broker is already connected';
+    state.message = 'Broker is already connected.';
     state.messageType = 'info';
 
     return;

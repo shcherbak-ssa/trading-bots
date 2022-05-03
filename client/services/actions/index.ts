@@ -1,4 +1,5 @@
 import type { Action, ActionFunction, ActionsObject } from 'shared/types';
+
 import { Notifications } from 'services/notifications';
 
 import { botsActions } from './bots';
@@ -11,7 +12,7 @@ const actions: ActionsObject = {
 };
 
 
-export async function runAction<Payload>({ type, payload, callback }: Action<Payload>): Promise<void> {
+export async function runAction<Payload>({ type, payload, callback, errorCallback }: Action<Payload>): Promise<void> {
   try {
     const action: ActionFunction<Payload> = actions[type];
 
@@ -27,12 +28,14 @@ export async function runAction<Payload>({ type, payload, callback }: Action<Pay
   } catch (e: any) {
     if ('heading' in e) {
       Notifications.showErrorNotification(e.heading, e.message);
+    } else {
+      console.error(e);
 
-      return;
+      Notifications.showErrorNotification('Application error', e.message);
     }
 
-    console.error(e);
-
-    Notifications.showErrorNotification('Application error', e.message);
+    if (errorCallback) {
+      errorCallback();
+    }
   }
 }

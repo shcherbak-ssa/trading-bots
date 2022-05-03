@@ -163,13 +163,12 @@
 import { computed, onMounted, reactive, watch } from 'vue';
 
 import type { BotClientInfo, LoadBotsPayload } from 'global/types';
-import { BotState, BotUpdateType } from 'global/constants';
+import { BotState } from 'global/constants';
 
-import type { BotUpdatePayload, BotDeletePayload } from 'shared/types';
 import { SectionComponent, ActionType } from 'shared/constants';
-import { brokerConfigs } from 'shared/config';
-import { runAction } from 'shared/actions';
 import { getCurrencySymbol } from 'shared/utils';
+
+import { runAction } from 'services/actions';
 
 import { useCloseItemSection, useLoadBrokers, useOpenActionSection, useOpenItemSection } from 'app/hooks';
 import { Store, useStore } from 'app/store';

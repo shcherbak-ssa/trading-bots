@@ -81,6 +81,7 @@ export class UserBots extends UserCollection<BotsDatabaseDocument> implements Bo
   async createBot(newBot: CreationDocument<BotsDatabaseDocument>): Promise<BotsDatabaseDocument> {
     const createdBot = await this.collection.create({ ...newBot });
 
+    // @TODO: refactor
     const botToken: string = createdBot.token + BOT_TOKEN_SEPARATOR + createdBot.id;
 
     const updatedBot

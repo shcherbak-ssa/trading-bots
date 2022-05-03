@@ -2,7 +2,8 @@
   <prime-vue-confirm-popup group="danger">
     <template #message="{ message }">
       <div class="confirm-popup-icon flex-align-center">
-        <base-icon type="mi" class="flex-shrink-0" :icon="deleteIcon" />
+        <base-icon type="pi" class="flex-shrink-0" icon="exclamation-triangle" />
+
         <span>Attention</span>
       </div>
 
@@ -13,7 +14,8 @@
   <prime-vue-confirm-popup group="confirm">
     <template #message="{ message }">
       <div class="confirm-popup-icon flex-align-center">
-        <base-icon type="mi" class="flex-shrink-0" :icon="confirmIcon" />
+        <base-icon type="pi" class="flex-shrink-0" icon="info-circle" />
+
         <span>Confirm action</span>
       </div>
 
@@ -23,16 +25,8 @@
 </template>
 
 <script setup lang="ts">
-import { IconList } from 'shared/constants';
-
-
 // Components
 import PrimeVueConfirmPopup from 'primevue/confirmpopup';
-
-
-// Data
-const deleteIcon = IconList.NOTIFICATION_ERROR;
-const confirmIcon = IconList.NOTIFICATION_INFO;
 </script>
 
 <style lang="scss" scoped>
@@ -40,9 +34,8 @@ const confirmIcon = IconList.NOTIFICATION_INFO;
   font-weight: 500;
   margin-bottom: 14px;
 
-  .base-mi-icon {
-    width: 28px;
-    height: 28px;
+  .base-icon {
+    font-size: 1.2rem;
     margin-right: 10px;
   }
 }

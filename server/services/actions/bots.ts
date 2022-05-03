@@ -31,7 +31,15 @@ import { UserBots } from 'api/database/user-bots';
 export const botsActions = {
   async [ActionType.BOTS_LOAD](userId: string, filters: BotsGetFilters): Promise<BotClientInfo[]> {
     const botsCollection: BotsDatabaseCollection = await UserBots.connect(userId);
-    const bots: BotsDatabaseDocument[] = await botsCollection.getBots(filters);
+    let bots: BotsDatabaseDocument[] = [];
+
+    if (filters.id) {
+      const bot: BotsDatabaseDocument = await botsCollection.getBot(filters.id);
+
+      bots.push(bot);
+    } else {
+      bots = await botsCollection.getBots(filters);
+    }
 
     const brokerAccounts = await Promise.all(
       bots.map(async ({ brokerId, brokerAccountId, brokerAccountType }) => {

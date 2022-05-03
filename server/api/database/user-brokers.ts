@@ -60,6 +60,7 @@ export class UserBrokers extends UserCollection<BrokersDatabaseDocument> impleme
   }
 
   async createBroker(broker: CreationDocument<BrokersDatabaseDocument>): Promise<BrokersDatabaseDocument> {
+    // @TODO: hide api keys
     const createdBroker = await this.collection.create(broker);
 
     return createdBroker.toObject();
