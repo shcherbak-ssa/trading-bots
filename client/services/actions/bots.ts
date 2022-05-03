@@ -50,6 +50,10 @@ export const botsActions = {
         notificationTitle = 'Bot is inactive';
         notificationMessage = `Bot "${botName}" deactivated successfully`;
         break;
+      case BotUpdateType.RESTART:
+        notificationTitle = 'Bot restarted';
+        notificationMessage = `Bot "${botName}" restarted successfully`;
+        break;
       case BotUpdateType.ARCHIVE:
         notificationTitle = 'Bot archived';
         notificationMessage = `Bot "${botName}" archived successfully`;

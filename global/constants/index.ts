@@ -68,6 +68,13 @@ export enum BotState {
 export enum BotUpdateType {
   ACTIVATE = 'activate',
   DEACTIVATE = 'deactivate',
+  RESTART = 'restart',
   ARCHIVE = 'archive',
   UPDATE = 'update',
+}
+
+export enum BotRestartMode {
+  NONE = 'none',
+  WEEK = 'week',
+  MONTH = 'month' // 4 weeks
 }

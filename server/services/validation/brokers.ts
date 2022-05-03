@@ -36,7 +36,7 @@ export const brokersValidation = {
         BrokerName.CURRENCY_COM,
       )
       .required(),
-    expiresAt: Joi.string().required(), // @TODO: maybe change format
+    expiresAt: Joi.string().required(),
     apiKeys: Joi.object()
       .pattern(Joi.string(), Joi.string())
       .required(),
@@ -51,7 +51,7 @@ export const brokersValidation = {
       )
       .required(),
     updates: Joi.object({
-      expiresAt: Joi.string().required(), // @TODO: maybe change format
+      expiresAt: Joi.string().required(),
       apiKeys: Joi.object()
         .pattern(Joi.string(), Joi.string())
         .required(),

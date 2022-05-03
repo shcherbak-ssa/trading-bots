@@ -5,9 +5,9 @@
   "main": "index.js",
   "scripts": {
     "start": "node build/server/index.js",
-    "build:client": "webpack --config webpack.client.js --env mode=production",
+    "build:client": "cross-env NODE_ENV=production webpack --config webpack.client.js",
     "build:server": "cross-env NODE_ENV=production webpack --config webpack.server.js",
-    "dev:client": "webpack --config webpack.client.js --env mode=development --watch",
+    "dev:client": "cross-env NODE_ENV=development webpack --config webpack.client.js --watch",
     "dev:server": "cross-env NODE_ENV=development nodemon --config nodemon.server.json"
   },
   "author": "shcherbak-ssa",

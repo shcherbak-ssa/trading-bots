@@ -89,7 +89,7 @@
               </template>
             </base-table-column>
 
-            <base-table-column field="сhange" header="Change">
+            <base-table-column field="progress" header="Progress">
               <template #body="{ data }">
                 <base-status
                     v-if="data.state === BotState.ARCHIVE"
@@ -101,14 +101,14 @@
                 <base-status
                     v-else-if="data.active"
                     status="success"
-                    :label="`+${getCurrencySymbol(data.brokerAccountCurrency)}120`"
+                    :label="`+${getCurrencySymbol(data.brokerAccountCurrency)}120 (10%)`"
                     tooltip="Income (TODO)"
                 />
 
                 <base-status
                     v-else-if="!data.active"
                     status="danger"
-                    :label="`-${getCurrencySymbol(data.brokerAccountCurrency)}15`"
+                    :label="`-${getCurrencySymbol(data.brokerAccountCurrency)}15 (2%)`"
                     tooltip="Loss (TODO)"
                 />
               </template>

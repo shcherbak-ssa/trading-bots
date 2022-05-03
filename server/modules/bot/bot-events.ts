@@ -66,6 +66,7 @@ export class BotEvents {
     }
 
     if (errorPlace === BotErrorPlace.POSITION_CLOSE) {
+      // @TODO: check position closing
       throw error;
     }
 

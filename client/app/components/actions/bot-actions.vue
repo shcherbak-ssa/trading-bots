@@ -219,6 +219,39 @@
         />
       </group-container>
 
+      <group-container heading="Restart">
+        <base-checkbox
+            label="Enable restart"
+            checkboxId="restart-bot"
+            :value="state.bot.restart"
+            @change="(value) => state.bot.restart = value"
+        />
+
+        <base-dropdown
+            v-if="state.bot.restart"
+            label="Restart mode"
+            placeholder="Select restart mode"
+            optionLabel="label"
+            :value="state.selectedRestartMode"
+            :options="botCreateSettings.restartMode.options"
+            :validation="v$.bot.restartMode"
+            :helpText="botCreateSettings.restartMode.helpText"
+            @select="selectRestartMode"
+        >
+          <template #value="{ value }">
+            <div>{{ value.label }}</div>
+          </template>
+
+          <template #option="{ option }">
+            <div>{{ option.label }}</div>
+          </template>
+        </base-dropdown>
+
+        <base-message type="info">
+          Restart need to reset your bot progress.
+        </base-message>
+      </group-container>
+
       <group-container :heading="storeGetters.isBotSelected ? 'Update' : 'Creation'">
         <base-checkbox
             v-if="!storeGetters.isBotSelected"
@@ -228,16 +261,18 @@
             @change="(value) => state.bot.active = value"
         />
 
-        <base-message v-if="storeGetters.isBotSelected && state.bot.active" type="info">
-          After the update, the bot will restart.
-        </base-message>
-
         <base-message
-            v-if="botUpdates !== null && botUpdates.tradeCapitalPercent !== undefined && state.bot.active"
-            type="danger"
+            v-if="botUpdates !== null && state.bot.active"
+            :type="botUpdates.tradeCapitalPercent === undefined ? 'info' : 'danger'"
         >
-          You updated important settings.
-          Open position will be closed before restart.
+          <span v-if="botUpdates.tradeCapitalPercent === undefined">
+            After the update, the bot will restart without resetting progress.
+          </span>
+
+          <span v-else>
+            You updated important settings. After the update, the bot will restart.
+            Open position will be closed and progress will be reset.
+          </span>
         </base-message>
 
         <base-message v-if="otherBotsForUpdate.length" type="danger">
@@ -263,7 +298,7 @@ import { minValue, required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 
 import type { BotClientInfo, BrokerAccount, BrokerMarket, GetBrokerDataPayload, UpdateBotPayload } from 'global/types';
-import { BotState, BotUpdateType, BrokerAccountType, BrokerDataType } from 'global/constants';
+import { BotRestartMode, BotState, BotUpdateType, BrokerDataType } from 'global/constants';
 import { botDefaultSettings } from 'global/config';
 
 import type {
@@ -271,11 +306,11 @@ import type {
   BotCreateConfig,
   BotUpdatePayload,
   DropdownBrokerOption,
+  DropdownRestartModeOption
 } from 'shared/types';
 
 import { ActionType, initialBotActionState, StoreMutation } from 'shared/constants';
 import { botCreateConfigs, botCreateSettings } from 'shared/config';
-import { formDate } from 'shared/utils';
 
 import { Notifications } from 'services/notifications';
 import { runAction } from 'services/actions';
@@ -315,6 +350,7 @@ type ComponentState = {
   selectedBrokerAccountOption: BrokerAccount | BotClientInfo['brokerAccount'] | null;
   selectedBrokerMarketOption: BrokerMarket | null;
   selectedBrokerMarketLeverageOption: { value: string } | null;
+  selectedRestartMode: DropdownRestartModeOption | null;
   botConfig: BotCreateConfig | null;
   bot: BotActionState;
 }
@@ -344,6 +380,7 @@ const state = reactive<ComponentState>({
   selectedBrokerAccountOption: null,
   selectedBrokerMarketOption: null,
   selectedBrokerMarketLeverageOption: null,
+  selectedRestartMode: null,
   botConfig: null,
   bot: { ...initialBotActionState },
 });
@@ -407,17 +444,28 @@ const otherBotsForUpdate = computed<BotUpdatePayload[]>(() => {
     });
 });
 
-const validationRules = {
-  bot: {
-    name: { required },
-    brokerId: { required },
-    brokerAccountId: { required },
-    brokerMarketSymbol: { required },
-    tradeCapitalPercent: {
-      minValue: minValue(botDefaultSettings.tradeCapitalPercent.min),
+const validationRules = computed(() => {
+  const rules = {
+    bot: {
+      name: { required },
+      brokerId: { required },
+      brokerAccountId: { required },
+      brokerMarketSymbol: { required },
+      tradeCapitalPercent: {
+        minValue: minValue(botDefaultSettings.tradeCapitalPercent.min),
+      },
+      restartMode: {},
     },
-  },
-};
+  };
+
+  if (state.bot.restart) {
+    rules.bot.restartMode = {
+      required: (value: string) => value !== '' && value !== BotRestartMode.NONE,
+    };
+  }
+
+  return rules;
+});
 
 const v$ = useVuelidate(validationRules, state);
 
@@ -468,6 +516,15 @@ async function setBrokerDataForCurrentBot(): Promise<void> {
   if (state.botConfig?.allowLeverageSettings) {
     await loadBrokerMarketLeverages(brokerMarketSymbol);
     state.selectedBrokerMarketLeverageOption = { value: actionState.tradeMarketLeverage.toString() };
+  }
+
+  if (selectedBot.restart) {
+    const selectedRestartModeOption: DropdownRestartModeOption | undefined
+      = botCreateSettings.restartMode.options.find(({ mode }) => mode === selectedBot.restartMode);
+
+    if (selectedRestartModeOption) {
+      state.selectedRestartMode = selectedRestartModeOption;
+    }
   }
 
   state.bot = { ...actionState };
@@ -603,6 +660,12 @@ function selectMarketLeverage(option: { value: string }): void {
   state.selectedBrokerMarketLeverageOption = option;
 
   state.bot.tradeMarketLeverage = Number(option.value);
+}
+
+function selectRestartMode(option: DropdownRestartModeOption): void {
+  state.bot.restartMode = option.mode;
+
+  state.selectedRestartMode = option;
 }
 
 function toggleCapitalConfig(e: Event): void {

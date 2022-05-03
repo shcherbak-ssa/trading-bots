@@ -42,6 +42,8 @@ const userBotSchema = new mongoose.Schema<BotsDatabaseDocument>({
   tradeMarketLeverage: { type: Number, required: true },
   tradeCloseAtEndDay: { type: Boolean, required: true },
   tradeCloseAtEndWeek: { type: Boolean, required: true },
+  restart: { type: Boolean, required: true },
+  restartMode: { type: String, required: true },
 });
 
 
