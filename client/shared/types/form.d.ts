@@ -1,5 +1,5 @@
 import type { BrokerAccount } from 'global/types';
-import { BrokerAccountType, BrokerName } from 'global/constants';
+import { BotRestartMode, BrokerAccountType, BrokerName } from 'global/constants';
 
 
 export type InputState = {
@@ -27,4 +27,9 @@ export type DropdownBrokerOption = {
 export type DropdownBrokerAccountOption = {
   label: BrokerAccountType;
   items: BrokerAccount[];
+}
+
+export type DropdownRestartModeOption = {
+  mode: BotRestartMode;
+  label: string;
 }

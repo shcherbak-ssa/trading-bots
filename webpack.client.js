@@ -8,7 +8,7 @@ const CssUrlRelativePlugin = require('css-url-relative-plugin');
 
 
 module.exports = (env = {}) => {
-  const isDev = env.mode && env.mode === 'development';
+  const isDev = process.env.NODE_ENV === 'development';
 
   const config = {
     mode: isDev ? 'development' : 'production',

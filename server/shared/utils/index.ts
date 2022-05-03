@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import querystring from 'querystring';
 
-import type { Bot } from 'global/types';
+import { ONE_HUNDRED } from 'shared/constants';
 
 
 // Math
@@ -11,6 +11,10 @@ export function getFractionDigits(num: string | number): number {
 
 export function roundNumber(num: number, fractionDigits: number): number {
   return Number(num.toFixed(fractionDigits));
+}
+
+export function calculateProportion(from: number, percent: number): number {
+  return from * percent / ONE_HUNDRED;
 }
 
 

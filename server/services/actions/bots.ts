@@ -21,7 +21,7 @@ import type {
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
-import { getTodayDateString } from 'shared/utils';
+import { calculateProportion, getTodayDateString } from 'shared/utils';
 
 import { runAction } from 'services/actions';
 
@@ -30,6 +30,7 @@ import { UserBots } from 'api/database/user-bots';
 
 export const botsActions = {
   async [ActionType.BOTS_LOAD](userId: string, filters: BotsGetFilters): Promise<BotClientInfo[]> {
+    // @TODO: refactor
     const botsCollection: BotsDatabaseCollection = await UserBots.connect(userId);
     let bots: BotsDatabaseDocument[] = [];
 
@@ -132,7 +133,7 @@ export const botsActions = {
         updates = {
           active: true,
           activateAt: today,
-          initialCapital: brokerAccount.amount,
+          initialCapital: calculateProportion(brokerAccount.amount, currentBot.tradeCapitalPercent),
         };
 
         await runAction<Bot, void>({
@@ -141,9 +142,7 @@ export const botsActions = {
           payload: { ...currentBot, ...updates },
         });
 
-        await botsCollection.updateBot(id, updates);
-
-        return;
+        break;
       case BotUpdateType.DEACTIVATE:
         await runAction<DeactivateBotPayload, void>({
           type: ActionType.BOT_MANAGER_DEACTIVATE_BOT,
@@ -151,14 +150,34 @@ export const botsActions = {
           payload: { botToken: currentBot.token },
         });
 
-        await botsCollection.updateBot(id, {
+        updates = {
           active: false,
           activateAt: '',
           activation,
           initialCapital: 0,
+        };
+
+        break;
+      case BotUpdateType.RESTART:
+        updates = {
+          activateAt: today,
+          initialCapital: calculateProportion(brokerAccount.amount, currentBot.tradeCapitalPercent),
+        };
+
+        currentBot.activations.push(activation);
+
+        await runAction<RestartBotPayload, void>({
+          type: ActionType.BOT_MANAGER_RESTART_BOT,
+          userId,
+          payload: {
+            bot: { ...currentBot, ...updates },
+            closePosition: true,
+          },
         });
 
-        return;
+        updates.activation = activation;
+
+        break;
       case BotUpdateType.ARCHIVE:
         updates = {
           active: false,
@@ -177,16 +196,14 @@ export const botsActions = {
           updates.activation = activation;
         }
 
-        await botsCollection.updateBot(id, updates);
-
-        return;
+        break;
       case BotUpdateType.UPDATE:
         if (currentBot.active) {
           const needToUpdateActivation: boolean = updates.tradeCapitalPercent !== undefined;
 
-          if (needToUpdateActivation) {
+          if (updates.tradeCapitalPercent !== undefined) {
             updates.activateAt = today;
-            updates.initialCapital = brokerAccount.amount;
+            updates.initialCapital = calculateProportion(brokerAccount.amount, updates.tradeCapitalPercent);
 
             currentBot.activations.push(activation);
           }
@@ -205,10 +222,10 @@ export const botsActions = {
           }
         }
 
-        await botsCollection.updateBot(id, updates);
-
-        return;
+        break;
     }
+
+    await botsCollection.updateBot(id, updates);
   },
 
   async [ActionType.BOTS_DELETE](userId: string, filters: BotsDeleteFilters): Promise<void> {

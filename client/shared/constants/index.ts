@@ -1,6 +1,6 @@
-import { BrokerAccountType, BrokerName } from 'global/constants';
+import { BotRestartMode, BrokerAccountType, BrokerName } from 'global/constants';
 
-import type { InputState, StoreState, BotActionState } from 'shared/types'
+import type { BotActionState, InputState, StoreState } from 'shared/types'
 
 
 export const NOTIFICATION_LIFE_TIME: number = 5000;
@@ -87,6 +87,8 @@ export const initialBotActionState: BotActionState = {
   tradeMarketLeverage: 0,
   tradeCloseAtEndDay: false,
   tradeCloseAtEndWeek: false,
+  restart: false,
+  restartMode: BotRestartMode.NONE,
 }
 
 export const initialStoreBrokerMarketLeverageState = {

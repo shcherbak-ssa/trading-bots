@@ -5,8 +5,8 @@
       <bot-action-buttons :bot="selectedBot" />
     </div>
 
-    <group-container heading="Signals URL">
-      @TODO: {{ selectedBot.token }}
+    <group-container heading="Token">
+      {{ selectedBot.token }}
     </group-container>
 
     <group-container heading="Settings">
@@ -59,7 +59,7 @@
       </div>
     </group-container>
 
-    <group-container heading="Change">
+    <group-container heading="Progress">
       @TODO
     </group-container>
   </item-container>

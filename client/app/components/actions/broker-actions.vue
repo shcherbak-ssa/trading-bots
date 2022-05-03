@@ -93,7 +93,7 @@ const validationRules = computed(() => {
 
 const v$ = useVuelidate(validationRules, state);
 
-  const brokersDropdownOptions: DropdownBrokerOption[] = getDropdownBrokerOptionsFromConfigs();
+const brokersDropdownOptions: DropdownBrokerOption[] = getDropdownBrokerOptionsFromConfigs();
 
 
 // Hooks

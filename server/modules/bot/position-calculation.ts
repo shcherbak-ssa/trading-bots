@@ -1,5 +1,5 @@
 import { FRACTION_DIGITS_TO_HUNDREDTHS, ONE_HUNDRED } from 'shared/constants';
-import { getFractionDigits, roundNumber } from 'shared/utils';
+import { calculateProportion, getFractionDigits, roundNumber } from 'shared/utils';
 
 import type { BotBroker, BotPosition, BotSettings, BotSignal } from './types';
 import { Position } from './position';
@@ -44,7 +44,7 @@ export class PositionCalculation {
     const { commission: marketCommission, minQuantity: marketMinQuantity } = this.broker.market;
 
     const openCommission: number = this.getOpenCommission(position);
-    const closeCommission: number = position.stopLossPrice * marketCommission / ONE_HUNDRED;
+    const closeCommission: number = calculateProportion(position.stopLossPrice, marketCommission);
     const totalCommission: number = openCommission + closeCommission;
 
     let riskSize: number = this.getRiskSize();
@@ -100,11 +100,11 @@ export class PositionCalculation {
   }
 
   private getRiskSize(): number {
-    return this.getCapitalSize() * this.botSettings.tradeRiskPercent / ONE_HUNDRED;
+    return calculateProportion(this.getCapitalSize(), this.botSettings.tradeRiskPercent);
   }
 
   private getCapitalSize(): number {
-    return this.broker.account.totalAmount * this.botSettings.tradeCapitalPercent / ONE_HUNDRED;
+    return calculateProportion(this.broker.account.totalAmount, this.botSettings.tradeCapitalPercent);
   }
 
   private getPositionAmount(position: BotPosition, positionSize: number): number {
@@ -135,6 +135,6 @@ export class PositionCalculation {
   private getOpenCommission(position: BotPosition): number {
     const { commission: marketCommission } = this.broker.market;
 
-    return this.getOpenPrice(position) * marketCommission / ONE_HUNDRED;
+    return calculateProportion(this.getOpenPrice(position), marketCommission);
   }
 }

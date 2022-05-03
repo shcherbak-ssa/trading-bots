@@ -1,4 +1,4 @@
-import { BotState, BotUpdateType, BrokerAccountType, BrokerName } from 'global/constants';
+import { BotRestartMode, BotState, BotUpdateType, BrokerAccountType, BrokerName } from 'global/constants';
 
 
 export type Bot = {
@@ -27,6 +27,8 @@ export type Bot = {
   tradeMarketLeverage: number;
   tradeCloseAtEndDay: boolean;
   tradeCloseAtEndWeek: boolean;
+  restart: boolean;
+  restartMode: BotRestartMode;
 }
 
 export type BotActivation = {
@@ -70,5 +72,7 @@ export type UpdateBotPayload = {
     tradeMarketLeverage?: number;
     tradeCloseAtEndDay?: boolean;
     tradeCloseAtEndWeek?: boolean;
+    restart?: boolean;
+    restartMode?: BotRestartMode;
   };
 }

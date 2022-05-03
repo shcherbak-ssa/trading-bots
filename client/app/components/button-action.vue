@@ -120,5 +120,10 @@ function processClick(e: Event): void {
   .pi-play {
     margin-left: 3px;
   }
+
+  .pi-refresh {
+    margin-top: -2px;
+    margin-right: -1px;
+  }
 }
 </style>

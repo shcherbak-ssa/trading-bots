@@ -7,7 +7,8 @@ import { QUERY_URL_SEPARATOR, RequestMethod, StatusCode } from 'global/constants
 import type { ServerRequestPayload, ServerResponsePayload } from 'shared/types';
 import type { ServerResponseResult, ServerRouteHandler } from 'shared/types';
 import { ENTRY_POINT_PATHNAME, API_PATHNAME, Validation, SIGNALS_PATHNAME } from 'shared/constants';
-import { validate } from 'shared/validation';
+
+import { validate } from 'services/validation';
 
 import { apiRoutes, signalRoutes } from './routes';
 import { serverConfig } from './config';

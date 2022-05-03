@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-import { BotUpdateType, BrokerAccountType, BrokerName } from 'global/constants';
+import { BotRestartMode, BotUpdateType, BrokerAccountType, BrokerName } from 'global/constants';
 import { botDefaultSettings } from 'global/config';
 
 import { Validation } from 'shared/constants';
@@ -52,6 +52,14 @@ export const botsValidation = {
     tradeMarketLeverage: Joi.number().required(),
     tradeCloseAtEndDay: Joi.boolean().required(),
     tradeCloseAtEndWeek: Joi.boolean().required(),
+    restart: Joi.boolean().required(),
+    restartMode: Joi.string()
+      .valid(
+        BotRestartMode.NONE,
+        BotRestartMode.WEEK,
+        BotRestartMode.MONTH,
+      )
+      .required(),
   }),
 
   [Validation.BOTS_UPDATE]: Joi.object({
@@ -60,6 +68,7 @@ export const botsValidation = {
       .valid(
         BotUpdateType.ACTIVATE,
         BotUpdateType.DEACTIVATE,
+        BotUpdateType.RESTART,
         BotUpdateType.ARCHIVE,
         BotUpdateType.UPDATE,
       )
@@ -83,6 +92,13 @@ export const botsValidation = {
       tradeMarketLeverage: Joi.number(),
       tradeCloseAtEndDay: Joi.boolean(),
       tradeCloseAtEndWeek: Joi.boolean(),
+      restart: Joi.boolean(),
+      restartMode: Joi.string()
+        .valid(
+          BotRestartMode.NONE,
+          BotRestartMode.WEEK,
+          BotRestartMode.MONTH,
+        ),
     }),
   }),
 };

@@ -8,7 +8,7 @@
           actionClass="danger"
           tooltip="Deactivate"
           popupType="danger"
-          popupMessage="This action will close all open positions of this bot.<br><br>Are you sure you want to <strong>deactivate</strong> this bot?"
+          popupMessage="This action will close open position of this bot.<br><br>Are you sure you want to <strong>deactivate</strong> this bot?"
           :blocked="state.isActionProcessing"
           :popupCommand="deactivateBot"
       />
@@ -23,6 +23,18 @@
           popupMessage="Are you sure you want to <strong>activate</strong> this bot?"
           :blocked="state.isActionProcessing"
           :popupCommand="activateBot"
+      />
+
+      <button-action
+          v-if="props.bot.active"
+          type="confirm"
+          icon="refresh"
+          actionClass="danger"
+          tooltip="Restart"
+          popupType="danger"
+          :blocked="state.isActionProcessing"
+          :popupMessage="getDangerActionMessage('restart')"
+          :popupCommand="restartBot"
       />
 
       <button-action-edit
@@ -107,6 +119,10 @@ async function deactivateBot(): Promise<void> {
   await updateBot(BotUpdateType.DEACTIVATE);
 }
 
+async function restartBot(): Promise<void> {
+  await updateBot(BotUpdateType.RESTART);
+}
+
 async function archiveBot(): Promise<void> {
   await updateBot(BotUpdateType.ARCHIVE);
 }
@@ -144,12 +160,15 @@ async function deleteBot(): Promise<void> {
 
 
 // Helpers
-function getDangerActionMessage(action: 'delete' | 'archive'): string {
-  const message: string = `The action cannot be undone. Are you sure you want to <strong>${action}</strong> this bot?`;
+function getDangerActionMessage(action: 'delete' | 'archive' | 'restart'): string {
+  const closePositionMessage: string = props.bot.active
+    ? 'This action will close open position of this bot.<br><br>'
+    : '';
 
-  return props.bot.active
-    ? 'This action will close all open positions of this bot.<br><br>' + message
-    : message;
+  const undoneMessage: string = action === 'restart' ? '' : 'The action cannot be undone. ';
+  const question: string = `Are you sure you want to <strong>${action}</strong> this bot?`;
+
+  return closePositionMessage + undoneMessage + question;
 }
 </script>
 

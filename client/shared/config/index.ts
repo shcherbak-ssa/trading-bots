@@ -1,4 +1,4 @@
-import { BrokerName } from 'global/constants';
+import { BotRestartMode, BrokerName } from 'global/constants';
 import { botDefaultSettings } from 'global/config';
 
 import type { AppMenuItem, BotCreateConfig, BrokerConnectConfig } from 'shared/types';
@@ -138,5 +138,18 @@ export const botCreateSettings = {
     numberMaxFractionDigits: 2,
     numberUseSlider: true,
     numberSliderStep: 0.5,
+  },
+  restartMode: {
+    helpText: 'Note that restart will always be on saturday',
+    options: [
+      {
+        mode: BotRestartMode.WEEK,
+        label: 'Every week'
+      },
+      {
+        mode: BotRestartMode.MONTH,
+        label: 'Every month (4 weeks)'
+      },
+    ],
   },
 };
