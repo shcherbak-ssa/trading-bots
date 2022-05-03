@@ -20,7 +20,6 @@
 .p-inputnumber, .p-calendar {
   .p-inputtext {
     background: transparent;
-    //font-size: .79rem;
     font: inherit;
     line-height: 1rem;
     width: 100%;
@@ -36,8 +35,7 @@
   color: var(--colors-text);
   display: flex;
   align-items: center;
-  //font-size: .79rem;
-  font: inherit; // @TODO: maybe refactor
+  font: inherit;
   line-height: 1rem;
   padding: 0 20px;
   width: 100%;

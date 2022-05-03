@@ -10,6 +10,7 @@ import { Notifications } from 'services/notifications';
 
 export type Getters = {
   getUserBroker(state: StoreState): (brokerId: string) => Broker;
+  getUserBot(state: StoreState): (botId: string) => BotClientInfo;
 
   isBotSelected(state: StoreState): boolean;
   isBrokerSelected(state: StoreState): boolean;
@@ -36,6 +37,20 @@ export const getters: GetterTree<StoreState, StoreState> & Getters = {
       }
 
       return foundBroker;
+    };
+  },
+
+  getUserBot(state: StoreState) {
+    return (botId: string) => {
+      const foundBot: BotClientInfo | undefined = state.user.bots.find(({ id }) => id === botId);
+
+      if (!foundBot) {
+        Notifications.showErrorNotification(`Application Error`, `Bot not found in store`);
+
+        throw new Error(`[app] - Bot not found in store (${botId})`);
+      }
+
+      return foundBot;
     };
   },
 

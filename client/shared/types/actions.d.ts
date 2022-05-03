@@ -9,4 +9,5 @@ export type Action<Payload> = {
   type: ActionType;
   payload: Payload;
   callback?: () => void;
+  errorCallback?: () => void;
 }

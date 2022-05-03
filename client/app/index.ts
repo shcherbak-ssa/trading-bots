@@ -25,14 +25,10 @@ import PrimeVueScrollPanel from 'primevue/scrollpanel';
 
 import roundDashboard from '@iconify-icons/ic/round-dashboard';
 import roundSmartToy from '@iconify-icons/ic/round-smart-toy';
-import roundCandlestickChart from '@iconify-icons/ic/round-candlestick-chart';
 import roundInsertChart from '@iconify-icons/ic/round-insert-chart';
 import baselineSettings from '@iconify-icons/ic/baseline-settings';
 import roundMenu from '@iconify-icons/ic/round-menu';
 import roundMenuOpen from '@iconify-icons/ic/round-menu-open';
-import roundReportGmailerrorred from '@iconify-icons/ic/round-report-gmailerrorred';
-import outlineInfo from '@iconify-icons/ic/outline-info';
-import roundCheckCircleOutline from '@iconify-icons/ic/round-check-circle-outline';
 
 import { IconList } from 'shared/constants';
 
@@ -87,14 +83,9 @@ function drawApp() {
 function setupIcons() {
   addIcon(IconList.DASHBOARD, roundDashboard);
   addIcon(IconList.BOTS, roundSmartToy);
-  addIcon(IconList.BROKERS, roundCandlestickChart);
   addIcon(IconList.ANALYTICS, roundInsertChart);
   addIcon(IconList.SETTINGS, baselineSettings);
 
   addIcon(IconList.MENU_CLOSE, roundMenu);
   addIcon(IconList.MENU_OPEN, roundMenuOpen);
-
-  addIcon(IconList.NOTIFICATION_ERROR, roundReportGmailerrorred);
-  addIcon(IconList.NOTIFICATION_INFO, outlineInfo);
-  addIcon(IconList.NOTIFICATION_SUCCESS, roundCheckCircleOutline);
 }

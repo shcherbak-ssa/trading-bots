@@ -22,11 +22,12 @@ export type BotCreateConfig = {
 export interface BotsStore {
   setBots(bots: BotClientInfo[]): void;
   addBot(bot: BotClientInfo): void;
-  updateBot(id: string, updates: BotUpdatePayload['updates']): void;
+  updateBot(bot: BotClientInfo): void;
   deleteBot(id: string): void;
 }
 
 export interface BotsApi {
+  getBot(id: string): Promise<BotClientInfo>;
   loadBots(payload: LoadBotsPayload): Promise<BotClientInfo[]>;
   createBot(newBot: NewBot): Promise<BotClientInfo>;
   updateBot(id: string, type: BotUpdateType, updates: BotUpdatePayload['updates']): Promise<void>;

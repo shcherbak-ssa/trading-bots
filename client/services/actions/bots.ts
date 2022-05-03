@@ -1,5 +1,5 @@
 import type { BotClientInfo, LoadBotsPayload, NewBot } from 'global/types';
-import { BotState, BotUpdateType } from 'global/constants';
+import { BotUpdateType } from 'global/constants';
 
 import type { BotDeletePayload, BotsApi, BotsStore, BotUpdatePayload } from 'shared/types';
 import { ActionType } from 'shared/constants';
@@ -26,17 +26,17 @@ export const botsActions = {
     const botsStore: BotsStore = new Store();
     botsStore.addBot(createdBot);
 
-    Notifications.showSuccessNotification(
-      'Bot created',
-      `Bot "${createdBot.name}" created successfully`,
-    );
+    Notifications.showSuccessNotification('Bot created', `Bot "${createdBot.name}" created successfully`);
   },
 
   async [ActionType.BOTS_UPDATE]({ id, type, botName, updates }: BotUpdatePayload): Promise<void> {
-    // @TODO: refactor client bot update
-
     const api: BotsApi = new Bots();
     await api.updateBot(id, type, updates);
+
+    const updatedBot: BotClientInfo = await api.getBot(id);
+
+    const botsStore: BotsStore = new Store();
+    botsStore.updateBot(updatedBot);
 
     let notificationTitle: string = '';
     let notificationMessage: string = '';
@@ -45,30 +45,20 @@ export const botsActions = {
       case BotUpdateType.ACTIVATE:
         notificationTitle = 'Bot is active';
         notificationMessage = `Bot "${botName}" activated successfully`;
-
-        updates.active = true;
         break;
       case BotUpdateType.DEACTIVATE:
         notificationTitle = 'Bot is inactive';
         notificationMessage = `Bot "${botName}" deactivated successfully`;
-
-        updates.active = false;
         break;
       case BotUpdateType.ARCHIVE:
         notificationTitle = 'Bot archived';
         notificationMessage = `Bot "${botName}" archived successfully`;
-
-        updates.active = false;
-        updates.state = BotState.ARCHIVE;
         break;
       case BotUpdateType.UPDATE:
         notificationTitle = 'Bot updated';
         notificationMessage = `Bot "${botName}" updated successfully`;
         break;
     }
-
-    const botsStore: BotsStore = new Store();
-    botsStore.updateBot(id, updates);
 
     Notifications.showSuccessNotification(notificationTitle, notificationMessage);
   },
@@ -80,9 +70,6 @@ export const botsActions = {
     const botsStore: BotsStore = new Store();
     botsStore.deleteBot(id);
 
-    Notifications.showSuccessNotification(
-      'Bot deleted',
-      `Bot "${botName}" deleted successfully`,
-    );
+    Notifications.showSuccessNotification('Bot deleted', `Bot "${botName}" deleted successfully`);
   },
 };

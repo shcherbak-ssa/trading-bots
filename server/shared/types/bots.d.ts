@@ -17,6 +17,7 @@ export type DeactivateBotPayload = {
 export type BotsDatabaseDocument = Bot;
 
 export type BotsGetFilters = LoadBotsPayload & {
+  id?: string;
   active?: boolean;
 }
 

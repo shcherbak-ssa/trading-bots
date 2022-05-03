@@ -1,28 +1,31 @@
 <template>
   <div class="base-message w-full" :class="[props.type]">
     <div class="message-icon">
-      <base-icon v-if="props.type === 'error'" type="mi" :icon="errorIcon" />
+      <base-icon
+          v-if="props.type === 'danger'"
+          type="pi"
+          icon="exclamation-triangle"
+      />
 
-      <base-icon v-if="props.type === 'info'" type="mi" :icon="infoIcon" />
+      <base-icon
+          v-if="props.type === 'info'"
+          type="pi"
+          icon="info-circle"
+      />
     </div>
     <slot />
   </div>
 </template>
 
 <script setup lang="ts">
-import { IconList } from 'shared/constants';
-
 // Types
 type ComponentProps = {
-  type: 'info' | 'error';
+  type: 'info' | 'danger';
 }
 
 
 // Data
 const props = defineProps<ComponentProps>();
-
-const errorIcon = IconList.NOTIFICATION_ERROR;
-const infoIcon = IconList.NOTIFICATION_INFO;
 </script>
 
 <style lang="scss" scoped>
@@ -38,7 +41,7 @@ const infoIcon = IconList.NOTIFICATION_INFO;
     color: var(--colors-primary);
   }
 
-  &.error {
+  &.danger {
     background: var(--colors-secondary-005);
     color: var(--colors-secondary);
   }
@@ -46,5 +49,9 @@ const infoIcon = IconList.NOTIFICATION_INFO;
 
 .message-icon {
   margin: 0 auto 5px;
+
+  .base-icon {
+    font-size: 1.2rem;
+  }
 }
 </style>

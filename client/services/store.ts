@@ -23,9 +23,9 @@ export class Store implements BotsStore, BrokersStore {
     this.setBots(userBots);
   }
 
-  updateBot(botId: string, updates: BotUpdatePayload['updates']): void {
+  updateBot(updatedBot: BotClientInfo): void {
     const updatedBots = store.state.user.bots.map((bot) => {
-      return bot.id === botId ? { ...bot, ...updates } : bot;
+      return bot.id === updatedBot.id ? updatedBot : bot;
     });
 
     this.setBots(updatedBots);

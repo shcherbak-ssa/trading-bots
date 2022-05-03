@@ -59,9 +59,8 @@ import { BotState, BotUpdateType } from 'global/constants';
 
 import type { BotDeletePayload, BotUpdatePayload } from 'shared/types';
 import { ActionType, SectionComponent } from 'shared/constants';
-import { runAction } from 'shared/actions';
 
-import { Notifications } from 'services/notifications';
+import { runAction } from 'services/actions';
 
 import { useCloseItemSection, useOpenActionSection } from 'app/hooks';
 import { Store, useStore } from 'app/store';
@@ -84,7 +83,7 @@ type ComponentProps = {
 
 
 // Data
-const { state: storeState }: Store = useStore();
+const { state: storeState, getters: storeGetters }: Store = useStore();
 
 const openBotActionSection = useOpenActionSection(SectionComponent.BOT);
 const closeItemSection = useCloseItemSection();
@@ -116,7 +115,7 @@ async function updateBot(type: BotUpdateType): Promise<void> {
   state.isActionProcessing = true;
 
   const { id } = props.bot;
-  const { name: botName } = findBot(id);
+  const { name: botName } = storeGetters.getUserBot(id);
 
   await runAction<BotUpdatePayload>({
     type: ActionType.BOTS_UPDATE,
@@ -130,7 +129,7 @@ async function deleteBot(): Promise<void> {
   state.isActionProcessing = true;
 
   const { id } = props.bot;
-  const { name: botName }: BotClientInfo = findBot(id);
+  const { name: botName }: BotClientInfo = storeGetters.getUserBot(id);
 
   await runAction<BotDeletePayload>({
     type: ActionType.BOTS_DELETE,
@@ -152,24 +151,6 @@ function getDangerActionMessage(action: 'delete' | 'archive'): string {
     ? 'This action will close all open positions of this bot.<br><br>' + message
     : message;
 }
-
-function findBot(botId: string): BotClientInfo {
-  const foundBot: BotClientInfo | undefined = storeState.user.bots.find(({ id }) => id === botId);
-
-  if (!foundBot) {
-    Notifications.showErrorNotification(
-        `Application Error`,
-        `Cannot find bot with id '${botId}' in store`
-    );
-
-    // @TODO: error processing
-    throw new Error(`[app] - Cannot find bot with id '${botId}'`);
-  }
-
-  return foundBot;
-}
 </script>
 
-<style lang="scss" scoped>
-
-</style>
+<style lang="scss" scoped></style>

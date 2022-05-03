@@ -2,12 +2,24 @@
   <prime-vue-toast position="bottom-left" group="notification">
     <template #message="{ message }">
       <div class="flex relative w-full">
-        <div class="notification-icon">
-          <base-icon v-if="message.severity === 'error'" type="mi" :icon="errorIcon" />
+        <div class="notification-icon flex-align-center">
+          <base-icon
+              v-if="message.severity === 'error'"
+              type="pi"
+              icon="exclamation-triangle"
+          />
 
-          <base-icon v-if="message.severity === 'info'" type="mi" :icon="infoIcon" />
+          <base-icon
+              v-if="message.severity === 'info'"
+              type="pi"
+              icon="info-circle"
+          />
 
-          <base-icon v-if="message.severity === 'success'" type="mi" :icon="successIcon" />
+          <base-icon
+              v-if="message.severity === 'success'"
+              type="pi"
+              icon="check-circle"
+          />
         </div>
 
         <div>
@@ -27,7 +39,7 @@
 import { watch } from 'vue';
 import { useToast } from 'primevue/usetoast';
 
-import { IconList, StoreMutation } from 'shared/constants';
+import { StoreMutation } from 'shared/constants';
 import { Store, useStore } from 'app/store';
 
 // Components
@@ -37,10 +49,6 @@ import PrimeVueToast from 'primevue/toast';
 // Data
 const { state: storeState, commit }: Store = useStore();
 const notifications = useToast();
-
-const errorIcon = IconList.NOTIFICATION_ERROR;
-const infoIcon = IconList.NOTIFICATION_INFO;
-const successIcon = IconList.NOTIFICATION_SUCCESS;
 
 watch(() => storeState.app.notification, () => {
   if (storeState.app.notification) {
@@ -68,6 +76,10 @@ function closeNotification(): void {
   .base-mi-icon {
     width: 28px;
     height: 28px;
+  }
+
+  .base-icon {
+    font-size: 1.7rem;
   }
 }
 
