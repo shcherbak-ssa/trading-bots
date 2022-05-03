@@ -20,10 +20,10 @@ export const apiBrokersRoutes: ServerRoute[] = [
   {
     endpoint: ServerEndpoint.API_BROKERS,
     method: RequestMethod.GET,
-    validation: Validation.BROKERS_LOAD,
+    validation: Validation.BROKERS_GET,
     async handler(userId: string, payload: LoadBrokersPayload): Promise<Broker[]> {
       return await runAction({
-        type: ActionType.BROKERS_LOAD,
+        type: ActionType.BROKERS_GET,
         userId,
         payload,
       });

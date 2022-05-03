@@ -14,7 +14,7 @@ export const apiBotsRoutes: ServerRoute[] = [
     validation: Validation.ONLY_ID,
     async handler(userId: string, payload: OnlyIdPayload): Promise<BotClientInfo> {
       const [ bot ] = await runAction({
-        type: ActionType.BOTS_LOAD,
+        type: ActionType.BOTS_GET,
         userId,
         payload,
       });
@@ -25,10 +25,10 @@ export const apiBotsRoutes: ServerRoute[] = [
   {
     endpoint: ServerEndpoint.API_BOTS,
     method: RequestMethod.GET,
-    validation: Validation.BOTS_LOAD,
+    validation: Validation.BOTS_GET,
     async handler(userId: string, payload: BotsGetFilters): Promise<BotClientInfo[]> {
       return await runAction({
-        type: ActionType.BOTS_LOAD,
+        type: ActionType.BOTS_GET,
         userId,
         payload,
       });

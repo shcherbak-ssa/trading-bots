@@ -13,13 +13,13 @@ export enum ActionType {
   BOT_MANAGER_DEACTIVATE_BOT = 'bot-manager/deactivate-bot',
   BOT_MANAGER_RESTART_BOT = 'bot-manager/restart-bot',
 
-  BOTS_LOAD = 'bots/load',
   BOTS_GET = 'bots/get',
   BOTS_CREATE = 'bots/create',
   BOTS_UPDATE = 'bots/update',
   BOTS_DELETE = 'bots/delete',
+  BOTS_CHECK_RESTART = 'bots/check-restart',
 
-  BROKERS_LOAD = 'brokers/load',
+  BROKERS_GET = 'brokers/get',
   BROKERS_GET_DATA = 'brokers/get-data',
   BROKERS_GET_ACCOUNT = 'brokers/get-account',
   BROKERS_GET_API_KEYS = 'brokers/get-api-keys',
@@ -61,11 +61,11 @@ export enum Validation {
   EMPTY = 'empty',
   ONLY_ID = 'only-id',
 
-  BOTS_LOAD = 'bots/load',
+  BOTS_GET = 'bots/get',
   BOTS_CREATE = 'bots/create',
   BOTS_UPDATE = 'bots/update',
 
-  BROKERS_LOAD = 'brokers/load',
+  BROKERS_GET = 'brokers/get',
   BROKERS_GET_DATA = 'brokers/get-data',
   BROKERS_CONNECT = 'brokers/connect',
   BROKERS_UPDATE = 'brokers/update',

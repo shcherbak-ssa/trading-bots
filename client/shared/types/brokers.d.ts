@@ -2,10 +2,14 @@ import type {
   Broker,
   NewBroker,
   LoadBrokersPayload,
-  ErrorPayload,
-  UpdateBrokerPayload, BrokerAccount, BrokerMarket, BrokerMarketLeverages
+  UpdateBrokerPayload,
+  BrokerAccount,
+  BrokerMarket,
+  BrokerMarketLeverages,
+  GetBrokerDataPayload,
+  GetBrokerDataResult
 } from 'global/types';
-import { GetBrokerDataPayload, GetBrokerDataResult } from 'global/types';
+
 import { BrokerName } from 'global/constants';
 
 import { InputConfig } from './form';

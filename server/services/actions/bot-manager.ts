@@ -37,7 +37,7 @@ export const botManagerActions = {
       const activeBots = await runAction<BotsGetFilters, Bot[]>({
         type: ActionType.BOTS_GET,
         userId,
-        payload: { active: true },
+        payload: { active: true, withBrokerAccount: false },
       });
 
       for (const activeBot of activeBots) {

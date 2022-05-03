@@ -7,7 +7,7 @@ import { Validation } from 'shared/constants';
 
 
 export const botsValidation = {
-  [Validation.BOTS_LOAD]: Joi.object({
+  [Validation.BOTS_GET]: Joi.object({
     brokerId: Joi.string(),
   }),
 

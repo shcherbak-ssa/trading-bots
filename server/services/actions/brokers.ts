@@ -42,7 +42,7 @@ const brokersDataApi: BrokersDataApi = new BrokersData();
 
 
 export const brokersActions = {
-  async [ActionType.BROKERS_LOAD](userId: string, { withBots }: LoadBrokersPayload): Promise<Broker[]> {
+  async [ActionType.BROKERS_GET](userId: string, { withBots }: LoadBrokersPayload): Promise<Broker[]> {
     const brokersCollection: BrokersDatabaseCollection = await UserBrokers.connect(userId);
     const brokers: BrokersDatabaseDocument[] = await brokersCollection.getBrokers();
 
@@ -52,7 +52,7 @@ export const brokersActions = {
       const bots = await runAction<BotsGetFilters, Bot[]>({
         type: ActionType.BOTS_GET,
         userId,
-        payload: {},
+        payload: { withBrokerAccount: false },
       });
 
       userBots.push(...bots);
@@ -205,7 +205,7 @@ export const brokersActions = {
     const activeBots = await runAction<BotsGetFilters, Bot[]>({
       type: ActionType.BOTS_GET,
       userId,
-      payload: { active: true },
+      payload: { active: true, withBrokerAccount: false },
     });
 
     for (const activeBot of activeBots) {
