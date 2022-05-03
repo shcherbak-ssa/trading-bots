@@ -19,6 +19,7 @@ export type BotsDatabaseDocument = Bot;
 export type BotsGetFilters = LoadBotsPayload & {
   id?: string;
   active?: boolean;
+  withBrokerAccount?: boolean;
 }
 
 export type BotsDeleteFilters = {

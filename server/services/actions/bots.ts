@@ -29,9 +29,12 @@ import { UserBots } from 'api/database/user-bots';
 
 
 export const botsActions = {
-  async [ActionType.BOTS_LOAD](userId: string, filters: BotsGetFilters): Promise<BotClientInfo[]> {
-    // @TODO: refactor
+  async [ActionType.BOTS_GET](
+    userId: string,
+    { withBrokerAccount = true, ...filters }: BotsGetFilters
+  ): Promise<BotClientInfo[]> {
     const botsCollection: BotsDatabaseCollection = await UserBots.connect(userId);
+
     let bots: BotsDatabaseDocument[] = [];
 
     if (filters.id) {
@@ -42,30 +45,28 @@ export const botsActions = {
       bots = await botsCollection.getBots(filters);
     }
 
-    const brokerAccounts = await Promise.all(
-      bots.map(async ({ brokerId, brokerAccountId, brokerAccountType }) => {
-        return runAction<GetBrokerDataPayload, BrokerAccount>({
-          type: ActionType.BROKERS_GET_ACCOUNT,
-          userId,
-          payload: {
-            id: brokerId,
-            dataType: BrokerDataType.ACCOUNT,
-            accountType: brokerAccountType,
-            accountId: brokerAccountId,
-          },
-        });
-      })
-    );
+    if (withBrokerAccount) {
+      const brokerAccounts = await Promise.all(
+        bots.map(async ({ brokerId, brokerAccountId, brokerAccountType }) => {
+          return runAction<GetBrokerDataPayload, BrokerAccount>({
+            type: ActionType.BROKERS_GET_ACCOUNT,
+            userId,
+            payload: {
+              id: brokerId,
+              dataType: BrokerDataType.ACCOUNT,
+              accountType: brokerAccountType,
+              accountId: brokerAccountId,
+            },
+          });
+        })
+      );
 
-    return bots.map((bot, index) => {
-      return { ...bot, brokerAccount: brokerAccounts[index] };
-    });
-  },
+      bots = bots.map((bot, index) => {
+        return { ...bot, brokerAccount: brokerAccounts[index] };
+      });
+    }
 
-  async [ActionType.BOTS_GET](userId: string, filters: BotsGetFilters): Promise<Bot[]> {
-    const botsCollection: BotsDatabaseCollection = await UserBots.connect(userId);
-
-    return await botsCollection.getBots(filters);
+    return bots;
   },
 
   async [ActionType.BOTS_CREATE](userId: string, newBot: NewBot): Promise<BotClientInfo> {
@@ -263,4 +264,6 @@ export const botsActions = {
 
     await botsCollection.deleteBots(filters);
   },
+
+  async [ActionType.BOTS_CHECK_RESTART](): Promise<void> {},
 };
