@@ -13,6 +13,10 @@ export type DeactivateBotPayload = {
   botToken: string;
 }
 
+export type CheckMaxLossBotPayload = {
+  bot: Bot;
+}
+
 // Database Api
 export type BotsDatabaseDocument = Bot;
 

@@ -16,6 +16,7 @@ export enum ActionType {
   BOT_MANAGER_ACTIVATE_BOT = 'bot-manager/activate-bot',
   BOT_MANAGER_DEACTIVATE_BOT = 'bot-manager/deactivate-bot',
   BOT_MANAGER_RESTART_BOT = 'bot-manager/restart-bot',
+  BOT_MANAGER_CHECK_MAX_LOSS = 'bot-manager/check-max-loss',
 
   BOTS_GET = 'bots/get',
   BOTS_CREATE = 'bots/create',
@@ -35,7 +36,9 @@ export enum ActionType {
   OPEN_POSITIONS_CREATE = 'open-positions/create',
   OPEN_POSITIONS_UPDATE = 'open-positions/update',
   OPEN_POSITIONS_DELETE = 'open-positions/delete',
+  OPEN_POSITIONS_CHECK_CLOSE = 'open-positions/check-close',
 
+  POSITIONS_GET = 'positions/get',
   POSITIONS_CREATE = 'positions/create',
   POSITIONS_DELETE = 'positions/delete',
 
@@ -90,4 +93,8 @@ export enum SignalDirection {
 
 export enum JobExpression {
   CHECK_BOTS_RESTART = '0 1 * * SAT',
+}
+
+export enum PositionsCalculation {
+  CURRENT_PROGRESS = 'current-progress',
 }

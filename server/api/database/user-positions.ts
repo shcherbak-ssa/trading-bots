@@ -2,9 +2,9 @@ import mongoose from 'mongoose';
 
 import type {
   CreationDocument,
-  PositionDeleteFilters,
+  PositionsDeleteFilters,
   PositionsDatabaseCollection,
-  PositionsDatabaseDocument
+  PositionsDatabaseDocument, PositionsGetFilters
 } from 'shared/types';
 
 import { DatabaseCollection } from 'shared/constants';
@@ -35,13 +35,19 @@ export class UserPositions extends UserCollection<PositionsDatabaseDocument> imp
 
 
   // Implementation
+  async getPositions(filters: PositionsGetFilters): Promise<PositionsDatabaseDocument[]> {
+    const foundPositions = await this.collection.find(filters);
+
+    return foundPositions.map((position) => position.toObject());
+  }
+
   async createPosition(position: CreationDocument<PositionsDatabaseDocument>): Promise<PositionsDatabaseDocument> {
     const createdPosition = await this.collection.create(position);
 
     return createdPosition.toObject();
   }
 
-  async deletePositions(filters: PositionDeleteFilters): Promise<void> {
+  async deletePositions(filters: PositionsDeleteFilters): Promise<void> {
     if (filters.botId) {
       await this.collection.deleteMany(filters);
     }
