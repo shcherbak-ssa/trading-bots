@@ -8,7 +8,7 @@ import type {
   UpdateBotPayload
 } from 'global/types';
 
-import { BotRestartMode, BotState, BotUpdateType, BrokerDataType } from 'global/constants';
+import { BotDeactivateReason, BotRestartMode, BotState, BotUpdateType, BrokerDataType } from 'global/constants';
 
 import type {
   BotsDatabaseCollection,
@@ -91,6 +91,9 @@ export const botsActions = {
       token: userId,
       activateAt: newBot.active ? today : '',
       activations: [],
+      deactivateReason: BotDeactivateReason.EMPTY,
+      deactivateAt: '',
+      archivedAt: '',
       createdAt: today,
       state: BotState.ALIVE,
       initialCapital: newBot.active ? brokerAccount.amount : 0,
@@ -135,6 +138,8 @@ export const botsActions = {
         updates = {
           active: true,
           activateAt: today,
+          deactivateAt: '',
+          deactivateReason: BotDeactivateReason.EMPTY,
           initialCapital: calculateProportion(brokerAccount.amount, currentBot.tradeCapitalPercent),
         };
 
@@ -156,6 +161,8 @@ export const botsActions = {
           active: false,
           activateAt: '',
           activation,
+          deactivateAt: today,
+          deactivateReason: updates.deactivateReason || BotDeactivateReason.USER,
           initialCapital: 0,
         };
 
@@ -182,8 +189,11 @@ export const botsActions = {
         break;
       case BotUpdateType.ARCHIVE:
         updates = {
+          archivedAt: today,
           active: false,
           activateAt: '',
+          deactivateAt: '',
+          deactivateReason: BotDeactivateReason.EMPTY,
           state: BotState.ARCHIVE,
           initialCapital: 0,
         };
@@ -264,45 +274,5 @@ export const botsActions = {
     }
 
     await botsCollection.deleteBots(filters);
-  },
-
-  async [ActionType.BOTS_CHECK_RESTART](): Promise<void> {
-    const users: UsersDatabaseDocument[] = await runAction({
-      type: ActionType.USERS_GET,
-      userId: '',
-      payload: {},
-    });
-
-    for (const { id: userId } of users) {
-      const activeBots = await runAction<BotsGetFilters, Bot[]>({
-        type: ActionType.BOTS_GET,
-        userId,
-        payload: { active: true, withBrokerAccount: false },
-      });
-
-      for (const { id, restartEnable, restartMode, activateAt } of activeBots) {
-        if (!restartEnable) continue;
-
-        const needToRestart: boolean = (
-          restartMode === BotRestartMode.WEEK ||
-          (
-            restartMode === BotRestartMode.MONTH &&
-            Date.now() - convertDateStringToNumber(activateAt) > getMilliseconds(DATE_STRING_27_DAYS)
-          )
-        );
-
-        if (needToRestart) {
-          await runAction<UpdateBotPayload, void>({
-            type: ActionType.BOTS_UPDATE,
-            userId,
-            payload: {
-              id,
-              type: BotUpdateType.RESTART,
-              updates: {},
-            },
-          });
-        }
-      }
-    }
   },
 };

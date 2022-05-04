@@ -1,4 +1,11 @@
-import { BotRestartMode, BotState, BotUpdateType, BrokerAccountType, BrokerName } from 'global/constants';
+import {
+  BotDeactivateReason,
+  BotRestartMode,
+  BotState,
+  BotUpdateType,
+  BrokerAccountType,
+  BrokerName
+} from 'global/constants';
 
 
 export type Bot = {
@@ -10,7 +17,10 @@ export type Bot = {
   active: boolean;
   activateAt: string;
   activations: BotActivation[];
+  deactivateReason: BotDeactivateReason;
+  deactivateAt: string;
   createdAt: string;
+  archivedAt: string;
   brokerId: string;
   brokerName: BrokerName;
   brokerAccountId: string;
@@ -39,7 +49,16 @@ export type BotActivation = {
 
 export type NewBot = Omit<
   Bot,
-  'id' | 'token' | 'state' | 'initialCapital' | 'activations' | 'activateAt' | 'createdAt'
+  | 'id'
+  | 'token'
+  | 'state'
+  | 'initialCapital'
+  | 'activations'
+  | 'activateAt'
+  | 'createdAt'
+  | 'deactivateReason'
+  | 'deactivateAt'
+  | 'archivedAt'
 >;
 
 export type BotClientInfo = Bot & {
@@ -62,6 +81,9 @@ export type UpdateBotPayload = {
     active?: boolean;
     activateAt?: string;
     activation?: BotActivation;
+    deactivateReason?: BotDeactivateReason;
+    deactivateAt?: string;
+    archivedAt?: string;
     state?: BotState;
     tradeRiskPercent?: number;
     tradeMaxLossPercent?: number;

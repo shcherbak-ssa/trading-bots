@@ -1,3 +1,6 @@
+import type { AnalyticsBotProgress } from 'global/types';
+
+
 export const API_PATHNAME: string = '/api';
 export const SIGNALS_PATHNAME: string = '/signals';
 export const ENTRY_POINT_PATHNAME: string = '*';
@@ -11,7 +14,19 @@ export const ONE_HUNDRED: number = 100;
 export const FRACTION_DIGITS_TO_HUNDREDTHS: number = 2;
 
 
+export const emptyBotProgress: AnalyticsBotProgress = {
+  botActivationIndex: 0,
+  totalFee: 0,
+  totalLoss: 0,
+  totalProfit: 0,
+  totalResult: 0,
+  changePercent: 0,
+};
+
+
 export enum ActionType {
+  ANALYTICS_GET_BOT_PROGRESS = 'analytics/get-bot-progress',
+
   BOT_MANAGER_SETUP_ACTIVE_BOTS = 'bot-manager/setup-active-bots',
   BOT_MANAGER_ACTIVATE_BOT = 'bot-manager/activate-bot',
   BOT_MANAGER_DEACTIVATE_BOT = 'bot-manager/deactivate-bot',
@@ -22,7 +37,6 @@ export enum ActionType {
   BOTS_CREATE = 'bots/create',
   BOTS_UPDATE = 'bots/update',
   BOTS_DELETE = 'bots/delete',
-  BOTS_CHECK_RESTART = 'bots/check-restart',
 
   BROKERS_GET = 'brokers/get',
   BROKERS_GET_DATA = 'brokers/get-data',
@@ -93,8 +107,5 @@ export enum SignalDirection {
 
 export enum JobExpression {
   CHECK_BOTS_RESTART = '0 1 * * SAT',
-}
-
-export enum PositionsCalculation {
-  CURRENT_PROGRESS = 'current-progress',
+  CLEAN_RESTART_BOT_COUNTS = '0 1 * * *',
 }

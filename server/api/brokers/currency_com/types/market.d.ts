@@ -8,6 +8,7 @@ export type Market = {
   price: number;
   spread: number;
   commission: number;
+  tradingHours: string;
 }
 
 export type MarketPrice = {

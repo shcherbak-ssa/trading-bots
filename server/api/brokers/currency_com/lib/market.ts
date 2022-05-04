@@ -103,7 +103,7 @@ export class MarketApi {
   }
 
   private async parseExchangeSymbol(
-    { symbol, quoteAsset, tickSize, filters, takerFee }: ExchangeSymbolInfo,
+    { symbol, quoteAsset, tickSize, filters, takerFee, tradingHours }: ExchangeSymbolInfo,
   ): Promise<Market> {
     const { value: leverage }: MarketLeverageResponse = await this.loadMarketLeverage(symbol);
     const { price, spread }: MarketPrice = await this.loadMarketPrice(symbol);
@@ -120,6 +120,7 @@ export class MarketApi {
       price,
       spread,
       commission: takerFee || 0,
+      tradingHours,
     };
   }
 

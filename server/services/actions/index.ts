@@ -1,5 +1,6 @@
 import type { Action, ActionFunction, ActionsObject } from 'shared/types';
 
+import { analyticsActions } from './analytics';
 import { botManagerActions } from './bot-manager';
 import { botsActions } from './bots';
 import { brokersActions } from './brokers';
@@ -10,6 +11,7 @@ import { usersActions } from './users';
 
 
 const actions: ActionsObject = {
+  ...analyticsActions,
   ...botManagerActions,
   ...botsActions,
   ...brokersActions,
