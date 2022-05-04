@@ -54,8 +54,6 @@ export class WsApi {
     };
 
     this.wsClient.onclose = (event) => {
-      console.error(` - error: [WS API] Currency.com - onclose`, event);
-
       BotEvents.processError(
         this.botToken,
         BotErrorPlace.MARKET_WS_CLOSE,
@@ -64,8 +62,6 @@ export class WsApi {
     };
 
     this.wsClient.onerror = (err) => {
-      console.error(` - error: [WS API] Currency.com - onerror`, err);
-
       BotEvents.processError(
         this.botToken,
         BotErrorPlace.MARKET_WS_ERROR,

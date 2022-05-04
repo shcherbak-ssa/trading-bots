@@ -91,18 +91,17 @@ export class Bot {
   async closeOpenPosition(): Promise<void> {
     if (this.currentPosition === null) return;
 
+    const position: BotPosition = this.currentPosition;
+    this.currentPosition = null;
+
     try {
       this.broker.market.unsubscribeToPriceUpdates();
 
-      await this.broker.closePosition(this.currentPosition);
+      await this.broker.closePosition(position);
 
-      await BotEvents.processPositionClose(this.settings.token, this.currentPosition);
-
-      this.currentPosition = null;
-    } catch (err: any) {
-      await BotEvents.processError(this.settings.token, BotErrorPlace.POSITION_CLOSE, err);
-
-      this.currentPosition = null;
+      await BotEvents.processPositionClose(this.settings.token, position);
+    } catch (e: any) {
+      await BotEvents.processError(this.settings.token, BotErrorPlace.POSITION_CLOSE, e, position);
     }
   }
 

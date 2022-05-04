@@ -2,7 +2,9 @@ import type { OpenPosition } from 'shared/types';
 import { BotError } from 'shared/exceptions';
 
 import type { BotSettings } from './types';
+import { BotErrorPlace } from './constants';
 import { Bot } from './bot';
+import { BotEvents } from './bot-events';
 
 
 export class BotManager {
@@ -19,16 +21,23 @@ export class BotManager {
     return bot;
   }
 
+  // @TODO: from parameter
   static async activateBot(setting: BotSettings, openPosition: OpenPosition | null): Promise<void> {
-    const createdBot: Bot = await Bot.create(setting);
+    try {
+      const createdBot: Bot = await Bot.create(setting);
 
-    if (openPosition !== null) {
-      createdBot.setCurrentPosition(openPosition);
+      if (openPosition !== null) {
+        createdBot.setCurrentPosition(openPosition);
+      }
+
+      BotManager.bots.set(setting.token, createdBot);
+
+      console.info(` - info: [bot manager] activate bot. Active bots - ${BotManager.bots.size}`);
+    } catch (e: any) {
+      await BotEvents.processError(setting.token, BotErrorPlace.BOT_CREATE, e);
+
+      throw e;
     }
-
-    BotManager.bots.set(setting.token, createdBot);
-
-    console.info(` - info: [bot manager] activate bot. Active bots - ${BotManager.bots.size}`);
   }
 
   static async deactivateBot(botToken: string): Promise<void> {

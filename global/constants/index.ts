@@ -41,6 +41,13 @@ export enum ServerEndpoint {
 }
 
 
+// Analytics
+export enum AnalyticsBotProgressType {
+  ALL = 'ALL',
+  CURRENT = 'CURRENT',
+}
+
+
 // Broker
 export enum BrokerName {
   CURRENCY_COM = 'currency_com',
@@ -61,8 +68,8 @@ export enum BrokerDataType {
 
 // Bot
 export enum BotState {
-  ALIVE = 'alive',
-  ARCHIVE = 'archive',
+  ALIVE = 'ALIVE',
+  ARCHIVE = 'ARCHIVE',
 }
 
 export enum BotUpdateType {
@@ -74,7 +81,14 @@ export enum BotUpdateType {
 }
 
 export enum BotRestartMode {
-  NONE = 'none',
-  WEEK = 'week',
-  MONTH = 'month' // 4 weeks
+  NONE = 'NONE',
+  WEEK = 'WEEK',
+  MONTH = 'MONTH' // 4 weeks
+}
+
+export enum BotDeactivateReason {
+  EMPTY = '',
+  USER = 'USER',
+  MAX_LOSS = 'MAX_LOSS',
+  RESTART_LIMIT = 'RESTART_LIMIT',
 }

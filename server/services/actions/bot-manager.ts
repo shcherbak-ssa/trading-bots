@@ -1,14 +1,23 @@
-import type { Bot, BrokerApiKeys, OnlyIdPayload } from 'global/types';
+import type {
+  AnalyticsBotProgress,
+  AnalyticsGetBotProgressPayload,
+  Bot,
+  BrokerApiKeys,
+  OnlyIdPayload,
+  UpdateBotPayload
+} from 'global/types';
+
+import { AnalyticsBotProgressType, BotDeactivateReason, BotUpdateType } from 'global/constants';
 
 import type {
   BotsGetFilters,
+  CheckMaxLossBotPayload,
   DeactivateBotPayload,
   OpenPosition,
+  OpenPositionCheckClosePayload,
   OpenPositionGetPayload,
-  UsersDatabaseDocument,
   RestartBotPayload,
-  CheckMaxLossBotPayload,
-  OpenPositionCheckClosePayload
+  UsersDatabaseDocument
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
@@ -100,5 +109,27 @@ export const botManagerActions = {
     });
   },
 
-  async [ActionType.BOT_MANAGER_CHECK_MAX_LOSS](userId: string, { bot }: CheckMaxLossBotPayload): Promise<void> {},
+  async [ActionType.BOT_MANAGER_CHECK_MAX_LOSS](userId: string, { bot }: CheckMaxLossBotPayload): Promise<void> {
+    const [ currentProgress ] = await runAction<AnalyticsGetBotProgressPayload, AnalyticsBotProgress[]>({
+      type: ActionType.ANALYTICS_GET_BOT_PROGRESS,
+      userId,
+      payload: { bot, type: AnalyticsBotProgressType.CURRENT },
+    });
+
+    const { changePercent } = currentProgress;
+
+    if (changePercent < 0 && Math.round(Math.abs(changePercent)) >= bot.tradeMaxLossPercent) {
+      await runAction<UpdateBotPayload, void>({
+        type: ActionType.BOTS_UPDATE,
+        userId,
+        payload: {
+          id: bot.id,
+          type: BotUpdateType.DEACTIVATE,
+          updates: { deactivateReason: BotDeactivateReason.MAX_LOSS },
+        },
+      });
+
+      // @TODO: notify user
+    }
+  },
 };
