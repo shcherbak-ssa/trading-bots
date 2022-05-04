@@ -116,7 +116,7 @@ export class PositionCalculation {
 
   private getMarketLeverage(): number {
     if (this.botSettings.tradeWithCustomMarketLeverage) {
-      return this.botSettings.tradeMarketLeverage;
+      return this.botSettings.tradeCustomMarketLeverage;
     }
 
     return this.broker.market.leverage;

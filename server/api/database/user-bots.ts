@@ -39,7 +39,7 @@ const userBotSchema = new mongoose.Schema<BotsDatabaseDocument>({
   tradeWithTakeProfit: { type: Boolean, required: true },
   tradeTakeProfitPL: { type: Number, required: true },
   tradeWithCustomMarketLeverage: { type: Boolean, required: true },
-  tradeMarketLeverage: { type: Number, required: true },
+  tradeCustomMarketLeverage: { type: Number, required: true },
   tradeCloseAtEndDay: { type: Boolean, required: true },
   tradeCloseAtEndWeek: { type: Boolean, required: true },
   restartEnable: { type: Boolean, required: true },

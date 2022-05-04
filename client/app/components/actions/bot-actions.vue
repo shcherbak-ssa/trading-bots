@@ -515,7 +515,7 @@ async function setBrokerDataForCurrentBot(): Promise<void> {
 
   if (state.botConfig?.allowLeverageSettings) {
     await loadBrokerMarketLeverages(brokerMarketSymbol);
-    state.selectedBrokerMarketLeverageOption = { value: actionState.tradeMarketLeverage.toString() };
+    state.selectedBrokerMarketLeverageOption = { value: actionState.tradeCustomMarketLeverage.toString() };
   }
 
   if (selectedBot.restartEnable) {
@@ -583,7 +583,7 @@ async function loadBrokerMarketLeverages(marketSymbol: string): Promise<void> {
   if (!selectedBot) {
     const { current: currentLeverage } = storeState.broker.marketLeverage;
 
-    state.bot.tradeMarketLeverage = currentLeverage;
+    state.bot.tradeCustomMarketLeverage = currentLeverage;
     state.selectedBrokerMarketLeverageOption = { value: currentLeverage.toString() };
   }
 
@@ -659,7 +659,7 @@ function selectMarker(market: BrokerMarket): void {
 function selectMarketLeverage(option: { value: string }): void {
   state.selectedBrokerMarketLeverageOption = option;
 
-  state.bot.tradeMarketLeverage = Number(option.value);
+  state.bot.tradeCustomMarketLeverage = Number(option.value);
 }
 
 function selectRestartMode(option: DropdownRestartModeOption): void {

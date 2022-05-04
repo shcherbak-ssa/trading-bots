@@ -49,7 +49,7 @@ export const botsValidation = {
       .max(botDefaultSettings.tradeTakeProfitPL.max)
       .required(),
     tradeWithCustomMarketLeverage: Joi.boolean().required(),
-    tradeMarketLeverage: Joi.number().required(),
+    tradeCustomMarketLeverage: Joi.number().required(),
     tradeCloseAtEndDay: Joi.boolean().required(),
     tradeCloseAtEndWeek: Joi.boolean().required(),
     restartEnable: Joi.boolean().required(),
@@ -89,7 +89,7 @@ export const botsValidation = {
         .min(botDefaultSettings.tradeTakeProfitPL.min)
         .max(botDefaultSettings.tradeTakeProfitPL.max),
       tradeWithCustomMarketLeverage: Joi.boolean(),
-      tradeMarketLeverage: Joi.number(),
+      tradeCustomMarketLeverage: Joi.number(),
       tradeCloseAtEndDay: Joi.boolean(),
       tradeCloseAtEndWeek: Joi.boolean(),
       restartEnable: Joi.boolean(),
