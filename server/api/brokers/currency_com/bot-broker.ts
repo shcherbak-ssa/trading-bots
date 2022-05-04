@@ -2,7 +2,7 @@ import { BrokerName } from 'global/constants';
 
 import type { BotBroker as Broker, BotBrokerAccount, BotBrokerMarket, BotPosition, BotSettings } from 'modules/bot/types';
 
-import type { ActiveParsedPositions, ClosedParsedPositions } from './types';
+import type { ActiveParsedPositions, ClosedParsedPositions, Position } from './types';
 import { OrderSide } from './constants';
 
 import { PositionApi } from './lib/position';
@@ -42,14 +42,25 @@ export class BotBroker implements Broker {
 
   // Implementations
   async openPosition(position: BotPosition): Promise<void> {
-    const { brokerAccountId, brokerMarketSymbol } = this.botSettings;
+    const {
+      brokerAccountId,
+      brokerMarketSymbol,
+      tradeWithCustomMarketLeverage,
+      tradeCustomMarketLeverage,
+    } = this.botSettings;
 
-    const openPosition: ActiveParsedPositions = await this.positionApi.openPosition({
+    const openPositionPayload: Position = {
       accountId: brokerAccountId,
       quantity: position.quantity,
       symbol: brokerMarketSymbol,
       side: position.isLong ? OrderSide.BUY : OrderSide.SELL,
-    });
+    };
+
+    if (tradeWithCustomMarketLeverage) {
+      openPositionPayload.leverage = tradeCustomMarketLeverage;
+    }
+
+    const openPosition: ActiveParsedPositions = await this.positionApi.openPosition(openPositionPayload);
 
     position.brokerPositionIds = openPosition.ids;
     position.feeOpen = openPosition.totalFee;

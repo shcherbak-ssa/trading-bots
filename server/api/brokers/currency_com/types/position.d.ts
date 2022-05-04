@@ -18,6 +18,7 @@ export type Position = {
   quantity: number;
   symbol: string;
   side: OrderSide;
+  leverage?: number;
 }
 
 export type ActiveParsedPositions = {

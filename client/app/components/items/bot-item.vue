@@ -51,7 +51,7 @@
 
         <template v-if="selectedBot.tradeWithCustomMarketLeverage">
           <div class="bot-settings-label">Custom leverage</div>
-          <div class="bot-settings-value">{{ selectedBot.tradeMarketLeverage }}</div>
+          <div class="bot-settings-value">{{ selectedBot.tradeCustomMarketLeverage }}</div>
         </template>
 
         <div class="bot-settings-label">Close positions</div>

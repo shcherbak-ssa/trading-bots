@@ -24,7 +24,7 @@ export type Bot = {
   tradeWithTakeProfit: boolean;
   tradeTakeProfitPL: number;
   tradeWithCustomMarketLeverage: boolean;
-  tradeMarketLeverage: number;
+  tradeCustomMarketLeverage: number;
   tradeCloseAtEndDay: boolean;
   tradeCloseAtEndWeek: boolean;
   restartEnable: boolean;
@@ -69,7 +69,7 @@ export type UpdateBotPayload = {
     tradeWithTakeProfit?: boolean;
     tradeTakeProfitPL?: number;
     tradeWithCustomMarketLeverage?: boolean;
-    tradeMarketLeverage?: number;
+    tradeCustomMarketLeverage?: number;
     tradeCloseAtEndDay?: boolean;
     tradeCloseAtEndWeek?: boolean;
     restartEnable?: boolean;

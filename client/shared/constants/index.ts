@@ -84,7 +84,7 @@ export const initialBotActionState: BotActionState = {
   tradeWithTakeProfit: false,
   tradeTakeProfitPL: 2,
   tradeWithCustomMarketLeverage: false,
-  tradeMarketLeverage: 0,
+  tradeCustomMarketLeverage: 0,
   tradeCloseAtEndDay: false,
   tradeCloseAtEndWeek: false,
   restartEnable: false,
