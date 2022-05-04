@@ -6,8 +6,9 @@ import type {
   OpenPosition,
   OpenPositionGetPayload,
   UsersDatabaseDocument,
-  RestartBotPayload, BrokersPositionsApi,
-  OpenPositionDeletePayload
+  RestartBotPayload,
+  CheckMaxLossBotPayload,
+  OpenPositionCheckClosePayload
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
@@ -16,11 +17,6 @@ import { runAction } from 'services/actions';
 
 import type { BotSettings } from 'modules/bot/types';
 import { BotManager } from 'modules/bot';
-
-import { BrokersPositions } from 'api/brokers/brokers-positions';
-
-
-const brokersPositionsApi: BrokersPositionsApi = new BrokersPositions();
 
 
 export const botManagerActions = {
@@ -68,25 +64,14 @@ export const botManagerActions = {
     });
 
     if (openPosition !== null) {
-      const checkResult: number | null = await brokersPositionsApi.checkPositionClose({
-        accountType: bot.brokerAccountType,
-        apiKeys: brokerApiKeys,
-        brokerName: bot.brokerName,
-        position: openPosition,
+      const closedPositionsCount = await runAction<OpenPositionCheckClosePayload, number | null>({
+        type: ActionType.OPEN_POSITIONS_CHECK_CLOSE,
+        userId,
+        payload: { bot, brokerApiKeys, position: openPosition },
       });
 
-      if (typeof checkResult === 'number') {
-        await runAction<OpenPositionDeletePayload, void>({
-          type: ActionType.OPEN_POSITIONS_DELETE,
-          userId,
-          payload: {
-            bot,
-            success: true,
-            position: openPosition,
-          },
-        });
-
-        if (checkResult !== openPosition.brokerPositionIds.length) {
+      if (typeof closedPositionsCount === 'number') {
+        if (closedPositionsCount !== openPosition.brokerPositionIds.length) {
           // @TODO: notify user
         }
 
@@ -114,4 +99,6 @@ export const botManagerActions = {
       payload: bot,
     });
   },
+
+  async [ActionType.BOT_MANAGER_CHECK_MAX_LOSS](userId: string, { bot }: CheckMaxLossBotPayload): Promise<void> {},
 };

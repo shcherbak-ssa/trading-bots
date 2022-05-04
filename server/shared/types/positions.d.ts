@@ -1,4 +1,4 @@
-import type { Bot } from 'global/types';
+import type { Bot, BrokerApiKeys } from 'global/types';
 
 import type { CreationDocument, BrokersApiPayload } from 'shared/types';
 
@@ -16,9 +16,17 @@ export type Position = {
   closedAt: string;
 }
 
-export type NewPosition = Omit<Position, 'id'>;
+export type PositionsGetFilters = {
+  botId?: string;
+  botActivationIndex?: number;
+}
 
-export type PositionDeleteFilters = {
+export type PositionsCreatePayload = {
+  bot: Bot;
+  openPosition: OpenPosition;
+}
+
+export type PositionsDeleteFilters = {
   botId?: string;
 }
 
@@ -42,9 +50,14 @@ export type OpenPositionUpdatePayload = {
 }
 
 export type OpenPositionDeletePayload = {
-  success: boolean;
   position: OpenPosition;
   bot: Bot;
+}
+
+export type OpenPositionCheckClosePayload = {
+  bot: Bot;
+  brokerApiKeys: BrokerApiKeys;
+  position: OpenPosition;
 }
 
 
@@ -61,8 +74,9 @@ export interface OpenPositionsDatabaseCollection {
 }
 
 export interface PositionsDatabaseCollection {
+  getPositions(filters: PositionsGetFilters): Promise<PositionsDatabaseDocument[]>;
   createPosition(position: CreationDocument<PositionsDatabaseDocument>): Promise<PositionsDatabaseDocument>;
-  deletePositions(filters: PositionDeleteFilters): Promise<void>;
+  deletePositions(filters: PositionsDeleteFilters): Promise<void>;
 }
 
 
@@ -72,5 +86,6 @@ export type BrokersPositionsApiPayload = BrokersApiPayload & {
 }
 
 export interface BrokersPositionsApi {
-  checkPositionClose(payload: BrokersPositionsApiPayload): Promise<number | null>; // number => closed positions count
+  /* number => closed positions count */
+  checkPositionClose(payload: BrokersPositionsApiPayload): Promise<number | null>;
 }

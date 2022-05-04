@@ -16,7 +16,7 @@ import type {
   BotsDeleteFilters,
   BotsGetFilters,
   DeactivateBotPayload,
-  PositionDeleteFilters,
+  PositionsDeleteFilters,
   RestartBotPayload,
   UsersDatabaseDocument
 } from 'shared/types';
@@ -247,7 +247,7 @@ export const botsActions = {
           });
         }
 
-        await runAction<PositionDeleteFilters, void>({
+        await runAction<PositionsDeleteFilters, void>({
           type: ActionType.POSITIONS_DELETE,
           userId,
           payload: { botId: bot.id },
@@ -256,7 +256,7 @@ export const botsActions = {
     }
 
     if (filters.id) {
-      await runAction<PositionDeleteFilters, void>({
+      await runAction<PositionsDeleteFilters, void>({
         type: ActionType.POSITIONS_DELETE,
         userId,
         payload: { botId: filters.id },

@@ -27,6 +27,7 @@ export class PositionApi {
   ) {}
 
 
+  // @TODO: refactor get info
   async openPosition(position: Position): Promise<ActiveParsedPositions> {
     const { orderId: createdOrderId, rejectMessage }
       = await this.restApi.post<CreateOrderRequest, CreateOrderResponse>(

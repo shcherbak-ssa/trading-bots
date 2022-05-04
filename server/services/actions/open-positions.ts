@@ -1,21 +1,25 @@
-import { BOT_TOKEN_SEPARATOR } from 'global/constants';
-
 import type {
+  BrokersPositionsApi,
+  CheckMaxLossBotPayload,
   NewOpenPosition,
-  NewPosition,
+  PositionsCreatePayload,
   OpenPosition,
   OpenPositionDeletePayload,
   OpenPositionGetPayload,
   OpenPositionsDatabaseCollection,
   OpenPositionUpdatePayload,
+  OpenPositionCheckClosePayload
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
-import { getTodayDateString } from 'shared/utils';
 
 import { runAction } from 'services/actions';
 
 import { UserOpenPositions } from 'api/database/user-open-positions';
+import { BrokersPositions } from 'api/brokers/brokers-positions';
+
+
+const brokersPositionsApi: BrokersPositionsApi = new BrokersPositions();
 
 
 export const openPositionsActions = {
@@ -39,30 +43,44 @@ export const openPositionsActions = {
 
   async [ActionType.OPEN_POSITIONS_DELETE](
     userId: string,
-    { success, position, bot }: OpenPositionDeletePayload
+    { position, bot }: OpenPositionDeletePayload
   ): Promise<void> {
     const openPositionsCollection: OpenPositionsDatabaseCollection = await UserOpenPositions.connect(userId);
 
     await openPositionsCollection.deleteOpenPosition(position.id);
 
-    if (success) {
-      const [ userId, botId ] = bot.token.split(BOT_TOKEN_SEPARATOR);
-      const { feeOpen, feeClose, result, isLong } = position;
+    await runAction<PositionsCreatePayload, void>({
+      type: ActionType.POSITIONS_CREATE,
+      userId,
+      payload: { bot, openPosition: position },
+    });
 
-      const newPosition: NewPosition = {
-        botId,
-        result,
-        isLong,
-        botActivationIndex: bot.activations.length,
-        totalFee: feeOpen + feeClose,
-        closedAt: getTodayDateString(),
-      };
+    await runAction<CheckMaxLossBotPayload, void>({
+      type: ActionType.BOT_MANAGER_CHECK_MAX_LOSS,
+      userId,
+      payload: { bot },
+    });
+  },
 
-      await runAction<NewPosition, void>({
-        type: ActionType.POSITIONS_CREATE,
+  async [ActionType.OPEN_POSITIONS_CHECK_CLOSE](
+    userId: string,
+    { position, bot, brokerApiKeys }: OpenPositionCheckClosePayload
+  ): Promise<number | null> {
+    const closedPositionsCount: number | null = await brokersPositionsApi.checkPositionClose({
+      accountType: bot.brokerAccountType,
+      apiKeys: brokerApiKeys,
+      brokerName: bot.brokerName,
+      position,
+    });
+
+    if (typeof closedPositionsCount === 'number') {
+      await runAction<OpenPositionDeletePayload, void>({
+        type: ActionType.OPEN_POSITIONS_DELETE,
         userId,
-        payload: newPosition,
+        payload: { bot, position },
       });
     }
+
+    return closedPositionsCount;
   },
 }
