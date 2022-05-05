@@ -1,10 +1,16 @@
 import type { OpenPosition } from 'shared/types';
 import { BotError } from 'shared/exceptions';
 
-import type { BotSettings } from './types';
+import { BotJobs } from 'services/jobs/bot-jobs';
+
+import type { BotJobs as Jobs, BotSettings } from './types';
 import { BotErrorPlace } from './constants';
 import { Bot } from './bot';
 import { BotEvents } from './bot-events';
+import { BotPositionCloseMode } from 'global/constants';
+
+
+const botJobs: Jobs = new BotJobs();
 
 
 export class BotManager {
@@ -30,6 +36,14 @@ export class BotManager {
         createdBot.setCurrentPosition(openPosition);
       }
 
+      botJobs.stopPositionCloseJob(setting.token);
+
+      if (setting.positionCloseEnable) {
+        setting.positionCloseMode === BotPositionCloseMode.DAY_END
+          ? await botJobs.startPositionCloseAtDayEndJob(createdBot)
+          : await botJobs.startPositionCloseAtWeekEndJob(createdBot);
+      }
+
       BotManager.bots.set(setting.token, createdBot);
 
       console.info(` - info: [bot manager] activate bot. Active bots - ${BotManager.bots.size}`);
@@ -44,6 +58,8 @@ export class BotManager {
     const bot: Bot = BotManager.getBot(botToken);
 
     await bot.closeOpenPosition();
+
+    botJobs.stopPositionCloseJob(botToken);
 
     BotManager.bots.delete(botToken);
 

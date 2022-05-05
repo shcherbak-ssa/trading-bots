@@ -120,8 +120,4 @@ export class Bot {
       return await this.closeOpenPosition();
     }
   }
-
-  private async checkCloseTime(): Promise<void> {
-    throw new Error('TODO: implement');
-  }
 }

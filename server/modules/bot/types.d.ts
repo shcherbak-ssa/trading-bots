@@ -1,6 +1,8 @@
 import type { Bot, BrokerApiKeys } from 'global/types';
 import { BrokerName } from 'global/constants';
 
+import type { Bot as BotWorker } from './bot';
+
 
 // Bot
 export type BotSettings = Bot & {
@@ -28,6 +30,13 @@ export interface BotPosition {
   result: number;
 }
 
+export type BotCloseTime = {
+  day: number;
+  nextDay: number;
+  hour: number;
+  minutes: number;
+}
+
 
 // Bot Broker
 export interface BotBrokerFactory {
@@ -50,7 +59,7 @@ export interface BotBrokerMarket {
   commission: number;
   currentPrice: number;
   currentSpread: number;
-  getCloseTime(): string;
+  getCloseTime(day: number | 'last'): Promise<BotCloseTime>;
   subscribeToPriceUpdates(callback: () => void): void;
   unsubscribeToPriceUpdates(): void;
 }
@@ -58,4 +67,12 @@ export interface BotBrokerMarket {
 export interface BotBrokerAccount {
   availableAmount: number;
   totalAmount: number;
+}
+
+
+// Jobs
+export interface BotJobs {
+  startPositionCloseAtWeekEndJob(bot: BotWorker): Promise<void>;
+  startPositionCloseAtDayEndJob(bot: BotWorker): Promise<void>;
+  stopPositionCloseJob(botToken: string): void;
 }

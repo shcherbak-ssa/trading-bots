@@ -2,12 +2,17 @@ export const REAL_ACCOUNT_API_URL: string = 'https://api-adapter.backend.currenc
 export const DEMO_ACCOUNT_API_URL: string = 'https://demo-api-adapter.backend.currency.com';
 export const WS_API_URL: string = 'wss://api-adapter.backend.currency.com/connect';
 
+export const TRADING_HOURS_SEPARATOR: string = ';';
+
 
 export const ACCOUNT_UPDATE_INTERVAL: number = 60000;
 export const WS_PING_DELAY: number = 5000;
 export const POSITION_HISTORY_LIMIT: number = 10;
 export const POSITION_CHECK_LIMIT: number = 20;
 export const POSITION_ACTION_SLEEP_TIME: number = 5000;
+
+
+export const daysMap = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 
 
 export enum MarketFilter {
