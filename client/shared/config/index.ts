@@ -1,4 +1,4 @@
-import { BotRestartMode, BrokerName } from 'global/constants';
+import { BotPositionCloseMode, BotRestartMode, BrokerName } from 'global/constants';
 import { botDefaultSettings } from 'global/config';
 
 import type { AppMenuItem, BotCreateConfig, BrokerConnectConfig } from 'shared/types';
@@ -140,7 +140,7 @@ export const botCreateSettings = {
     numberSliderStep: 0.5,
   },
   restartMode: {
-    helpText: 'Note that restart will always be on saturday',
+    helpText: 'Note that restart will always be on saturday at 01:00',
     options: [
       {
         mode: BotRestartMode.WEEK,
@@ -149,6 +149,18 @@ export const botCreateSettings = {
       {
         mode: BotRestartMode.MONTH,
         label: 'Every month (4 weeks)'
+      },
+    ],
+  },
+  positionCloseMode: {
+    options: [
+      {
+        mode: BotPositionCloseMode.DAY_END,
+        label: 'At the end of the trading day'
+      },
+      {
+        mode: BotPositionCloseMode.WEEK_END,
+        label: 'At the end of the trading week'
       },
     ],
   },

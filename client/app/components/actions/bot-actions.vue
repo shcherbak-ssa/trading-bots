@@ -205,18 +205,30 @@
         </template>
 
         <base-checkbox
-            label="Close positions at the end of the trading day"
-            checkboxId="close-at-day-end"
-            :value="state.bot.tradeCloseAtEndDay"
-            @change="(value) => state.bot.tradeCloseAtEndDay = value"
+            label="Enable position closing mode"
+            checkboxId="position-close"
+            :value="state.bot.positionCloseEnable"
+            @change="(value) => state.bot.positionCloseEnable = value"
         />
 
-        <base-checkbox
-            label="Close positions at the end of the trading week"
-            checkboxId="close-at-week-end"
-            :value="state.bot.tradeCloseAtEndWeek"
-            @change="(value) => state.bot.tradeCloseAtEndWeek = value"
-        />
+        <base-dropdown
+            v-if="state.bot.positionCloseEnable"
+            label="Position closing mode"
+            placeholder="Select position closing mode"
+            optionLabel="label"
+            :value="state.selectedPositionCloseMode"
+            :options="botCreateSettings.positionCloseMode.options"
+            :validation="v$.bot.positionCloseMode"
+            @select="selectPositionCloseMode"
+        >
+          <template #value="{ value }">
+            <div>{{ value.label }}</div>
+          </template>
+
+          <template #option="{ option }">
+            <div>{{ option.label }}</div>
+          </template>
+        </base-dropdown>
       </group-container>
 
       <group-container heading="Restart">
@@ -298,7 +310,7 @@ import { minValue, required } from '@vuelidate/validators';
 import useVuelidate from '@vuelidate/core';
 
 import type { BotClientInfo, BrokerAccount, BrokerMarket, GetBrokerDataPayload, UpdateBotPayload } from 'global/types';
-import { BotRestartMode, BotState, BotUpdateType, BrokerDataType } from 'global/constants';
+import { BotRestartMode, BotState, BotUpdateType, BrokerDataType, BotPositionCloseMode } from 'global/constants';
 import { botDefaultSettings } from 'global/config';
 
 import type {
@@ -306,7 +318,8 @@ import type {
   BotCreateConfig,
   BotUpdatePayload,
   DropdownBrokerOption,
-  DropdownRestartModeOption
+  DropdownRestartModeOption,
+  DropdownPositionCloseModeOption
 } from 'shared/types';
 
 import { ActionType, initialBotActionState, StoreMutation } from 'shared/constants';
@@ -351,6 +364,7 @@ type ComponentState = {
   selectedBrokerMarketOption: BrokerMarket | null;
   selectedBrokerMarketLeverageOption: { value: string } | null;
   selectedRestartMode: DropdownRestartModeOption | null;
+  selectedPositionCloseMode: DropdownPositionCloseModeOption | null;
   botConfig: BotCreateConfig | null;
   bot: BotActionState;
 }
@@ -381,6 +395,7 @@ const state = reactive<ComponentState>({
   selectedBrokerMarketOption: null,
   selectedBrokerMarketLeverageOption: null,
   selectedRestartMode: null,
+  selectedPositionCloseMode: null,
   botConfig: null,
   bot: { ...initialBotActionState },
 });
@@ -455,12 +470,19 @@ const validationRules = computed(() => {
         minValue: minValue(botDefaultSettings.tradeCapitalPercent.min),
       },
       restartMode: {},
+      positionCloseMode: {}
     },
   };
 
   if (state.bot.restartEnable) {
     rules.bot.restartMode = {
       required: (value: string) => value !== '' && value !== BotRestartMode.NONE,
+    };
+  }
+
+  if (state.bot.positionCloseEnable) {
+    rules.bot.positionCloseMode = {
+      required: (value: string) => value !== '' && value !== BotPositionCloseMode.NONE,
     };
   }
 
@@ -524,6 +546,15 @@ async function setBrokerDataForCurrentBot(): Promise<void> {
 
     if (selectedRestartModeOption) {
       state.selectedRestartMode = selectedRestartModeOption;
+    }
+  }
+
+  if (selectedBot.positionCloseEnable) {
+    const selectedPositionCloseMode: DropdownPositionCloseModeOption | undefined
+      = botCreateSettings.positionCloseMode.options.find(({ mode }) => mode === selectedBot.positionCloseMode);
+
+    if (selectedPositionCloseMode) {
+      state.selectedPositionCloseMode = selectedPositionCloseMode;
     }
   }
 
@@ -666,6 +697,12 @@ function selectRestartMode(option: DropdownRestartModeOption): void {
   state.bot.restartMode = option.mode;
 
   state.selectedRestartMode = option;
+}
+
+function selectPositionCloseMode(option: DropdownPositionCloseModeOption): void {
+  state.bot.positionCloseMode = option.mode;
+
+  state.selectedPositionCloseMode = option;
 }
 
 function toggleCapitalConfig(e: Event): void {

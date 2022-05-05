@@ -163,11 +163,11 @@ function signalsRouteMiddleware(validation: Validation, handler: ServerRouteHand
 
       validate(validation, requestPayload);
 
-      await handler('', requestPayload);
+      handler('', requestPayload);
     } catch (err: any) {
       console.error(err);
 
-      // @TODO: process error
+      // @TODO: notify user
     } finally {
       response.result = { status: StatusCode.SUCCESS, payload: {}};
 

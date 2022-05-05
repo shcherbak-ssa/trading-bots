@@ -1,5 +1,5 @@
 import {
-  BotDeactivateReason,
+  BotDeactivateReason, BotPositionCloseMode,
   BotRestartMode,
   BotState,
   BotUpdateType,
@@ -35,8 +35,8 @@ export type Bot = {
   tradeTakeProfitPL: number;
   tradeWithCustomMarketLeverage: boolean;
   tradeCustomMarketLeverage: number;
-  tradeCloseAtEndDay: boolean;
-  tradeCloseAtEndWeek: boolean;
+  positionCloseEnable: boolean;
+  positionCloseMode: BotPositionCloseMode;
   restartEnable: boolean;
   restartMode: BotRestartMode;
 }
@@ -92,8 +92,8 @@ export type UpdateBotPayload = {
     tradeTakeProfitPL?: number;
     tradeWithCustomMarketLeverage?: boolean;
     tradeCustomMarketLeverage?: number;
-    tradeCloseAtEndDay?: boolean;
-    tradeCloseAtEndWeek?: boolean;
+    positionCloseEnable?: boolean;
+    positionCloseMode?: BotPositionCloseMode;
     restartEnable?: boolean;
     restartMode?: BotRestartMode;
   };

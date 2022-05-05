@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-import { BotRestartMode, BotUpdateType, BrokerAccountType, BrokerName } from 'global/constants';
+import { BotPositionCloseMode, BotRestartMode, BotUpdateType, BrokerAccountType, BrokerName } from 'global/constants';
 import { botDefaultSettings } from 'global/config';
 
 import { Validation } from 'shared/constants';
@@ -50,8 +50,14 @@ export const botsValidation = {
       .required(),
     tradeWithCustomMarketLeverage: Joi.boolean().required(),
     tradeCustomMarketLeverage: Joi.number().required(),
-    tradeCloseAtEndDay: Joi.boolean().required(),
-    tradeCloseAtEndWeek: Joi.boolean().required(),
+    positionCloseEnable: Joi.boolean().required(),
+    positionCloseMode: Joi.string()
+      .valid(
+        BotPositionCloseMode.NONE,
+        BotPositionCloseMode.DAY_END,
+        BotPositionCloseMode.WEEK_END,
+      )
+      .required(),
     restartEnable: Joi.boolean().required(),
     restartMode: Joi.string()
       .valid(
@@ -90,8 +96,13 @@ export const botsValidation = {
         .max(botDefaultSettings.tradeTakeProfitPL.max),
       tradeWithCustomMarketLeverage: Joi.boolean(),
       tradeCustomMarketLeverage: Joi.number(),
-      tradeCloseAtEndDay: Joi.boolean(),
-      tradeCloseAtEndWeek: Joi.boolean(),
+      positionCloseEnable: Joi.boolean(),
+      positionCloseMode: Joi.string()
+        .valid(
+          BotPositionCloseMode.NONE,
+          BotPositionCloseMode.DAY_END,
+          BotPositionCloseMode.WEEK_END,
+        ),
       restartEnable: Joi.boolean(),
       restartMode: Joi.string()
         .valid(

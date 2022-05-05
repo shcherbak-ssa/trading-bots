@@ -1,5 +1,5 @@
 import type { BrokerAccount } from 'global/types';
-import { BotRestartMode, BrokerAccountType, BrokerName } from 'global/constants';
+import { BotPositionCloseMode, BotRestartMode, BrokerAccountType, BrokerName } from 'global/constants';
 
 
 export type InputState = {
@@ -31,5 +31,10 @@ export type DropdownBrokerAccountOption = {
 
 export type DropdownRestartModeOption = {
   mode: BotRestartMode;
+  label: string;
+}
+
+export type DropdownPositionCloseModeOption = {
+  mode: BotPositionCloseMode;
   label: string;
 }

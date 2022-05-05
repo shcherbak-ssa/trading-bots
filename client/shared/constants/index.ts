@@ -1,4 +1,4 @@
-import { BotRestartMode, BrokerAccountType, BrokerName } from 'global/constants';
+import { BotPositionCloseMode, BotRestartMode, BrokerAccountType, BrokerName } from 'global/constants';
 
 import type { BotActionState, InputState, StoreState } from 'shared/types'
 
@@ -85,8 +85,8 @@ export const initialBotActionState: BotActionState = {
   tradeTakeProfitPL: 2,
   tradeWithCustomMarketLeverage: false,
   tradeCustomMarketLeverage: 0,
-  tradeCloseAtEndDay: false,
-  tradeCloseAtEndWeek: false,
+  positionCloseEnable: false,
+  positionCloseMode: BotPositionCloseMode.NONE,
   restartEnable: false,
   restartMode: BotRestartMode.NONE,
 }

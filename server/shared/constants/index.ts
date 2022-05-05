@@ -5,7 +5,7 @@ export const API_PATHNAME: string = '/api';
 export const SIGNALS_PATHNAME: string = '/signals';
 export const ENTRY_POINT_PATHNAME: string = '*';
 
-export const JOB_TIMEZONE: string = 'Europe/London';
+export const JOB_TIMEZONE: string = 'Etc/UTC';
 
 export const DATE_STRING_27_DAYS: string = '27 days';
 
