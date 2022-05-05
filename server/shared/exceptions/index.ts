@@ -4,17 +4,6 @@ import { BrokerName, StatusCode } from 'global/constants';
 import { ErrorName } from 'shared/constants';
 
 
-export class ProcessError extends Error {
-  name = ErrorName.PROCESS_ERROR;
-  status: StatusCode;
-
-  constructor(message: string, status: StatusCode = StatusCode.INTERNAL_SERVER_ERROR) {
-    super(message);
-    this.status = status;
-  }
-}
-
-
 export class AppError extends Error {
   payload: ErrorPayload;
   status: StatusCode;
@@ -59,19 +48,6 @@ export class SignalError extends Error {
   // @TODO: add payload type
   constructor(message: string, payload: {}) {
     super(message);
-  }
-}
-
-export class BotError extends AppError {
-  name = ErrorName.BOT_ERROR;
-
-  constructor(message: string) {
-    super(StatusCode.INTERNAL_SERVER_ERROR, { message });
-
-    this.payload = {
-      heading: 'Bot error',
-      errors: [{ message }],
-    }
   }
 }
 

@@ -1,6 +1,6 @@
-import { StatusCode } from 'global/constants';
+import { BrokerName } from 'global/constants';
 
-import { ProcessError } from 'shared/exceptions';
+import { BrokerApiError } from 'shared/exceptions';
 
 import type { AccountBalance, AccountRequest, AccountRequestSettings, AccountResponse, ParsedBalance } from '../types';
 import { Endpoint } from '../constants';
@@ -36,8 +36,7 @@ export class AccountApi {
       return AccountApi.parseBalance(foundBalance);
     }
 
-    // @TODO: refactor
-    throw new ProcessError(`Cannot found account with id '${accountId}'`, StatusCode.BAD_REQUEST);
+    throw new BrokerApiError(`Cannot found account with id '${accountId}'`, BrokerName.CURRENCY_COM);
   }
 
 

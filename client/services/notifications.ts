@@ -1,4 +1,5 @@
 import { NOTIFICATION_LIFE_TIME, StoreMutation } from 'shared/constants';
+
 import { store } from 'app/store';
 
 

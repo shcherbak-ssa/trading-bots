@@ -7,6 +7,8 @@ import { daysMap, TRADING_HOURS_SEPARATOR } from './constants';
 
 import type { RestApi } from './lib/rest-api';
 import { MarketApi } from './lib/market';
+import { BrokerApiError } from 'shared/exceptions';
+import { BrokerName } from 'global/constants';
 
 
 export class BotMarket implements BotBrokerMarket {
@@ -66,7 +68,7 @@ export class BotMarket implements BotBrokerMarket {
    * */
   private parseTradingDay(tradingDay: string, nextDay: number): BotCloseTime {
     if (!tradingDay) {
-      throw new Error(''); // @TODO: process error
+      throw new BrokerApiError(`Received empty trading day string`, BrokerName.CURRENCY_COM);
     }
 
     const parsedTradingDay: string[] = tradingDay.trim().split(' ') || [];

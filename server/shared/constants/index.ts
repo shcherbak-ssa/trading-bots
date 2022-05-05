@@ -71,11 +71,9 @@ export enum DatabaseCollection {
 }
 
 export enum ErrorName {
-  PROCESS_ERROR = 'ProcessError',
   BROKER_API_ERROR = 'BrokerApiError',
   VALIDATION_ERROR = 'ValidationError',
   SIGNAL_ERROR = 'SignalError',
-  BOT_ERROR = 'BotError',
   POSITION_ERROR = 'PositionError',
 }
 

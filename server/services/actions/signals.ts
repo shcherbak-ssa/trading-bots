@@ -23,7 +23,7 @@ export const signalsActions = {
           return await bot.closeOpenPosition();
       }
     } catch (e: any) {
-      // @TODO: process error
+      // @TODO: notify user
       console.error(` - error: [signal] ${e.message}`);
     }
   },

@@ -129,8 +129,6 @@ export class BotEvents {
         }
       }
     }
-
-    // @TODO: process errors
   }
 
 
