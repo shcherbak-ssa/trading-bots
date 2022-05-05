@@ -52,7 +52,6 @@ export const brokersActions = {
 
   async [ActionType.BROKERS_CONNECT](newBroker: NewBroker): Promise<void> {
     const api: BrokersApi = new Brokers();
-    // @TODO: hide api keys values
     const connectedBroker: Broker = await api.connectBroker(newBroker);
 
     const brokersStore: BrokersStore = new Store();

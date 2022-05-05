@@ -16,7 +16,13 @@ import type {
   ActiveParsedPositions,
 } from '../types';
 
-import { Endpoint, OrderType, POSITION_ACTION_SLEEP_TIME, POSITION_HISTORY_LIMIT } from '../constants';
+import {
+  Endpoint,
+  OrderType,
+  POSITION_ACTION_SLEEP_TIME,
+  POSITION_CHECK_LIMIT,
+  POSITION_HISTORY_LIMIT
+} from '../constants';
 
 import type { RestApi } from './rest-api';
 
@@ -27,7 +33,6 @@ export class PositionApi {
   ) {}
 
 
-  // @TODO: refactor get info
   async openPosition(position: Position): Promise<ActiveParsedPositions> {
     const { orderId: createdOrderId, rejectMessage }
       = await this.restApi.post<CreateOrderRequest, CreateOrderResponse>(
@@ -47,58 +52,46 @@ export class PositionApi {
       );
     }
 
-    await sleep(POSITION_ACTION_SLEEP_TIME);
+    let checkCount: number = 0;
 
-    const { positions }
-      = await this.restApi.get<PositionListRequest, ActivePositionsResponse>(Endpoint.POSITIONS, {});
+    while (checkCount !== POSITION_CHECK_LIMIT) {
+      console.info(` - info: [position] check open positions (${checkCount})`);
 
-    const createdPositions: ActivePosition[] = positions.filter(({ orderId }) => orderId === createdOrderId);
+      const activePositions: ActivePosition[] = await this.getActivePositions(createdOrderId);
 
-    if (!createdPositions.length) {
-      console.error(` - error: [position] open positions - no open positions found`);
+      if (activePositions.length) {
+        const openQuantity: number = activePositions.reduce((total, position) => {
+          return total + position.openQuantity;
+        }, 0);
 
-      throw new PositionError(
-        {
-          message: `Something went wrong with open position. Reason: no open positions found.`
-        }, {
-          message: `Please, check position in broker system.`,
-        },
-      );
+        if (Math.abs(openQuantity) === position.quantity) {
+          return this.parseActivePositions(activePositions);
+        }
+      }
+
+      await sleep(POSITION_ACTION_SLEEP_TIME);
+
+      checkCount += 1;
     }
 
-    const openQuantity: number = createdPositions.reduce((total, position) => {
-      return total + position.openQuantity;
-    }, 0);
+    console.error(` - error: [position] open positions - no open positions found`);
 
-    if (Math.abs(openQuantity) !== position.quantity) {
-      const reasonMessage: string = `quantity compare (open: ${Math.abs(openQuantity)}, must: ${position.quantity})`;
-
-      console.error(` - error: [position] open positions - ${reasonMessage}`);
-
-      throw new PositionError(
-        {
-          message: `Something went wrong with open position. Reason: ${reasonMessage}.`
-        }, {
-          message: `Please, check position in broker system.`,
-        },
-      );
-    }
-
-    return createdPositions
-      .reduce((result, position) => {
-        result.ids.push(position.id);
-        result.totalFee += position.fee;
-
-        return result;
-      }, { totalFee: 0, ids: [] } as ActiveParsedPositions);
+    throw new PositionError(
+      {
+        message: `Something went wrong with open position. Reason: no open positions found.`
+      }, {
+        message: `Please, check position in broker system.`,
+      },
+    );
   }
 
   async closePosition(positionIds: string[], marketSymbol: string): Promise<ClosedParsedPositions> {
     for (const id of positionIds) {
-      const { request: [{ rejectReason }] } = await this.restApi.post<ClosePositionRequest, ClosePositionResponse>(
-        Endpoint.CLOSE_POSITION,
-        { positionId: id }
-      );
+      const { request: [{ rejectReason }] }
+        = await this.restApi.post<ClosePositionRequest, ClosePositionResponse>(
+          Endpoint.CLOSE_POSITION,
+          { positionId: id }
+        );
 
       if (rejectReason !== undefined) {
         console.error(` - error: [position] close positions (${positionIds.length}) - ${rejectReason}`);
@@ -113,25 +106,41 @@ export class PositionApi {
       }
     }
 
-    await sleep(POSITION_ACTION_SLEEP_TIME);
+    let checkCount: number = 0;
 
-    const closedPositions: ClosedPosition[] = await this.getClosedPositions(positionIds, marketSymbol);
+    while (checkCount !== POSITION_CHECK_LIMIT) {
+      console.info(` - info: [position] check close positions (${checkCount})`);
 
-    if (closedPositions.length !== positionIds.length) {
-      console.error(` - error: [position] close positions (${positionIds.length}) - invalid history positions length`);
+      const closedPositions: ClosedPosition[] = await this.getClosedPositions(positionIds, marketSymbol);
 
-      throw new PositionError(
-        {
-          message: `Something went wrong with position closing.`
-        }, {
-          message: `Please, check position in broker system.`,
-        },
-      );
+      if (closedPositions.length === positionIds.length) {
+        return this.parseClosedPositions(closedPositions);
+      }
+
+      await sleep(POSITION_ACTION_SLEEP_TIME);
+
+      checkCount += 1;
     }
 
-    return this.parseClosedPositions(closedPositions);
+    console.error(` - error: [position] close positions (${positionIds.length}) - invalid history positions length`);
+
+    throw new PositionError(
+      {
+        message: `Something went wrong with position closing.`
+      }, {
+        message: `Please, check position in broker system.`,
+      },
+    );
   }
 
+
+  // Helpers
+  async getActivePositions(createdOrderId: string): Promise<ActivePosition[]> {
+    const { positions }
+      = await this.restApi.get<PositionListRequest, ActivePositionsResponse>(Endpoint.POSITIONS, {});
+
+    return positions.filter(({ orderId }) => orderId === createdOrderId);
+  }
 
   async getClosedPositions(positionIds: string[], marketSymbol: string): Promise<ClosedPosition[]> {
     const { history } = await this.restApi.get<PositionListRequest, ClosedPositionsResponse>(
@@ -155,5 +164,15 @@ export class PositionApi {
 
         return result;
       }, { totalFee: 0, result: 0 } as ClosedParsedPositions);
+  }
+
+  parseActivePositions(activePositions: ActivePosition[]): ActiveParsedPositions {
+    return activePositions
+      .reduce((result, position) => {
+        result.ids.push(position.id);
+        result.totalFee += position.fee;
+
+        return result;
+      }, { totalFee: 0, ids: [] } as ActiveParsedPositions);
   }
 }

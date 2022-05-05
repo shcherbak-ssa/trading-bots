@@ -86,6 +86,12 @@ export enum BotRestartMode {
   MONTH = 'MONTH' // 4 weeks
 }
 
+export enum BotPositionCloseMode {
+  NONE = 'NONE',
+  DAY_END = 'DAY_END',
+  WEEK_END = 'WEEK_END',
+}
+
 export enum BotDeactivateReason {
   EMPTY = '',
   USER = 'USER',
