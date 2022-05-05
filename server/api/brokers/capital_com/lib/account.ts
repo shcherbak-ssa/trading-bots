@@ -1,5 +1,6 @@
-import { StatusCode } from 'global/constants';
-import { ProcessError } from 'shared/exceptions';
+import { BrokerName } from 'global/constants';
+
+import { BrokerApiError } from 'shared/exceptions';
 
 import type { AccountItem, AccountResponse, EmptyRequest, ParsedAccount } from '../types';
 import { Endpoint } from '../constants';
@@ -27,7 +28,7 @@ export class AccountApi {
       return AccountApi.parseAccount(foundAccount);
     }
 
-    throw new ProcessError(`Cannot found account with id '${accountId}'`, StatusCode.BAD_REQUEST);
+    throw new BrokerApiError(`Cannot found account with id '${accountId}'`, BrokerName.CAPITAL_COM);
   }
 
 

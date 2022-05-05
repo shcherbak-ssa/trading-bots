@@ -1,6 +1,6 @@
 import type { Broker, BotClientInfo, BrokerAccount, BrokerMarket, BrokerMarketLeverages } from 'global/types';
 
-import type { BotsStore, BotUpdatePayload, BrokersStore } from 'shared/types';
+import type { BotsStore, BrokersStore } from 'shared/types';
 import { StoreMutation } from 'shared/constants';
 
 import { store } from 'app/store';

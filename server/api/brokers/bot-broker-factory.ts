@@ -1,5 +1,6 @@
 import { BrokerName, StatusCode } from 'global/constants';
-import { ProcessError } from 'shared/exceptions';
+
+import { AppError } from 'shared/exceptions';
 
 import type { BotBroker, BotBrokerFactory, BotSettings } from 'modules/bot/types';
 
@@ -13,6 +14,8 @@ export class BrokerFactory implements BotBrokerFactory {
         return await CurrencyComBotBroker.setup(settings);
     }
 
-    throw new ProcessError(`Cannot found broker '${settings.brokerName}'`, StatusCode.BAD_REQUEST);
+    throw new AppError(StatusCode.NOT_IMPLEMENTED, {
+      message: `Broker [${settings.brokerName}] data API not implemented yet`,
+    });
   }
 }
