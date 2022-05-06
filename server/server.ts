@@ -6,7 +6,8 @@ import { QUERY_URL_SEPARATOR, RequestMethod, StatusCode } from 'global/constants
 
 import type { ServerRequestPayload, ServerResponsePayload } from 'shared/types';
 import type { ServerResponseResult, ServerRouteHandler } from 'shared/types';
-import { ENTRY_POINT_PATHNAME, API_PATHNAME, Validation, SIGNALS_PATHNAME } from 'shared/constants';
+import { ENTRY_POINT_PATHNAME, API_PATHNAME, Validation, SIGNALS_PATHNAME, ErrorName } from 'shared/constants';
+import { appLogger } from 'shared/logger';
 
 import { validate } from 'services/validation';
 
@@ -118,10 +119,14 @@ function authMiddleware() {
 }
 
 function loggerMiddleware(request: express.Request, response: express.Response, next: express.NextFunction): void {
-  const { method, baseUrl, url, params, query, body } = request;
+  const { userId, method, baseUrl, url, params, query, body } = request;
   const data = { ...params, ...query, ...body };
 
-  console.info(`\ninfo: [request] ${method} ${baseUrl + url} - ${JSON.stringify(data)}`);
+  appLogger.logInfo({
+    message: `request - ${method} ${baseUrl + url}`,
+    idLabel: `user ${userId}`,
+    payload: data
+  });
 
   next();
 }
@@ -140,13 +145,17 @@ function apiRouteMiddleware(validation: Validation, handler: ServerRouteHandler)
         status: getResponseStatus(request),
         payload: responsePayload || {},
       };
-    } catch (err: any) {
-      console.error(err);
+    } catch (e: any) {
+      if (e.name in ErrorName) {
+        appLogger.logError(`${e.name} ${e.message}`);
+      } else {
+        console.log(e);
+      }
 
       response.result = {
-        status: err.status || StatusCode.INTERNAL_SERVER_ERROR,
+        status: e.status || StatusCode.INTERNAL_SERVER_ERROR,
         payload: {
-          ...( err.payload || { errors: [{ message: err.message }] } ),
+          ...( e.payload || { errors: [{ message: e.message }] } ),
         },
       };
     } finally {
@@ -164,8 +173,12 @@ function signalsRouteMiddleware(validation: Validation, handler: ServerRouteHand
       validate(validation, requestPayload);
 
       handler('', requestPayload);
-    } catch (err: any) {
-      console.error(err);
+    } catch (e: any) {
+      if (e.name in ErrorName) {
+        appLogger.logError(`${e.name} ${e.message}`);
+      } else {
+        console.log(e);
+      }
 
       // @TODO: notify user
     } finally {
@@ -206,13 +219,11 @@ function responseMiddleware(request: express.Request, response: express.Response
   if (result?.payload) {
     response.status(result.status).json(result.payload);
 
-    let payloadString: string = JSON.stringify(result.payload);
-
-    if (payloadString.length > 500) {
-      payloadString = payloadString.slice(0, 500) + '...';
-    }
-
-    console.info(`info: [response] ${result.status} ${payloadString}`);
+    appLogger.logInfo({
+      message: `response - ${result.status}`,
+      idLabel: `user ${request.userId}`,
+      payload: result.payload
+    });
 
     return;
   }

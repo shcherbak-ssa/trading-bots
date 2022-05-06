@@ -25,6 +25,13 @@ export const emptyBotProgress: AnalyticsBotProgress = {
 };
 
 
+export enum LogScope {
+  APP = 'APP',
+  API = 'API',
+  BOT = 'BOT',
+  JOB = 'JOB',
+}
+
 export enum ActionType {
   ANALYTICS_GET_BOT_PROGRESS = 'analytics/get-bot-progress',
 

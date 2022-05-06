@@ -1,6 +1,7 @@
 import cron from 'node-cron';
 
 import { JOB_TIMEZONE } from 'shared/constants';
+import { jobLogger } from 'shared/logger';
 
 import type { BotCloseTime, BotJobs as Jobs } from 'modules/bot/types';
 import type { Bot } from 'modules/bot';
@@ -15,12 +16,13 @@ export class BotJobs implements Jobs {
     const jobExpression: string = BotJobs.getJobExpression(closeTime);
 
     const task: cron.ScheduledTask = cron.schedule(jobExpression, async () => {
-      console.info('info: [job] close position at day end - start');
+      jobLogger.logInfo(`START close position at day end`);
 
       await bot.closeOpenPosition();
+
       await this.startPositionCloseAtDayEndJob(bot, closeTime.nextDay);
 
-      console.info('info: [job] close position at day end - end');
+      jobLogger.logInfo(`END close position at day end`);
     }, { timezone: JOB_TIMEZONE });
 
     this.stopPositionCloseJob(bot.settings.token);
@@ -32,12 +34,13 @@ export class BotJobs implements Jobs {
     const jobExpression: string = BotJobs.getJobExpression(closeTime);
 
     const task: cron.ScheduledTask = cron.schedule(jobExpression, async () => {
-      console.info('info: [job] close position at week end - start');
+      jobLogger.logInfo(`START close position at week end`);
 
       await bot.closeOpenPosition();
+
       await this.startPositionCloseAtWeekEndJob(bot);
 
-      console.info('info: [job] close position at week end - end');
+      jobLogger.logInfo(`END close position at week end`);
     }, { timezone: JOB_TIMEZONE });
 
     this.stopPositionCloseJob(bot.settings.token);

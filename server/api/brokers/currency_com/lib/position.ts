@@ -1,3 +1,4 @@
+import { apiLogger } from 'shared/logger';
 import { PositionError } from 'shared/exceptions';
 import { sleep } from 'shared/utils';
 
@@ -34,14 +35,19 @@ export class PositionApi {
 
 
   async openPosition(position: Position): Promise<ActiveParsedPositions> {
-    const { orderId: createdOrderId, rejectMessage }
+    const createdOrder
       = await this.restApi.post<CreateOrderRequest, CreateOrderResponse>(
         Endpoint.ORDER,
         { ...position, type: OrderType.MARKET },
       );
 
-    if (rejectMessage !== undefined) {
-      console.error(` - error: [position] open positions - ${rejectMessage}`);
+    if (createdOrder.rejectMessage !== undefined) {
+      const { rejectMessage } = createdOrder;
+
+      apiLogger.logError({
+        message: `Currency.com - open positions (${rejectMessage})`,
+        payload: createdOrder,
+      });
 
       throw new PositionError(
         {
@@ -55,9 +61,9 @@ export class PositionApi {
     let checkCount: number = 0;
 
     while (checkCount !== POSITION_CHECK_LIMIT) {
-      console.info(` - info: [position] check open positions (${checkCount})`);
+      apiLogger.logInfo(`Currency.com - check open positions (${checkCount})`);
 
-      const activePositions: ActivePosition[] = await this.getActivePositions(createdOrderId);
+      const activePositions: ActivePosition[] = await this.getActivePositions(createdOrder.orderId);
 
       if (activePositions.length) {
         const openQuantity: number = activePositions.reduce((total, position) => {
@@ -74,7 +80,10 @@ export class PositionApi {
       checkCount += 1;
     }
 
-    console.error(` - error: [position] open positions - no open positions found`);
+    apiLogger.logError({
+      message: `Currency.com - no open positions found`,
+      payload: createdOrder,
+    });
 
     throw new PositionError(
       {
@@ -87,14 +96,19 @@ export class PositionApi {
 
   async closePosition(positionIds: string[], marketSymbol: string): Promise<ClosedParsedPositions> {
     for (const id of positionIds) {
-      const { request: [{ rejectReason }] }
+      const { request: [ closePositionResult ] }
         = await this.restApi.post<ClosePositionRequest, ClosePositionResponse>(
           Endpoint.CLOSE_POSITION,
           { positionId: id }
         );
 
-      if (rejectReason !== undefined) {
-        console.error(` - error: [position] close positions (${positionIds.length}) - ${rejectReason}`);
+      if (closePositionResult.rejectReason !== undefined) {
+        const { rejectReason } = closePositionResult;
+
+        apiLogger.logError({
+          message: `Currency.com - close ${positionIds.length} positions (${rejectReason})`,
+          payload: closePositionResult,
+        });
 
         throw new PositionError(
           {
@@ -109,7 +123,7 @@ export class PositionApi {
     let checkCount: number = 0;
 
     while (checkCount !== POSITION_CHECK_LIMIT) {
-      console.info(` - info: [position] check close positions (${checkCount})`);
+      apiLogger.logInfo(`Currency.com - check close positions (${checkCount})`);
 
       const closedPositions: ClosedPosition[] = await this.getClosedPositions(positionIds, marketSymbol);
 
@@ -122,7 +136,7 @@ export class PositionApi {
       checkCount += 1;
     }
 
-    console.error(` - error: [position] close positions (${positionIds.length}) - invalid history positions length`);
+    apiLogger.logError(`Currency.com - close ${positionIds.length} positions (invalid history positions length)`);
 
     throw new PositionError(
       {

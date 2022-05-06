@@ -1,9 +1,8 @@
-console.log('\n#################### Setup server [BEGIN] ####################');
-
 import env from 'shared/utils/dotenv';
 
 import type { UsersDatabaseCollection, UsersDatabaseDocument } from 'shared/types';
 import { ActionType } from 'shared/constants';
+import { appLogger } from 'shared/logger';
 
 import { startAppJobs } from 'services/jobs/app-jobs';
 import { runAction } from 'services/actions';
@@ -22,29 +21,35 @@ setupServer().catch(console.error);
 
 
 async function setupServer() {
-  console.info('\n mode:', process.env.NODE_ENV);
-  console.info(env.env);
+  console.log('\n#################### Setup server [BEGIN] ####################');
 
-  console.info('\n - info: [server] setup environment');
+  console.log('\n mode:', process.env.NODE_ENV);
+  console.log('\n environment:\n')
+
+  for (const [key, value] of Object.entries(env.env)) {
+    console.log(` ${key} = ${value}`);
+  }
+
+  console.log('\n');
 
   setupDatabase();
-  console.info(' - info: [server] setup database');
+  appLogger.logInfo('setup database');
 
   if (process.env.NODE_ENV === 'development') {
     await setupDevUser();
-    console.info(` - info: [server] setup dev user (${process.env.DEV_USER_ID})\n`);
+    appLogger.logInfo(`setup dev user (${process.env.DEV_USER_ID})`);
   }
 
   const activateBotsCount: number = await setupActiveBots();
-  console.info(` - info: [server] setup active bots (${activateBotsCount})\n`);
+  appLogger.logInfo(`setup active bots (${activateBotsCount})`);
 
   startAppJobs();
-  console.info(' - info: [server] start app jobs');
+  appLogger.logInfo(`start application jobs`);
 
   await runServer()
-  console.info('\n - info: [server] run server');
+  appLogger.logInfo(`run server`);
 
-  console.info('\n#################### Setup server [END] ####################\n');
+  console.log('\n#################### Setup server [END] ####################\n');
 }
 
 async function setupActiveBots(): Promise<number> {

@@ -30,7 +30,7 @@ export class UserPositions extends UserCollection<PositionsDatabaseDocument> imp
       userPositionsSchema,
     );
 
-    return new UserPositions(collection);
+    return new UserPositions(collection, userId);
   }
 
 

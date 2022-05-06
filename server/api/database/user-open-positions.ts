@@ -40,7 +40,7 @@ export class UserOpenPositions
       userOpenPositionSchema,
     );
 
-    return new UserOpenPositions(collection);
+    return new UserOpenPositions(collection, userId);
   }
 
 
