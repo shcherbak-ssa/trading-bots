@@ -1,5 +1,6 @@
 import type { Signal } from 'shared/types';
-import { ActionType, SignalDirection, SignalType } from 'shared/constants';
+import { ActionType, ErrorName, SignalDirection, SignalType } from 'shared/constants';
+import { botLogger } from 'shared/logger';
 
 import type { BotSignal } from 'modules/bot/types';
 import { Bot, BotManager } from 'modules/bot';
@@ -23,8 +24,19 @@ export const signalsActions = {
           return await bot.closeOpenPosition();
       }
     } catch (e: any) {
-      // @TODO: notify user
-      console.error(` - error: [signal] ${e.message}`);
+      if (e.name === ErrorName.SIGNAL_ERROR) {
+        botLogger.logError({
+          message: `signal - ${e.message}`,
+          idLabel: `botToken ${botToken}`,
+          payload: { type, stopLossPrice, direction },
+        });
+
+        // @TODO: notify user
+      } else {
+        // @TODO: notify user
+
+        throw e;
+      }
     }
   },
 };

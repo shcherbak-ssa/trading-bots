@@ -12,6 +12,7 @@ import type {
 } from 'shared/types';
 
 import { DatabaseCollection } from 'shared/constants';
+import { apiLogger } from 'shared/logger';
 import { AppError } from 'shared/exceptions';
 
 import { UserCollection } from './lib/user-collection';
@@ -58,7 +59,7 @@ export class UserBots extends UserCollection<BotsDatabaseDocument> implements Bo
       userBotSchema,
     );
 
-    return new UserBots(collection);
+    return new UserBots(collection, userId);
   }
 
 
@@ -67,9 +68,12 @@ export class UserBots extends UserCollection<BotsDatabaseDocument> implements Bo
     const bot = await this.collection.findOne({ _id: botId });
 
     if (!bot) {
-      console.error(` - error: [database] cannot found bot with id '${botId}'`);
+      apiLogger.logError({
+        message: `database - cannot found bot (${botId})`,
+        idLabel: `user ${this.userId}`,
+      });
 
-      throw new AppError(StatusCode.BAD_REQUEST, {
+      throw new AppError(StatusCode.NOT_FOUND, {
         message: `Cannot found bot with id '${botId}'`,
       });
     }

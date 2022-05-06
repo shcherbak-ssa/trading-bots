@@ -10,6 +10,7 @@ import { Database } from './database';
 export class UserCollection<Document> {
   constructor(
     protected collection: MongoCollection<Document>,
+    protected userId: string,
   ) {}
 
 

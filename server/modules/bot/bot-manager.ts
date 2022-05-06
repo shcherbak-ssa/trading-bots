@@ -1,14 +1,13 @@
 import { BotPositionCloseMode, StatusCode } from 'global/constants';
 
 import type { OpenPosition } from 'shared/types';
+import { botLogger } from 'shared/logger';
 import { AppError } from 'shared/exceptions';
 
 import { BotJobs } from 'services/jobs/bot-jobs';
 
 import type { BotJobs as Jobs, BotSettings } from './types';
-import { BotErrorPlace } from './constants';
 import { Bot } from './bot';
-import { BotEvents } from './bot-events';
 
 
 const botJobs: Jobs = new BotJobs();
@@ -47,7 +46,7 @@ export class BotManager {
 
     BotManager.bots.set(setting.token, createdBot);
 
-    console.info(` - info: [bot manager] activate bot. Active bots - ${BotManager.bots.size}`);
+    botLogger.logInfo(`activate bot. Active bots - ${BotManager.bots.size}`);
   }
 
   static async deactivateBot(botToken: string): Promise<void> {
@@ -59,6 +58,6 @@ export class BotManager {
 
     BotManager.bots.delete(botToken);
 
-    console.info(` - info: [bot manager] deactivate bot. Active bots - ${BotManager.bots.size}`);
+    botLogger.logInfo(`deactivate bot. Active bots - ${BotManager.bots.size}`);
   }
 }

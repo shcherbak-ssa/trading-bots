@@ -3,6 +3,7 @@ import Joi from 'joi';
 
 import type { ServerRequestPayload } from 'shared/types';
 import { Validation } from 'shared/constants';
+import { appLogger } from 'shared/logger';
 import { ValidationError } from 'shared/exceptions';
 
 import { brokersValidation } from './brokers';
@@ -29,12 +30,13 @@ export function validate(validation: Validation, payload: ServerRequestPayload):
   const validationResult = schema.validate(payload);
 
   if (validationResult.error) {
-    console.error(`error: [validation] - ${JSON.stringify(validationResult.error)}`);
+    appLogger.logError({
+      message: `validation (${validation})`,
+      payload: validationResult.error,
+    });
 
     throw new ValidationError(
-      ...validationResult.error.details.map(({ message }) => {
-        return { message };
-      })
+      ...validationResult.error.details.map(({ message }) => ({ message }))
     );
   }
 }

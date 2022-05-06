@@ -11,6 +11,7 @@ import type {
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
+import { botLogger } from 'shared/logger';
 
 import { runAction } from 'services/actions';
 
@@ -35,7 +36,11 @@ export class BotEvents {
 
     position.id = openPosition.id;
 
-    console.info(` - info: [bot event] open position - ${JSON.stringify(position)}`);
+    botLogger.logInfo({
+      message: 'open position',
+      idLabel: `botToken ${botToken}`,
+      payload: position,
+    });
   }
 
   static async processPositionUpdate(botToken: string, position: BotPosition): Promise<void> {
@@ -48,7 +53,11 @@ export class BotEvents {
       payload: { id, updates: { stopLossPrice } },
     });
 
-    console.info(` - info: [bot event] update position - ${JSON.stringify(position)}`);
+    botLogger.logInfo({
+      message: 'update position',
+      idLabel: `botToken ${botToken}`,
+      payload: position,
+    });
   }
 
   static async processPositionClose(botToken: string, position: BotPosition): Promise<void> {
@@ -64,7 +73,11 @@ export class BotEvents {
       },
     });
 
-    console.info(` - info: [bot event] close position - ${JSON.stringify(position)}`);
+    botLogger.logInfo({
+      message: 'close position',
+      idLabel: `botToken ${botToken}`,
+      payload: position,
+    });
   }
 
   static async processError(
@@ -73,7 +86,10 @@ export class BotEvents {
     error: Error,
     openPosition?: BotPosition
   ): Promise<void> {
-    console.error(` - error: [bot event] ${errorPlace} - ${error.message}`);
+    botLogger.logError({
+      message: `${errorPlace} ${error.message}`,
+      idLabel: `botToken ${botToken}`,
+    });
 
     const botWorker: Bot = BotManager.getBot(botToken);
     const [ userId, botId ] = botToken.split(BOT_TOKEN_SEPARATOR);
@@ -93,24 +109,20 @@ export class BotEvents {
         });
 
         // @TODO: notify user
+      } else {
+        await runAction<RestartBotPayload, void>({
+          type: ActionType.BOT_MANAGER_RESTART_BOT,
+          userId,
+          payload: {
+            bot: botWorker.settings,
+            closePosition: false,
+          },
+        });
 
-        return;
+        BotEvents.restartCounts.set(botToken, restartCount + 1);
+
+        // @TODO: notify user
       }
-
-      await runAction<RestartBotPayload, void>({
-        type: ActionType.BOT_MANAGER_RESTART_BOT,
-        userId,
-        payload: {
-          bot: botWorker.settings,
-          closePosition: false,
-        },
-      });
-
-      BotEvents.restartCounts.set(botToken, restartCount + 1);
-
-      // @TODO: notify user
-
-      return;
     }
 
     if (errorPlace === BotErrorPlace.POSITION_CLOSE && openPosition) {
@@ -129,6 +141,8 @@ export class BotEvents {
         }
       }
     }
+
+    throw error;
   }
 
 

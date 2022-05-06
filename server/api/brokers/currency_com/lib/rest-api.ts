@@ -2,6 +2,7 @@ import fetch from 'node-fetch';
 
 import { BrokerName, QUERY_URL_SEPARATOR, RequestMethod } from 'global/constants';
 
+import { apiLogger } from 'shared/logger';
 import { BrokerApiError } from 'shared/exceptions';
 import { generateHmacSignature, stringifyPayload } from 'shared/utils';
 
@@ -39,9 +40,9 @@ export class RestApi extends BrokerRestApi {
     endpoint: Endpoint,
     payload: RequestPayload,
   ): Promise<ResponsePayload> {
-    const requestUrl: string = this.preparingUrl(endpoint, payload);
+    const url: string = this.preparingUrl(endpoint, payload);
 
-    const response = await fetch(requestUrl, {
+    const response = await fetch(url, {
       method,
       headers: {
         'Content-Type': 'application/json',
@@ -54,7 +55,11 @@ export class RestApi extends BrokerRestApi {
     }
 
     const { msg, code } = await response.json() as ResponseError;
-    console.error(` - error: [API] Currency.com - ${response.status} ${msg} [${code}]`);
+
+    apiLogger.logError({
+      message: `Currency.com ${endpoint} - ${response.status} ${msg} [${code}]`,
+      payload,
+    });
 
     throw new BrokerApiError(msg, BrokerName.CURRENCY_COM);
   }

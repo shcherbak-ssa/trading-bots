@@ -4,6 +4,7 @@ import { StatusCode } from 'global/constants';
 
 import type { BrokersDatabaseCollection, BrokersDatabaseDocument, CreationDocument } from 'shared/types';
 import { DatabaseCollection } from 'shared/constants';
+import { apiLogger } from 'shared/logger';
 import { AppError } from 'shared/exceptions';
 
 import { UserCollection } from './lib/user-collection';
@@ -25,7 +26,7 @@ export class UserBrokers extends UserCollection<BrokersDatabaseDocument> impleme
       userBrokerSchema
     );
 
-    return new UserBrokers(collection);
+    return new UserBrokers(collection, userId);
   }
 
 
@@ -34,9 +35,12 @@ export class UserBrokers extends UserCollection<BrokersDatabaseDocument> impleme
     const broker = await this.collection.findOne({ _id: brokerId });
 
     if (!broker) {
-      console.error(` - error: [database] cannot found broker with id '${brokerId}'`);
+      apiLogger.logError({
+        message: `database - cannot found broker (${brokerId})`,
+        idLabel: `user ${this.userId}`,
+      });
 
-      throw new AppError(StatusCode.BAD_REQUEST, {
+      throw new AppError(StatusCode.NOT_FOUND, {
         message: `Cannot found broker with id '${brokerId}'`,
       });
     }

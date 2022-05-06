@@ -29,6 +29,7 @@ import type {
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
+import { apiLogger } from 'shared/logger';
 import { AppError } from 'shared/exceptions';
 
 import { runAction } from 'services/actions';
@@ -154,9 +155,13 @@ export const brokersActions = {
     const foundBrokerAccount = brokerAccounts.find(({ accountId }) => accountId === filters.accountId);
 
     if (!foundBrokerAccount) {
-      console.error(` - error: [database] cannot found broker account with id '${filters.accountId}'`);
+      apiLogger.logError({
+        message: `${brokerName} - cannot found broker account (${filters.accountId})`,
+        idLabel: `user ${userId}`,
+        payload: { brokerId, ...filters },
+      });
 
-      throw new AppError(StatusCode.BAD_REQUEST, {
+      throw new AppError(StatusCode.NOT_FOUND, {
         message: `Cannot found broker account with id '${brokerId}'`,
       });
     }
