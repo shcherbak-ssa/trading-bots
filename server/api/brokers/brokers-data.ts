@@ -14,9 +14,10 @@ export class BrokersData implements BrokersDataApi {
         return await CurrencyComDataApi.getAccounts(accountType, apiKeys);
     }
 
-    throw new AppError(StatusCode.NOT_IMPLEMENTED, {
-      message: `Broker [${brokerName}] data API not implemented yet`,
-    });
+    throw new AppError({
+      message: `data API not implemented yet`,
+      messageLabel: `Broker [${brokerName}]`,
+    }, StatusCode.NOT_IMPLEMENTED);
   }
 
   async getMarkets(
@@ -27,9 +28,10 @@ export class BrokersData implements BrokersDataApi {
         return await CurrencyComDataApi.getMarkets(accountType, accountCurrency, apiKeys);
     }
 
-    throw new AppError(StatusCode.NOT_IMPLEMENTED, {
-      message: `Broker [${brokerName}] data API not implemented yet`,
-    });
+    throw new AppError({
+      message: `data API not implemented yet`,
+      messageLabel: `Broker [${brokerName}]`,
+    }, StatusCode.NOT_IMPLEMENTED);
   }
 
   async getMarketLeverages(
@@ -40,8 +42,9 @@ export class BrokersData implements BrokersDataApi {
         return await CurrencyComDataApi.getMarketLeverages(accountType, marketSymbol, apiKeys);
     }
 
-    throw new AppError(StatusCode.NOT_IMPLEMENTED, {
-      message: `Broker [${brokerName}] data API not implemented yet`,
-    });
+    throw new AppError({
+      message: `data API not implemented yet`,
+      messageLabel: `Broker [${brokerName}]`,
+    }, StatusCode.NOT_IMPLEMENTED);
   }
 }

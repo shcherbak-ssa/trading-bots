@@ -7,10 +7,6 @@ export type EmptyResponse = {}
 
 export type ErrorPayload = {
   heading?: string;
-  errors: ErrorItem[];
-}
-
-export type ErrorItem = {
   message: string;
 }
 

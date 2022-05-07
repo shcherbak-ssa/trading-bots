@@ -3,7 +3,6 @@ import Joi from 'joi';
 
 import type { ServerRequestPayload } from 'shared/types';
 import { Validation } from 'shared/constants';
-import { appLogger } from 'shared/logger';
 import { ValidationError } from 'shared/exceptions';
 
 import { brokersValidation } from './brokers';
@@ -12,6 +11,7 @@ import { signalsValidation } from './signals';
 
 
 const validations: { [p in Validation]: Schema } = {
+  [Validation.NONE]: Joi.object({}),
   [Validation.EMPTY]: Joi.object({}),
 
   [Validation.ONLY_ID]: Joi.object({
@@ -30,13 +30,12 @@ export function validate(validation: Validation, payload: ServerRequestPayload):
   const validationResult = schema.validate(payload);
 
   if (validationResult.error) {
-    appLogger.logError({
-      message: `validation (${validation})`,
+    throw new ValidationError({
+      message: validationResult.error.details.map(({ message }) => message).join(' '),
+      messageLabel: 'Validation',
+      idLabel: 'validation',
+      id: validation,
       payload: validationResult.error,
     });
-
-    throw new ValidationError(
-      ...validationResult.error.details.map(({ message }) => ({ message }))
-    );
   }
 }

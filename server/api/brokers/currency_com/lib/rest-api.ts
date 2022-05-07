@@ -1,9 +1,8 @@
 import fetch from 'node-fetch';
 
-import { BrokerName, QUERY_URL_SEPARATOR, RequestMethod } from 'global/constants';
+import { QUERY_URL_SEPARATOR, RequestMethod } from 'global/constants';
 
-import { apiLogger } from 'shared/logger';
-import { BrokerApiError } from 'shared/exceptions';
+import { ApiError } from 'shared/exceptions';
 import { generateHmacSignature, stringifyPayload } from 'shared/utils';
 
 import { BrokerRestApi } from 'api/brokers/lib/broker-rest-api';
@@ -56,12 +55,11 @@ export class RestApi extends BrokerRestApi {
 
     const { msg, code } = await response.json() as ResponseError;
 
-    apiLogger.logError({
-      message: `Currency.com ${endpoint} - ${response.status} ${msg} [${code}]`,
+    throw new ApiError({
+      message: `${endpoint} ${response.status} ${msg} [${code}]`,
+      messageLabel: `Broker Currency.com`,
       payload,
     });
-
-    throw new BrokerApiError(msg, BrokerName.CURRENCY_COM);
   }
 
   private preparingUrl<Payload>(endpoint: Endpoint, payload: Payload): string {

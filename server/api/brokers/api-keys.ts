@@ -13,8 +13,9 @@ export class ApiKeys implements BrokersApiKeys {
         return await CurrencyComApiKeys.check(apiKeys);
     }
 
-    throw new AppError(StatusCode.NOT_IMPLEMENTED, {
-      message: `Broker API [${brokerName}] not implemented yet`,
-    });
+    throw new AppError({
+      message: `API not implemented yet`,
+      messageLabel: `Broker [${brokerName}]`,
+    }, StatusCode.NOT_IMPLEMENTED);
   }
 }

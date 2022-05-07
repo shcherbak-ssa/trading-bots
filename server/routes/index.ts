@@ -4,7 +4,7 @@ import { apiBotsRoutes } from './api-bots';
 import { apiBrokersRoutes } from './api-brokers';
 
 
-export * from './signals';
+export * from './webhooks';
 
 export const apiRoutes: ServerRoute[] = [
   ...apiBotsRoutes,

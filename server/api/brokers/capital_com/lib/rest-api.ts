@@ -1,8 +1,8 @@
 import fetch from 'node-fetch';
 
-import { BrokerName, RequestMethod } from 'global/constants';
+import { RequestMethod } from 'global/constants';
 
-import { BrokerApiError } from 'shared/exceptions';
+import { ApiError } from 'shared/exceptions';
 
 import { BrokerRestApi } from 'api/brokers/lib/broker-rest-api';
 
@@ -48,7 +48,10 @@ export class RestApi extends BrokerRestApi {
       return await response.json() as ResponsePayload;
     }
 
-    throw new BrokerApiError('TODO', BrokerName.CAPITAL_COM);
+    throw new ApiError({
+      message: '@TODO',
+      messageLabel: 'Broker - Capital.com',
+    });
   }
 
   private preparingUrl(endpoint: Endpoint): string {
