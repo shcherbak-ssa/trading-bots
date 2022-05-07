@@ -54,13 +54,10 @@ export class Api {
       return await response.json() as Response;
     }
 
-    const { heading, errors } = await response.json() as ErrorPayload;
+    const { heading, message } = await response.json() as ErrorPayload;
     const { status, statusText } = response;
 
-    const errorHeading: string = heading || `${status} ${statusText}`;
-    const errorMessage: string = errors.map(({ message }) => message).join('');
-
-    throw new AppError(errorHeading, errorMessage);
+    throw new AppError(heading || `${status} ${statusText}`, message);
   }
 
   private static replaceParams<Params>(endpoint: ServerEndpoint, params: Params): string {

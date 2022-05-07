@@ -2,7 +2,7 @@ import type { AnalyticsBotProgress } from 'global/types';
 
 
 export const API_PATHNAME: string = '/api';
-export const SIGNALS_PATHNAME: string = '/signals';
+export const WEBHOOKS_PATHNAME: string = '/webhook';
 export const ENTRY_POINT_PATHNAME: string = '*';
 
 export const JOB_TIMEZONE: string = 'Etc/UTC';
@@ -66,6 +66,8 @@ export enum ActionType {
 
   SIGNALS_PROCESS = 'signals/process',
 
+  TELEGRAM_PROCESS_INCOME_MESSAGE = 'telegram/process-income-message',
+
   USERS_GET = 'users/get',
 }
 
@@ -78,13 +80,14 @@ export enum DatabaseCollection {
 }
 
 export enum ErrorName {
-  BROKER_API_ERROR = 'BrokerApiError',
+  APP_ERROR = 'AppError',
+  API_ERROR = 'ApiError',
   VALIDATION_ERROR = 'ValidationError',
   SIGNAL_ERROR = 'SignalError',
-  POSITION_ERROR = 'PositionError',
 }
 
 export enum Validation {
+  NONE = 'none',
   EMPTY = 'empty',
   ONLY_ID = 'only-id',
 

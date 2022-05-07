@@ -1,20 +1,20 @@
-import { apiLogger } from 'shared/logger';
-import { PositionError } from 'shared/exceptions';
+import { logger } from 'shared/logger';
+import { ApiError } from 'shared/exceptions';
 import { sleep } from 'shared/utils';
 
 import type {
+  ActiveParsedPositions,
+  ActivePosition,
+  ActivePositionsResponse,
   ClosedParsedPositions,
+  ClosedPosition,
+  ClosedPositionsResponse,
   ClosePositionRequest,
+  ClosePositionResponse,
   CreateOrderRequest,
   CreateOrderResponse,
-  ClosedPositionsResponse,
-  ClosePositionResponse,
-  ClosedPosition,
   Position,
   PositionListRequest,
-  ActivePositionsResponse,
-  ActivePosition,
-  ActiveParsedPositions,
 } from '../types';
 
 import {
@@ -26,6 +26,7 @@ import {
 } from '../constants';
 
 import type { RestApi } from './rest-api';
+import { LogScope } from 'shared/constants';
 
 
 export class PositionApi {
@@ -44,24 +45,17 @@ export class PositionApi {
     if (createdOrder.rejectMessage !== undefined) {
       const { rejectMessage } = createdOrder;
 
-      apiLogger.logError({
-        message: `Currency.com - open positions (${rejectMessage})`,
+      throw new ApiError({
+        message: `Something went wrong with open position.\nReason: ${rejectMessage}.\n\nPlease, check position in broker system.`,
+        messageLabel: 'Broker Currency.com',
         payload: createdOrder,
       });
-
-      throw new PositionError(
-        {
-          message: `Something went wrong with open position. Reason: ${rejectMessage}.`
-        }, {
-          message: `Please, check position in broker system.`,
-        },
-      );
     }
 
     let checkCount: number = 0;
 
     while (checkCount !== POSITION_CHECK_LIMIT) {
-      apiLogger.logInfo(`Currency.com - check open positions (${checkCount})`);
+      logger.logInfo(LogScope.API, `Broker Currency.com - check open positions (${checkCount})`);
 
       const activePositions: ActivePosition[] = await this.getActivePositions(createdOrder.orderId);
 
@@ -80,18 +74,11 @@ export class PositionApi {
       checkCount += 1;
     }
 
-    apiLogger.logError({
-      message: `Currency.com - no open positions found`,
+    throw new ApiError({
+      message: `Something went wrong with open position.\nReason: no open positions found.\n\nPlease, check position in broker system.`,
+      messageLabel: 'Broker Currency.com',
       payload: createdOrder,
     });
-
-    throw new PositionError(
-      {
-        message: `Something went wrong with open position. Reason: no open positions found.`
-      }, {
-        message: `Please, check position in broker system.`,
-      },
-    );
   }
 
   async closePosition(positionIds: string[], marketSymbol: string): Promise<ClosedParsedPositions> {
@@ -105,25 +92,18 @@ export class PositionApi {
       if (closePositionResult.rejectReason !== undefined) {
         const { rejectReason } = closePositionResult;
 
-        apiLogger.logError({
-          message: `Currency.com - close ${positionIds.length} positions (${rejectReason})`,
+        throw new ApiError({
+          message: `Something went wrong with open position.\nReason: ${rejectReason}.\n\nPlease, check position in broker system.`,
+          messageLabel: 'Broker Currency.com',
           payload: closePositionResult,
         });
-
-        throw new PositionError(
-          {
-            message: `Something went wrong with position closing. Reason: ${rejectReason}.`
-          }, {
-            message: `Please, check position in broker system.`,
-          },
-        );
       }
     }
 
     let checkCount: number = 0;
 
     while (checkCount !== POSITION_CHECK_LIMIT) {
-      apiLogger.logInfo(`Currency.com - check close positions (${checkCount})`);
+      logger.logInfo(LogScope.API, `Broker Currency.com - check close positions (${checkCount})`);
 
       const closedPositions: ClosedPosition[] = await this.getClosedPositions(positionIds, marketSymbol);
 
@@ -136,15 +116,10 @@ export class PositionApi {
       checkCount += 1;
     }
 
-    apiLogger.logError(`Currency.com - close ${positionIds.length} positions (invalid history positions length)`);
-
-    throw new PositionError(
-      {
-        message: `Something went wrong with position closing.`
-      }, {
-        message: `Please, check position in broker system.`,
-      },
-    );
+    throw new ApiError({
+      message: `Something went wrong with open position.\n\nPlease, check position in broker system.`,
+      messageLabel: 'Broker Currency.com',
+    });
   }
 
 

@@ -1,65 +1,51 @@
-import type { ErrorItem, ErrorPayload } from 'global/types';
-import { BrokerName, StatusCode } from 'global/constants';
+import { StatusCode } from 'global/constants';
 
-import { ErrorName } from 'shared/constants';
+import { ErrorName, LogScope } from 'shared/constants';
+import type { LogPayload } from 'shared/types';
 
 
-export class AppError extends Error {
-  payload: ErrorPayload;
+export class AppError<Payload> extends Error {
+  name = ErrorName.APP_ERROR;
+  scope: LogScope = LogScope.APP;
+  errorHeading: string = 'Application error';
+
   status: StatusCode;
+  logPayload: LogPayload<Payload>
 
-  constructor(status: StatusCode, ...errors: ErrorItem[]) {
-    super(errors.map(({ message }) => message).join('\n'));
+  constructor(logPayload: LogPayload<Payload>, status: StatusCode = StatusCode.INTERNAL_SERVER_ERROR) {
+    super(logPayload.message);
 
-    this.payload = { errors };
     this.status = status;
+    this.logPayload = logPayload;
   }
 }
 
-export class ValidationError extends AppError {
+export class ValidationError<Payload> extends AppError<Payload> {
   name = ErrorName.VALIDATION_ERROR;
+  errorHeading = 'Validation error';
 
-  constructor(...errors: ErrorItem[]) {
-    super(StatusCode.UNPROCESSABLE_ENTITY, ...errors);
-
-    this.payload = {
-      heading: 'Validation error',
-      errors,
-    };
+  constructor(logPayload: LogPayload<Payload>) {
+    super(logPayload, StatusCode.UNPROCESSABLE_ENTITY);
   }
 }
 
-export class BrokerApiError extends AppError {
-  name = ErrorName.BROKER_API_ERROR;
+export class ApiError<Payload> extends AppError<Payload> {
+  name = ErrorName.API_ERROR;
+  scope: LogScope = LogScope.API;
 
-  constructor(message: string, brokerName: BrokerName) {
-    super(StatusCode.INTERNAL_SERVER_ERROR, { message });
+  constructor(logPayload: LogPayload<Payload>) {
+    super(logPayload);
 
-    this.payload = {
-      heading: `Broker API error (${brokerName})`,
-      errors: [{ message }],
-    };
+    this.errorHeading = `Api error (${logPayload.messageLabel})`;
   }
 }
 
 export class SignalError extends Error {
   name = ErrorName.SIGNAL_ERROR;
+  scope: LogScope = LogScope.BOT;
 
   // @TODO: add payload type
   constructor(message: string, payload: {}) {
     super(message);
-  }
-}
-
-export class PositionError extends AppError {
-  name = ErrorName.POSITION_ERROR;
-
-  constructor(...errors: ErrorItem[]) {
-    super(StatusCode.INTERNAL_SERVER_ERROR, ...errors);
-
-    this.payload = {
-      heading: 'Position error',
-      errors,
-    }
   }
 }

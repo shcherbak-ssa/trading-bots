@@ -1,10 +1,15 @@
+import { LogScope } from 'shared/constants';
+
+
 export type LogPayload<T> = {
   message: string;
+  messageLabel: string;
   idLabel?: string;
+  id?: string;
   payload?: T;
 }
 
 export interface Logger {
-  logInfo<T>(info: string | LogPayload<T>): void;
-  logError<T>(error: string | LogPayload<T>): void;
+  logInfo<T>(scope: LogScope, info: string | LogPayload<T>): void;
+  logError<T>(scope: LogScope, error: string | LogPayload<T>): void;
 }

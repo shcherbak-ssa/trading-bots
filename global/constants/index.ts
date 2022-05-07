@@ -37,7 +37,8 @@ export enum ServerEndpoint {
   API_BROKERS = '/api/brokers',
   API_BROKERS_WITH_ID = '/api/brokers/:id',
 
-  SIGNALS = '/signals/',
+  WEBHOOK_SIGNALS = '/webhook/signals',
+  WEBHOOK_TELEGRAM = '/webhook/telegram/:token',
 }
 
 

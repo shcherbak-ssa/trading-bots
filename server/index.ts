@@ -1,13 +1,14 @@
 import env from 'shared/utils/dotenv';
 
 import type { UsersDatabaseCollection, UsersDatabaseDocument } from 'shared/types';
-import { ActionType } from 'shared/constants';
-import { appLogger } from 'shared/logger';
+import { ActionType, LogScope } from 'shared/constants';
+import { logger } from 'shared/logger';
 
 import { startAppJobs } from 'services/jobs/app-jobs';
 import { runAction } from 'services/actions';
 
 import { setupDatabase } from 'api/database';
+import { setupTelegramWebhook } from 'api/telegram';
 import { AppUsers } from 'api/database/app-users';
 
 import { runServer } from './server';
@@ -33,21 +34,24 @@ async function setupServer() {
   console.log('\n');
 
   setupDatabase();
-  appLogger.logInfo('setup database');
+  logger.logInfo(LogScope.APP, 'setup database');
 
   if (process.env.NODE_ENV === 'development') {
     await setupDevUser();
-    appLogger.logInfo(`setup dev user (${process.env.DEV_USER_ID})`);
+    logger.logInfo(LogScope.APP, `setup dev user (${process.env.DEV_USER_ID})`);
   }
 
   const activateBotsCount: number = await setupActiveBots();
-  appLogger.logInfo(`setup active bots (${activateBotsCount})`);
+  logger.logInfo(LogScope.APP, `setup active bots (${activateBotsCount})`);
+
+  await setupTelegramWebhook();
+  logger.logInfo(LogScope.APP, `setup Telegram webhook`);
 
   startAppJobs();
-  appLogger.logInfo(`start application jobs`);
+  logger.logInfo(LogScope.APP, `start application jobs`);
 
   await runServer()
-  appLogger.logInfo(`run server`);
+  logger.logInfo(LogScope.APP, `run server`);
 
   console.log('\n#################### Setup server [END] ####################\n');
 }

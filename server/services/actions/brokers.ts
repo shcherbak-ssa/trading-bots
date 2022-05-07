@@ -29,8 +29,7 @@ import type {
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
-import { apiLogger } from 'shared/logger';
-import { AppError } from 'shared/exceptions';
+import { ApiError, AppError } from 'shared/exceptions';
 
 import { runAction } from 'services/actions';
 
@@ -134,9 +133,10 @@ export const brokersActions = {
       };
     }
 
-    throw new AppError(StatusCode.INTERNAL_SERVER_ERROR, {
+    throw new AppError({
       message: `Unknown data type filter '${filters.dataType}'`,
-    });
+      messageLabel: 'Request',
+    }, StatusCode.BAD_REQUEST);
   },
 
   async [ActionType.BROKERS_GET_ACCOUNT](
@@ -155,14 +155,12 @@ export const brokersActions = {
     const foundBrokerAccount = brokerAccounts.find(({ accountId }) => accountId === filters.accountId);
 
     if (!foundBrokerAccount) {
-      apiLogger.logError({
-        message: `${brokerName} - cannot found broker account (${filters.accountId})`,
-        idLabel: `user ${userId}`,
+      throw new ApiError({
+        message: `Cannot found broker account (${filters.accountId})`,
+        messageLabel: `Broker [${brokerName}]`,
+        idLabel: 'user',
+        id: userId,
         payload: { brokerId, ...filters },
-      });
-
-      throw new AppError(StatusCode.NOT_FOUND, {
-        message: `Cannot found broker account with id '${brokerId}'`,
       });
     }
 

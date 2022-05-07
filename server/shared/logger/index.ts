@@ -1,39 +1,31 @@
 import type { Logger as BaseLogger, LogPayload } from 'shared/types';
-import { LogScope } from 'shared/constants';
+import type { LogScope } from 'shared/constants';
 import { getTodayDateString } from 'shared/utils';
 
 
 class Logger implements BaseLogger {
-  private readonly scope: LogScope;
 
-  constructor(scope: LogScope) {
-    this.scope = scope;
+  logInfo<T>(scope: LogScope, info: string | LogPayload<T>): void {
+    Logger.log('info', scope, info);
+  }
+
+  logError<T>(scope: LogScope, error: string | LogPayload<T>): void {
+    Logger.log('error', scope, error);
   }
 
 
-  logInfo<T>(info: string | LogPayload<T>): void {
-    this.log('info', info);
-  }
-
-  logError<T>(error: string | LogPayload<T>): void {
-    this.log('error', error);
-  }
-
-
-  private log<T>(level: 'info' | 'error', info: string | LogPayload<T>): void {
+  private static log<T>(level: 'info' | 'error', scope: LogScope, info: string | LogPayload<T>): void {
     const timestamp: string = getTodayDateString();
 
     if (typeof info === 'string') {
-      console.log(`${timestamp} [${this.scope}] ${level}: ${info}`);
+      console.log(`${timestamp} [${scope}] ${level}: ${info}`);
     } else {
-      const { message, idLabel, payload } = info;
+      const { message, messageLabel, idLabel, id, payload } = info;
 
-      console.log(`${timestamp} [${this.scope}] info: ${message}`);
+      console.log(`${timestamp} [${scope}] ${level}: ${messageLabel} - ${message}`);
 
       if (idLabel) {
-        const [ label, id ] = idLabel.split(' ');
-
-        console.log(` - ${label}: ${id}`);
+        console.log(` - ${idLabel}: ${id}`);
       }
 
       if (payload) {
@@ -52,7 +44,4 @@ class Logger implements BaseLogger {
 }
 
 
-export const appLogger: BaseLogger = new Logger(LogScope.APP);
-export const apiLogger: BaseLogger = new Logger(LogScope.API);
-export const botLogger: BaseLogger = new Logger(LogScope.BOT);
-export const jobLogger: BaseLogger = new Logger(LogScope.JOB);
+export const logger: BaseLogger = new Logger();

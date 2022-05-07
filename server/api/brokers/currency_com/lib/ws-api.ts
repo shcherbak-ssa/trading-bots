@@ -1,4 +1,5 @@
 import WebSocket from 'ws';
+
 import { BotErrorPlace, BotEvents } from 'modules/bot';
 
 import type { WsSubscribeResponse } from '../types';

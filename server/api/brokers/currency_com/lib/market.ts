@@ -1,6 +1,4 @@
-import { BrokerName } from 'global/constants';
-
-import { BrokerApiError } from 'shared/exceptions';
+import { ApiError } from 'shared/exceptions';
 import { getFractionDigits, roundNumber } from 'shared/utils';
 
 import type {
@@ -61,7 +59,10 @@ export class MarketApi {
       return await this.parseExchangeSymbol(foundSymbol);
     }
 
-    throw new BrokerApiError(`Cannot found broker symbol '${marketSymbol}'`, BrokerName.CURRENCY_COM);
+    throw new ApiError({
+      message: `Cannot found broker symbol (${marketSymbol})`,
+      messageLabel: `Broker Currency.com`,
+    });
   }
 
   async loadMarketLeverage(marketSymbol: string): Promise<MarketLeverageResponse> {
@@ -82,7 +83,10 @@ export class MarketApi {
 
   subscribeToMarketPriceUpdates(marketSymbol: string, callback: (marketPrice: MarketPrice) => void): void {
     if (!this.wsApi) {
-      throw new BrokerApiError(`No connection by web-socket`, BrokerName.CURRENCY_COM);
+      throw new ApiError({
+        message: `No connection by web-socket`,
+        messageLabel: `Broker Currency.com`,
+      });
     }
 
     this.wsApi.subscribe<MarketPriceSubscribePayload, MarketPriceSubscribeResponsePayload>(

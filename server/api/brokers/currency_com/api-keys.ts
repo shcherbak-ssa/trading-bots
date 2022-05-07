@@ -17,9 +17,10 @@ export class ApiKeys {
     const { canTrade }: AccountResponse = await accountApi.loadAccountsInfo(true);
 
     if (!canTrade) {
-      throw new AppError(StatusCode.BAD_REQUEST, {
-        message: `API keys are valid, but you cannot use trade API.<br>Please, check permissions or wait account verification.`,
-      });
+      throw new AppError({
+        message: `API keys are valid, but you cannot use trade API.\n\nPlease, check permissions or wait account verification.`,
+        messageLabel: 'Broker Currency.com',
+      }, StatusCode.BAD_REQUEST);
     }
   }
 }

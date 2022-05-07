@@ -4,14 +4,20 @@ import queryString from 'query-string';
 
 import { QUERY_URL_SEPARATOR, RequestMethod, StatusCode } from 'global/constants';
 
-import type { ServerRequestPayload, ServerResponsePayload } from 'shared/types';
-import type { ServerResponseResult, ServerRouteHandler } from 'shared/types';
-import { ENTRY_POINT_PATHNAME, API_PATHNAME, Validation, SIGNALS_PATHNAME, ErrorName } from 'shared/constants';
-import { appLogger } from 'shared/logger';
+import type {
+  ServerRequestPayload,
+  ServerResponsePayload,
+  ServerResponseResult,
+  ServerRouteHandler
+} from 'shared/types';
+
+import { API_PATHNAME, ENTRY_POINT_PATHNAME, LogScope, Validation, WEBHOOKS_PATHNAME } from 'shared/constants';
+import { logger } from 'shared/logger';
+import { isCustomError } from 'shared/utils';
 
 import { validate } from 'services/validation';
 
-import { apiRoutes, signalRoutes } from './routes';
+import { apiRoutes, webhooksRoutes } from './routes';
 import { serverConfig } from './config';
 
 
@@ -36,12 +42,9 @@ export async function runServer(): Promise<void> {
   app.use(queryParserMiddleware);
 
   setupApiRouter(app);
-  setupSignalsRouter(app);
-
+  setupWebhookRouter(app);
   setupStaticServe(app);
   setupEntryPoint(app);
-
-  app.use(responseMiddleware);
 
   app.listen(serverConfig.server.port, serverConfig.server.host);
 }
@@ -66,23 +69,28 @@ function setupApiRouter(app: express.Application): void {
     authMiddleware(),
     loggerMiddleware,
     apiRouter,
+    responseMiddleware,
   );
 }
 
-function setupSignalsRouter(app: express.Application): void {
-  const signalsRouter: express.Router = express.Router();
+function setupWebhookRouter(app: express.Application): void {
+  const webhookRouter: express.Router = express.Router();
 
-  for (const { endpoint, method, validation, handler } of signalRoutes) {
-    const pathname: string = endpoint.replace(SIGNALS_PATHNAME, '');
+  for (const { endpoint, method, validation, handler } of webhooksRoutes) {
+    const pathname: string = endpoint.replace(WEBHOOKS_PATHNAME, '');
 
     // @ts-ignore
-    signalsRouter[method.toLowerCase()](
+    webhookRouter[method.toLowerCase()](
       pathname,
-      signalsRouteMiddleware(validation, handler),
+      webhookRouteMiddleware(validation, handler),
     );
   }
 
-  app.use(SIGNALS_PATHNAME, loggerMiddleware, signalsRouter);
+  app.use(
+    WEBHOOKS_PATHNAME,
+    loggerMiddleware,
+    webhookRouter,
+  );
 }
 
 function setupStaticServe(app: express.Application): void {
@@ -90,7 +98,11 @@ function setupStaticServe(app: express.Application): void {
 }
 
 function setupEntryPoint(app: express.Application): void {
-  app.use(ENTRY_POINT_PATHNAME, entryPointMiddleware);
+  app.use(
+    ENTRY_POINT_PATHNAME,
+    entryPointMiddleware,
+    responseMiddleware,
+  );
 }
 
 
@@ -122,10 +134,12 @@ function loggerMiddleware(request: express.Request, response: express.Response, 
   const { userId, method, baseUrl, url, params, query, body } = request;
   const data = { ...params, ...query, ...body };
 
-  appLogger.logInfo({
-    message: `request - ${method} ${baseUrl + url}`,
-    idLabel: `user ${userId}`,
-    payload: data
+  logger.logInfo(LogScope.APP, {
+    message: `${method} ${baseUrl + url}`,
+    messageLabel: `Request`,
+    idLabel: 'user',
+    id: userId,
+    payload: data,
   });
 
   next();
@@ -146,8 +160,8 @@ function apiRouteMiddleware(validation: Validation, handler: ServerRouteHandler)
         payload: responsePayload || {},
       };
     } catch (e: any) {
-      if (e.name in ErrorName) {
-        appLogger.logError(`${e.name} ${e.message}`);
+      if (isCustomError(e.name)) {
+        logger.logError(e.scope, e.logPayload);
       } else {
         console.log(e);
       }
@@ -155,7 +169,8 @@ function apiRouteMiddleware(validation: Validation, handler: ServerRouteHandler)
       response.result = {
         status: e.status || StatusCode.INTERNAL_SERVER_ERROR,
         payload: {
-          ...( e.payload || { errors: [{ message: e.message }] } ),
+          heading: e.errorHeading || '',
+          message: e.message,
         },
       };
     } finally {
@@ -164,27 +179,27 @@ function apiRouteMiddleware(validation: Validation, handler: ServerRouteHandler)
   }
 }
 
-function signalsRouteMiddleware(validation: Validation, handler: ServerRouteHandler) {
-  return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+function webhookRouteMiddleware(validation: Validation, handler: ServerRouteHandler) {
+  return async (request: express.Request, response: express.Response) => {
     try {
+      response.status(StatusCode.SUCCESS).json({});
+
       const { params, query, body } = request;
       const requestPayload: ServerRequestPayload = { ...params, ...query, ...body };
 
-      validate(validation, requestPayload);
+      if (validation !== Validation.NONE) {
+        validate(validation, requestPayload);
+      }
 
-      handler('', requestPayload);
+      await handler('', requestPayload);
     } catch (e: any) {
-      if (e.name in ErrorName) {
-        appLogger.logError(`${e.name} ${e.message}`);
+      if (isCustomError(e.name)) {
+        logger.logError(e.scope, e.logPayload);
       } else {
         console.log(e);
       }
 
       // @TODO: notify user
-    } finally {
-      response.result = { status: StatusCode.SUCCESS, payload: {}};
-
-      next();
     }
   }
 }
@@ -219,9 +234,11 @@ function responseMiddleware(request: express.Request, response: express.Response
   if (result?.payload) {
     response.status(result.status).json(result.payload);
 
-    appLogger.logInfo({
-      message: `response - ${result.status}`,
-      idLabel: `user ${request.userId}`,
+    logger.logInfo(LogScope.APP, {
+      message: `${result.status}`,
+      messageLabel: 'Response',
+      idLabel: 'user',
+      id: request.userId,
       payload: result.payload
     });
 

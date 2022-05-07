@@ -15,8 +15,9 @@ export class BrokersPositions implements BrokersPositionsApi {
         return await CurrencyComPositionApi.positionExist(accountType, apiKeys, position);
     }
 
-    throw new AppError(StatusCode.NOT_IMPLEMENTED, {
-      message: `Broker [${brokerName}] data API not implemented yet`,
-    });
+    throw new AppError({
+      message: `data API not implemented yet`,
+      messageLabel: `Broker [${brokerName}]`,
+    }, StatusCode.NOT_IMPLEMENTED);
   }
 }

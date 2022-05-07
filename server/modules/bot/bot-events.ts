@@ -10,8 +10,8 @@ import type {
   RestartBotPayload
 } from 'shared/types';
 
-import { ActionType } from 'shared/constants';
-import { botLogger } from 'shared/logger';
+import { ActionType, LogScope } from 'shared/constants';
+import { logger } from 'shared/logger';
 
 import { runAction } from 'services/actions';
 
@@ -36,9 +36,11 @@ export class BotEvents {
 
     position.id = openPosition.id;
 
-    botLogger.logInfo({
+    logger.logInfo(LogScope.BOT, {
       message: 'open position',
-      idLabel: `botToken ${botToken}`,
+      messageLabel: 'Bot Events',
+      idLabel: 'token',
+      id: botToken,
       payload: position,
     });
   }
@@ -53,9 +55,11 @@ export class BotEvents {
       payload: { id, updates: { stopLossPrice } },
     });
 
-    botLogger.logInfo({
+    logger.logInfo(LogScope.BOT, {
       message: 'update position',
-      idLabel: `botToken ${botToken}`,
+      messageLabel: 'Bot Events',
+      idLabel: 'token',
+      id: botToken,
       payload: position,
     });
   }
@@ -73,9 +77,11 @@ export class BotEvents {
       },
     });
 
-    botLogger.logInfo({
+    logger.logInfo(LogScope.BOT, {
       message: 'close position',
-      idLabel: `botToken ${botToken}`,
+      messageLabel: 'Bot Events',
+      idLabel: 'token',
+      id: botToken,
       payload: position,
     });
   }
@@ -86,9 +92,11 @@ export class BotEvents {
     error: Error,
     openPosition?: BotPosition
   ): Promise<void> {
-    botLogger.logError({
+    logger.logError(LogScope.BOT, {
       message: `${errorPlace} ${error.message}`,
-      idLabel: `botToken ${botToken}`,
+      messageLabel: `Bot Events`,
+      idLabel: `token`,
+      id: botToken,
     });
 
     const botWorker: Bot = BotManager.getBot(botToken);

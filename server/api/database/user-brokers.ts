@@ -1,14 +1,12 @@
 import mongoose from 'mongoose';
 
-import { StatusCode } from 'global/constants';
+import type { BrokerApiKeys, UpdateBrokerPayload } from 'global/types';
 
 import type { BrokersDatabaseCollection, BrokersDatabaseDocument, CreationDocument } from 'shared/types';
 import { DatabaseCollection } from 'shared/constants';
-import { apiLogger } from 'shared/logger';
-import { AppError } from 'shared/exceptions';
+import { ApiError } from 'shared/exceptions';
 
 import { UserCollection } from './lib/user-collection';
-import type { BrokerApiKeys, UpdateBrokerPayload } from 'global/types';
 
 
 const userBrokerSchema = new mongoose.Schema<BrokersDatabaseDocument>({
@@ -35,13 +33,12 @@ export class UserBrokers extends UserCollection<BrokersDatabaseDocument> impleme
     const broker = await this.collection.findOne({ _id: brokerId });
 
     if (!broker) {
-      apiLogger.logError({
-        message: `database - cannot found broker (${brokerId})`,
-        idLabel: `user ${this.userId}`,
-      });
-
-      throw new AppError(StatusCode.NOT_FOUND, {
-        message: `Cannot found broker with id '${brokerId}'`,
+      throw new ApiError({
+        message: `Cannot found broker (${brokerId})`,
+        messageLabel: 'Database',
+        idLabel: 'user',
+        id: this.userId,
+        payload: { brokerId },
       });
     }
 

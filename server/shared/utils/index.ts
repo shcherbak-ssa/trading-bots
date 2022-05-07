@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import querystring from 'querystring';
 
-import { ONE_HUNDRED } from 'shared/constants';
+import { ErrorName, ONE_HUNDRED } from 'shared/constants';
 
 const ms = require('ms');
 
@@ -52,4 +52,13 @@ export function convertDateStringToNumber(date: string): number {
 // Helpers
 export async function sleep(milliseconds: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+export function isCustomError(name: string): boolean {
+  return [
+    ErrorName.APP_ERROR as string,
+    ErrorName.API_ERROR as string,
+    ErrorName.VALIDATION_ERROR as string,
+    ErrorName.SIGNAL_ERROR as string,
+  ].includes(name);
 }

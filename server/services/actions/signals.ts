@@ -1,6 +1,6 @@
 import type { Signal } from 'shared/types';
-import { ActionType, ErrorName, SignalDirection, SignalType } from 'shared/constants';
-import { botLogger } from 'shared/logger';
+import { ActionType, ErrorName, LogScope, SignalDirection, SignalType } from 'shared/constants';
+import { logger } from 'shared/logger';
 
 import type { BotSignal } from 'modules/bot/types';
 import { Bot, BotManager } from 'modules/bot';
@@ -25,9 +25,11 @@ export const signalsActions = {
       }
     } catch (e: any) {
       if (e.name === ErrorName.SIGNAL_ERROR) {
-        botLogger.logError({
-          message: `signal - ${e.message}`,
-          idLabel: `botToken ${botToken}`,
+        logger.logError(LogScope.BOT, {
+          message: e.message,
+          messageLabel: 'Bot Signal',
+          idLabel: 'token',
+          id: botToken,
           payload: { type, stopLossPrice, direction },
         });
 

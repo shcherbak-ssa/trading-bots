@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
 import type { UpdateBotPayload } from 'global/types';
-import { BOT_TOKEN_SEPARATOR, StatusCode } from 'global/constants';
+import { BOT_TOKEN_SEPARATOR } from 'global/constants';
 
 import type {
   BotsDatabaseCollection,
@@ -12,8 +12,7 @@ import type {
 } from 'shared/types';
 
 import { DatabaseCollection } from 'shared/constants';
-import { apiLogger } from 'shared/logger';
-import { AppError } from 'shared/exceptions';
+import { ApiError } from 'shared/exceptions';
 
 import { UserCollection } from './lib/user-collection';
 
@@ -68,13 +67,12 @@ export class UserBots extends UserCollection<BotsDatabaseDocument> implements Bo
     const bot = await this.collection.findOne({ _id: botId });
 
     if (!bot) {
-      apiLogger.logError({
-        message: `database - cannot found bot (${botId})`,
-        idLabel: `user ${this.userId}`,
-      });
-
-      throw new AppError(StatusCode.NOT_FOUND, {
-        message: `Cannot found bot with id '${botId}'`,
+      throw new ApiError({
+        message: `Cannot found bot (${botId})`,
+        messageLabel: 'Database',
+        idLabel: 'user',
+        id: this.userId,
+        payload: { botId },
       });
     }
 
@@ -100,8 +98,9 @@ export class UserBots extends UserCollection<BotsDatabaseDocument> implements Bo
       return updatedBot.toObject();
     }
 
-    throw new AppError(StatusCode.INTERNAL_SERVER_ERROR, {
+    throw new ApiError({
       message: `Something went wrong with bot creation`,
+      messageLabel: 'Database',
     });
   }
 

@@ -1,7 +1,8 @@
-import { BotPositionCloseMode, StatusCode } from 'global/constants';
+import { BotPositionCloseMode } from 'global/constants';
 
 import type { OpenPosition } from 'shared/types';
-import { botLogger } from 'shared/logger';
+import { LogScope } from 'shared/constants';
+import { logger } from 'shared/logger';
 import { AppError } from 'shared/exceptions';
 
 import { BotJobs } from 'services/jobs/bot-jobs';
@@ -21,8 +22,11 @@ export class BotManager {
     const bot: Bot | undefined = BotManager.bots.get(botToken);
 
     if (!bot) {
-      throw new AppError(StatusCode.INTERNAL_SERVER_ERROR, {
+      throw new AppError({
         message: `Bot with token '${botToken}' does not exist`,
+        messageLabel: 'Bot Manager',
+        idLabel: 'token',
+        id: botToken,
       });
     }
 
@@ -46,7 +50,7 @@ export class BotManager {
 
     BotManager.bots.set(setting.token, createdBot);
 
-    botLogger.logInfo(`activate bot. Active bots - ${BotManager.bots.size}`);
+    logger.logInfo(LogScope.BOT, `Bot Manager - activate bot (${BotManager.bots.size}).`);
   }
 
   static async deactivateBot(botToken: string): Promise<void> {
@@ -58,6 +62,6 @@ export class BotManager {
 
     BotManager.bots.delete(botToken);
 
-    botLogger.logInfo(`deactivate bot. Active bots - ${BotManager.bots.size}`);
+    logger.logInfo(LogScope.BOT, `Bot Manager - deactivate bot (${BotManager.bots.size}).`);
   }
 }

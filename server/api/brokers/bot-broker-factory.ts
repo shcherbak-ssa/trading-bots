@@ -14,8 +14,9 @@ export class BrokerFactory implements BotBrokerFactory {
         return await CurrencyComBotBroker.setup(settings);
     }
 
-    throw new AppError(StatusCode.NOT_IMPLEMENTED, {
-      message: `Broker [${settings.brokerName}] data API not implemented yet`,
-    });
+    throw new AppError({
+      message: `API not implemented yet`,
+      messageLabel: `Broker [${settings.brokerName}]`,
+    }, StatusCode.NOT_IMPLEMENTED);
   }
 }

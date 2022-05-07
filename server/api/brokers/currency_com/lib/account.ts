@@ -1,6 +1,4 @@
-import { BrokerName } from 'global/constants';
-
-import { BrokerApiError } from 'shared/exceptions';
+import { ApiError } from 'shared/exceptions';
 
 import type { AccountBalance, AccountRequest, AccountRequestSettings, AccountResponse, ParsedBalance } from '../types';
 import { Endpoint } from '../constants';
@@ -36,7 +34,10 @@ export class AccountApi {
       return AccountApi.parseBalance(foundBalance);
     }
 
-    throw new BrokerApiError(`Cannot found account with id '${accountId}'`, BrokerName.CURRENCY_COM);
+    throw new ApiError({
+      message: `Cannot found account (${accountId})`,
+      messageLabel: `Broker Currency.com`,
+    });
   }
 
 
