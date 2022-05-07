@@ -16,7 +16,7 @@ export class BrokerFactory implements BotBrokerFactory {
 
     throw new AppError({
       message: `API not implemented yet`,
-      messageLabel: `Broker [${settings.brokerName}]`,
+      messageHeading: `Broker [${settings.brokerName}]`,
     }, StatusCode.NOT_IMPLEMENTED);
   }
 }

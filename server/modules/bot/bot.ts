@@ -1,3 +1,4 @@
+import type { Signal } from 'shared/types';
 import { SignalError } from 'shared/exceptions';
 
 import { BrokerFactory } from 'api/brokers/bot-broker-factory';
@@ -11,6 +12,7 @@ import { PositionCheck } from './position-check';
 
 export class Bot {
   currentPosition: BotPosition | null = null;
+  private checkInProgress: boolean = false;
 
   constructor(
     public settings: BotSettings,
@@ -36,24 +38,29 @@ export class Bot {
     );
   }
 
-  setCurrentPosition(position: BotPosition): void {
+  setCurrentPosition(position: BotPosition | null): void {
     this.currentPosition = position;
-    this.broker.market.subscribeToPriceUpdates(this.checkPosition.bind(this));
+
+    if (position) {
+      this.broker.market.subscribeToPriceUpdates(this.checkPosition.bind(this));
+    } else {
+      this.broker.market.unsubscribeToPriceUpdates();
+    }
   }
 
-  async openPosition(signal: BotSignal): Promise<void> {
+  async openPosition(botSignal: BotSignal, signal: Signal): Promise<void> {
     if (this.currentPosition !== null) {
       await this.closeOpenPosition();
     }
 
-    const position: BotPosition = this.calculation.calculatePosition(signal);
+    const position: BotPosition = this.calculation.calculatePosition(botSignal);
 
     if (position.stopLossSize < 0) {
-      throw new SignalError('Invalid position direction', {});
+      throw new SignalError('Invalid position direction.', this.settings, signal);
     }
 
     if (position.quantity === 0) {
-      throw new SignalError('Position stop-loss is too far', {});
+      throw new SignalError('Position stop-loss is too far.', this.settings, signal);
     }
 
     try {
@@ -67,20 +74,20 @@ export class Bot {
     }
   }
 
-  async updateOpenPosition(signal: BotSignal): Promise<void> {
+  async updateOpenPosition(botSignal: BotSignal, signal: Signal): Promise<void> {
     if (this.currentPosition === null) return;
 
     const { isLong, stopLossPrice } = this.currentPosition;
     const { currentPrice: marketCurrentPrice, currentSpread: marketCurrentSpread } = this.broker.market;
 
-    const signalStopLossPrice: number = signal.stopLossPrice + ( isLong ? 0 : marketCurrentSpread );
+    const signalStopLossPrice: number = botSignal.stopLossPrice + ( isLong ? 0 : marketCurrentSpread );
 
     if (
-      (isLong && (signalStopLossPrice < stopLossPrice || signalStopLossPrice >= marketCurrentPrice))
+      (isLong && (signalStopLossPrice <= stopLossPrice || signalStopLossPrice >= marketCurrentPrice))
       ||
-      (!isLong && (signalStopLossPrice > stopLossPrice || signalStopLossPrice <= marketCurrentPrice))
+      (!isLong && (signalStopLossPrice >= stopLossPrice || signalStopLossPrice <= marketCurrentPrice))
     ) {
-      throw new SignalError('Received invalid stop-loss price for update', {});
+      throw new SignalError('Received invalid stop-loss price for update.', this.settings, signal);
     }
 
     this.currentPosition.stopLossPrice = signalStopLossPrice;
@@ -91,33 +98,36 @@ export class Bot {
   async closeOpenPosition(): Promise<void> {
     if (this.currentPosition === null) return;
 
-    const position: BotPosition = this.currentPosition;
-    this.currentPosition = null;
-
     try {
-      this.broker.market.unsubscribeToPriceUpdates();
+      const position: BotPosition = this.currentPosition;
 
       await this.broker.closePosition(position);
 
+      this.setCurrentPosition(null);
+
       await BotEvents.processPositionClose(this.settings.token, position);
     } catch (e: any) {
-      await BotEvents.processError(this.settings.token, BotErrorPlace.POSITION_CLOSE, e, position);
+      await BotEvents.processError(this.settings.token, BotErrorPlace.POSITION_CLOSE, e);
     }
   }
 
 
   private async checkPosition(): Promise<void> {
-    if (this.currentPosition === null) return;
+    if (this.currentPosition === null || this.checkInProgress) return;
+
+    this.checkInProgress = true;
 
     const { currentPrice: marketCurrentPrice } = this.broker.market;
 
-    const closePosition: boolean = (
+    const needToClosePosition: boolean = (
       this.check.closeByStopLoss(this.currentPosition, marketCurrentPrice) ||
       this.check.closeByTakeProfit(this.currentPosition, marketCurrentPrice)
     );
 
-    if (closePosition) {
-      return await this.closeOpenPosition();
+    if (needToClosePosition) {
+      await this.closeOpenPosition();
     }
+
+    this.checkInProgress = false;
   }
 }

@@ -135,7 +135,7 @@ export const brokersActions = {
 
     throw new AppError({
       message: `Unknown data type filter '${filters.dataType}'`,
-      messageLabel: 'Request',
+      messageHeading: 'Request',
     }, StatusCode.BAD_REQUEST);
   },
 
@@ -157,7 +157,7 @@ export const brokersActions = {
     if (!foundBrokerAccount) {
       throw new ApiError({
         message: `Cannot found broker account (${filters.accountId})`,
-        messageLabel: `Broker [${brokerName}]`,
+        messageHeading: `Broker [${brokerName}]`,
         idLabel: 'user',
         id: userId,
         payload: { brokerId, ...filters },

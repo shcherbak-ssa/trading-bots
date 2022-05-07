@@ -2,20 +2,32 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import queryString from 'query-string';
 
-import { QUERY_URL_SEPARATOR, RequestMethod, StatusCode } from 'global/constants';
+import type { User } from 'global/types';
+import { BOT_TOKEN_SEPARATOR, GetUserType, QUERY_URL_SEPARATOR, RequestMethod, StatusCode } from 'global/constants';
 
 import type {
   ServerRequestPayload,
   ServerResponsePayload,
   ServerResponseResult,
-  ServerRouteHandler
+  ServerRouteHandler,
+  Notification, Signal, TelegramIncomeMessage,
+  GetUserFilters,
 } from 'shared/types';
 
-import { API_PATHNAME, ENTRY_POINT_PATHNAME, LogScope, Validation, WEBHOOKS_PATHNAME } from 'shared/constants';
+import {
+  ActionType,
+  API_PATHNAME,
+  ENTRY_POINT_PATHNAME,
+  LogScope, NotificationType,
+  Validation,
+  WEBHOOKS_PATHNAME
+} from 'shared/constants';
+
 import { logger } from 'shared/logger';
 import { isCustomError } from 'shared/utils';
 
 import { validate } from 'services/validation';
+import { runAction } from 'services/actions';
 
 import { apiRoutes, webhooksRoutes } from './routes';
 import { serverConfig } from './config';
@@ -119,7 +131,7 @@ function queryParserMiddleware(request: express.Request, response: express.Respo
 function authMiddleware() {
   if (process.env.NODE_ENV === 'development') {
     return (request: express.Request, response: express.Response, next: express.NextFunction) => {
-      request.userId = process.env.DEV_USER_ID;
+      request.userId = process.env.ADMIN_USER_ID;
 
       next();
     }
@@ -136,7 +148,7 @@ function loggerMiddleware(request: express.Request, response: express.Response, 
 
   logger.logInfo(LogScope.APP, {
     message: `${method} ${baseUrl + url}`,
-    messageLabel: `Request`,
+    messageHeading: `Request`,
     idLabel: 'user',
     id: userId,
     payload: data,
@@ -147,24 +159,22 @@ function loggerMiddleware(request: express.Request, response: express.Response, 
 
 function apiRouteMiddleware(validation: Validation, handler: ServerRouteHandler) {
   return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
-    try {
-      const { userId, params, query, body } = request;
-      const requestPayload: ServerRequestPayload = { ...params, ...query, ...body };
+    const { userId = '', params, query, body } = request;
+    const requestPayload: ServerRequestPayload = { ...params, ...query, ...body };
 
+    try {
       validate(validation, requestPayload);
 
-      const responsePayload: ServerResponsePayload = await handler(userId || '', requestPayload);
+      const responsePayload: ServerResponsePayload = await handler(userId, requestPayload);
 
       response.result = {
         status: getResponseStatus(request),
         payload: responsePayload || {},
       };
     } catch (e: any) {
-      if (isCustomError(e.name)) {
-        logger.logError(e.scope, e.logPayload);
-      } else {
-        console.log(e);
-      }
+      logError(e);
+
+      await sendNotifications(userId, e);
 
       response.result = {
         status: e.status || StatusCode.INTERNAL_SERVER_ERROR,
@@ -181,25 +191,39 @@ function apiRouteMiddleware(validation: Validation, handler: ServerRouteHandler)
 
 function webhookRouteMiddleware(validation: Validation, handler: ServerRouteHandler) {
   return async (request: express.Request, response: express.Response) => {
+    response.status(StatusCode.SUCCESS).json({});
+
+    const { params, query, body } = request;
+    const requestPayload: ServerRequestPayload = { ...params, ...query, ...body };
+
     try {
-      response.status(StatusCode.SUCCESS).json({});
-
-      const { params, query, body } = request;
-      const requestPayload: ServerRequestPayload = { ...params, ...query, ...body };
-
       if (validation !== Validation.NONE) {
         validate(validation, requestPayload);
       }
 
       await handler('', requestPayload);
     } catch (e: any) {
-      if (isCustomError(e.name)) {
-        logger.logError(e.scope, e.logPayload);
-      } else {
-        console.log(e);
+      logError(e);
+
+      let userId: string = '';
+
+      if (requestPayload.botToken) {
+        const { botToken } = requestPayload as Signal;
+
+        userId = botToken.split(BOT_TOKEN_SEPARATOR)[0];
+      } else if (requestPayload.telegramToken) {
+        const { message: { chat } } = requestPayload as TelegramIncomeMessage;
+
+        const [ foundUser ] = await runAction<GetUserFilters, User[]>({
+          type: ActionType.USERS_GET,
+          userId: '',
+          payload: { type: GetUserType.ONE, telegramChatId: chat.id },
+        });
+
+        userId = foundUser.id;
       }
 
-      // @TODO: notify user
+      await sendNotifications(userId, e);
     }
   }
 }
@@ -236,7 +260,7 @@ function responseMiddleware(request: express.Request, response: express.Response
 
     logger.logInfo(LogScope.APP, {
       message: `${result.status}`,
-      messageLabel: 'Response',
+      messageHeading: 'Response',
       idLabel: 'user',
       id: request.userId,
       payload: result.payload
@@ -261,5 +285,39 @@ function getResponseStatus(request: express.Request): StatusCode {
       return StatusCode.NO_CONTENT;
     default:
       return StatusCode.SUCCESS;
+  }
+}
+
+function logError(e: any): void {
+  if (isCustomError(e.name)) {
+    logger.logError(e.scope, e.logPayload);
+  } else {
+    console.log(e);
+  }
+}
+
+async function sendNotifications(userId: string, e: any): Promise<void> {
+  if (!e.notified) {
+    await runAction<Notification, void>({
+      type: ActionType.NOTIFICATIONS_NOTIFY_USER,
+      userId,
+      payload: {
+        type: NotificationType.ERROR,
+        forAdmin: false,
+        error: e,
+      },
+    });
+  }
+
+  if (userId || e.notified) {
+    await runAction<Notification, void>({
+      type: ActionType.NOTIFICATIONS_NOTIFY_ADMIN,
+      userId: '',
+      payload: {
+        type: NotificationType.ERROR,
+        forAdmin: true,
+        error: e,
+      },
+    });
   }
 }

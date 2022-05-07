@@ -69,7 +69,7 @@ export class BotMarket implements BotBrokerMarket {
     if (!tradingDay) {
       throw new ApiError({
         message: `Received empty trading day string`,
-        messageLabel: `Broker Currency.com`,
+        messageHeading: `Broker Currency.com`,
       });
     }
 

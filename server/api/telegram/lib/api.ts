@@ -26,7 +26,7 @@ export class Api {
 
     throw new ApiError({
       message: `${endpoint} ${result.description} [${result.error_code}]`,
-      messageLabel: `Telegram`,
+      messageHeading: `Telegram`,
       payload,
     });
   }

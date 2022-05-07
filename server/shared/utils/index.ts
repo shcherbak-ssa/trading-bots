@@ -1,9 +1,15 @@
 import crypto from 'crypto';
 import querystring from 'querystring';
 
-import { ErrorName, ONE_HUNDRED } from 'shared/constants';
+import { ErrorName, FRACTION_DIGITS_TO_HUNDREDTHS, ONE_HUNDRED } from 'shared/constants';
 
 const ms = require('ms');
+
+
+// Currency
+export function getAmountWithCurrency(currency: string, amount: number): string {
+  return `${roundNumber(amount, FRACTION_DIGITS_TO_HUNDREDTHS)} ${currency}`;
+}
 
 
 // Math

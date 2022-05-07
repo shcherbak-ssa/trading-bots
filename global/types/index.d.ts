@@ -1,6 +1,7 @@
 export * from './analytics';
 export * from './bots';
 export * from './brokers';
+export * from './users';
 
 
 export type EmptyResponse = {}

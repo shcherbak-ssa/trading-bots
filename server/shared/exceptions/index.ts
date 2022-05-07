@@ -1,7 +1,8 @@
+import type { Bot } from 'global/types';
 import { StatusCode } from 'global/constants';
 
+import type { LogPayload, Signal, SignalLogPayload } from 'shared/types';
 import { ErrorName, LogScope } from 'shared/constants';
-import type { LogPayload } from 'shared/types';
 
 
 export class AppError<Payload> extends Error {
@@ -31,21 +32,28 @@ export class ValidationError<Payload> extends AppError<Payload> {
 
 export class ApiError<Payload> extends AppError<Payload> {
   name = ErrorName.API_ERROR;
-  scope: LogScope = LogScope.API;
+  scope = LogScope.API;
 
   constructor(logPayload: LogPayload<Payload>) {
     super(logPayload);
 
-    this.errorHeading = `Api error (${logPayload.messageLabel})`;
+    this.errorHeading = `Api error (${logPayload.messageHeading})`;
   }
 }
 
-export class SignalError extends Error {
+export class SignalError extends AppError<SignalLogPayload> {
   name = ErrorName.SIGNAL_ERROR;
-  scope: LogScope = LogScope.BOT;
+  scope = LogScope.BOT;
 
-  // @TODO: add payload type
-  constructor(message: string, payload: {}) {
-    super(message);
+  constructor(message: string, bot: Bot, signal: Signal) {
+    super({
+      message,
+      messageHeading: 'Bot Signal',
+      idLabel: 'token',
+      id: bot.token,
+      payload: { bot, signal },
+    },
+      StatusCode.BAD_REQUEST
+    );
   }
 }

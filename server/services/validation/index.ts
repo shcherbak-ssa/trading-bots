@@ -32,7 +32,7 @@ export function validate(validation: Validation, payload: ServerRequestPayload):
   if (validationResult.error) {
     throw new ValidationError({
       message: validationResult.error.details.map(({ message }) => message).join(' '),
-      messageLabel: 'Validation',
+      messageHeading: 'Validation',
       idLabel: 'validation',
       id: validation,
       payload: validationResult.error,

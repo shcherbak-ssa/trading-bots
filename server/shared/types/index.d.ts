@@ -4,6 +4,7 @@ export * from './server';
 export * from './signals';
 export * from './telegram';
 export * from './logger';
+export * from './notifications';
 
 export * from './bots';
 export * from './brokers';

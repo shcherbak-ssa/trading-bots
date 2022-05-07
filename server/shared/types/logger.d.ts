@@ -3,7 +3,7 @@ import { LogScope } from 'shared/constants';
 
 export type LogPayload<T> = {
   message: string;
-  messageLabel: string;
+  messageHeading: string;
   idLabel?: string;
   id?: string;
   payload?: T;

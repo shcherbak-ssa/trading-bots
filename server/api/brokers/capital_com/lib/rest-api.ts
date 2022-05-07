@@ -50,7 +50,7 @@ export class RestApi extends BrokerRestApi {
 
     throw new ApiError({
       message: '@TODO',
-      messageLabel: 'Broker - Capital.com',
+      messageHeading: 'Broker - Capital.com',
     });
   }
 

@@ -69,7 +69,7 @@ export class UserBots extends UserCollection<BotsDatabaseDocument> implements Bo
     if (!bot) {
       throw new ApiError({
         message: `Cannot found bot (${botId})`,
-        messageLabel: 'Database',
+        messageHeading: 'Database',
         idLabel: 'user',
         id: this.userId,
         payload: { botId },
@@ -100,7 +100,7 @@ export class UserBots extends UserCollection<BotsDatabaseDocument> implements Bo
 
     throw new ApiError({
       message: `Something went wrong with bot creation`,
-      messageLabel: 'Database',
+      messageHeading: 'Database',
     });
   }
 

@@ -4,23 +4,24 @@ import type {
   Bot,
   BrokerApiKeys,
   OnlyIdPayload,
-  UpdateBotPayload
+  UpdateBotPayload,
+  User
 } from 'global/types';
 
-import { AnalyticsBotProgressType, BotDeactivateReason, BotUpdateType } from 'global/constants';
+import { AnalyticsBotProgressType, BotDeactivateReason, BotUpdateType, GetUserType } from 'global/constants';
 
 import type {
   BotsGetFilters,
   CheckMaxLossBotPayload,
-  DeactivateBotPayload,
+  DeactivateBotPayload, GetUserFilters,
   OpenPosition,
   OpenPositionCheckClosePayload,
   OpenPositionGetPayload,
   RestartBotPayload,
-  UsersDatabaseDocument
+  Notification
 } from 'shared/types';
 
-import { ActionType } from 'shared/constants';
+import { ActionType, NotificationType } from 'shared/constants';
 
 import { runAction } from 'services/actions';
 
@@ -30,10 +31,10 @@ import { BotManager } from 'modules/bot';
 
 export const botManagerActions = {
   async [ActionType.BOT_MANAGER_SETUP_ACTIVE_BOTS](): Promise<number> {
-    const users: UsersDatabaseDocument[] = await runAction({
+    const users = await runAction<GetUserFilters, User[]>({
       type: ActionType.USERS_GET,
       userId: '',
-      payload: {},
+      payload: { type: GetUserType.ALL },
     });
 
     let activateBotsCount: number = 0;
@@ -81,7 +82,16 @@ export const botManagerActions = {
 
       if (typeof closedPositionsCount === 'number') {
         if (closedPositionsCount !== openPosition.brokerPositionIds.length) {
-          // @TODO: notify user
+          await runAction<Notification, void>({
+            type: ActionType.NOTIFICATIONS_NOTIFY_USER,
+            userId,
+            payload: {
+              type: NotificationType.BOT_DEACTIVATION,
+              bot,
+              reason: `Unexpected error (not all positions are closed).`,
+              message: `You most likely have open positions. Please, close positions manually before bot reactivation.`,
+            },
+          });
         }
 
         openPosition = null;
@@ -129,7 +139,16 @@ export const botManagerActions = {
         },
       });
 
-      // @TODO: notify user
+      await runAction<Notification, void>({
+        type: ActionType.NOTIFICATIONS_NOTIFY_USER,
+        userId,
+        payload: {
+          type: NotificationType.BOT_DEACTIVATION,
+          bot,
+          reason: 'Reason: Max loss.',
+          message: '',
+        },
+      });
     }
   },
 };

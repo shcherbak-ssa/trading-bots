@@ -57,7 +57,7 @@ export class RestApi extends BrokerRestApi {
 
     throw new ApiError({
       message: `${endpoint} ${response.status} ${msg} [${code}]`,
-      messageLabel: `Broker Currency.com`,
+      messageHeading: `Broker Currency.com`,
       payload,
     });
   }

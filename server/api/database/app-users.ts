@@ -1,6 +1,15 @@
 import mongoose from 'mongoose';
 
-import type { UsersDatabaseCollection, UsersDatabaseDocument, CreationDocument } from 'shared/types';
+import { GetUserType } from 'global/constants';
+
+import type {
+  GetUserFilters,
+  UsersDatabaseCollection,
+  UsersDatabaseDocument,
+  CreationDocument,
+  UpdateUserPayload
+} from 'shared/types';
+
 import { DatabaseCollection } from 'shared/constants';
 
 import type { MongoCollection } from './types';
@@ -8,7 +17,8 @@ import { Database } from './lib/database';
 
 
 const appUsersSchema = new mongoose.Schema<UsersDatabaseDocument>({
-  email: { type: String, unique: true, required: true },
+  telegramChatId: { type: Number, unique: true, required: true },
+  isAdmin: { type: Boolean, required: true },
 });
 
 
@@ -34,21 +44,25 @@ export class AppUsers implements UsersDatabaseCollection {
 
 
   // Implementation
-  async getUsers(): Promise<UsersDatabaseDocument[]> {
+  async getUsers({ type, ...filters }: GetUserFilters): Promise<UsersDatabaseDocument[]> {
+    if (type === GetUserType.ONE) {
+      const foundUser = await this.collection.findOne(filters.id ? { _id: filters.id } : filters);
+
+      return foundUser ? [ foundUser.toObject() ] : [];
+    }
+
     const users = await this.collection.find();
 
     return users.map((user) => user.toObject());
-  }
-
-  async findUserByEmail(email: string): Promise<UsersDatabaseDocument | null> {
-    const foundUser = await this.collection.findOne({ email });
-
-    return foundUser ? foundUser.toObject() : null;
   }
 
   async createUser(user: CreationDocument<UsersDatabaseDocument>): Promise<UsersDatabaseDocument> {
     const createdUser = await this.collection.create(user);
 
     return createdUser.toObject();
+  }
+
+  async updateUser(userId: string, updates: UpdateUserPayload): Promise<void> {
+    await this.collection.updateOne({ _id: userId }, updates);
   }
 }

@@ -35,7 +35,7 @@ export class UserBrokers extends UserCollection<BrokersDatabaseDocument> impleme
     if (!broker) {
       throw new ApiError({
         message: `Cannot found broker (${brokerId})`,
-        messageLabel: 'Database',
+        messageHeading: 'Database',
         idLabel: 'user',
         id: this.userId,
         payload: { brokerId },

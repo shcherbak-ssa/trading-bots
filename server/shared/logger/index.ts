@@ -14,15 +14,15 @@ class Logger implements BaseLogger {
   }
 
 
-  private static log<T>(level: 'info' | 'error', scope: LogScope, info: string | LogPayload<T>): void {
+  private static log<T>(level: 'info' | 'error', scope: LogScope, data: string | LogPayload<T>): void {
     const timestamp: string = getTodayDateString();
 
-    if (typeof info === 'string') {
-      console.log(`${timestamp} [${scope}] ${level}: ${info}`);
+    if (typeof data === 'string') {
+      console.log(`${timestamp} [${scope}] ${level}: ${data}`);
     } else {
-      const { message, messageLabel, idLabel, id, payload } = info;
+      const { message, messageHeading, idLabel, id, payload } = data;
 
-      console.log(`${timestamp} [${scope}] ${level}: ${messageLabel} - ${message}`);
+      console.log(`${timestamp} [${scope}] ${level}: ${messageHeading} - ${message}`);
 
       if (idLabel) {
         console.log(` - ${idLabel}: ${id}`);

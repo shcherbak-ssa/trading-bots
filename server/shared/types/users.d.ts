@@ -1,15 +1,26 @@
-import { CreationDocument } from 'shared/types';
+import type { User } from 'global/types';
+import { GetUserType } from 'global/constants';
+
+import type { CreationDocument } from 'shared/types';
 
 
-// Database Api
-export type UsersDatabaseDocument = {
-  id: string;
-  email: string;
+export type GetUserFilters = {
+  type: GetUserType;
+  id?: string;
+  telegramChatId?: number;
+  isAdmin?: boolean;
+}
+
+export type UpdateUserPayload = {
+  telegramChatId?: number;
 }
 
 
+// Database Api
+export type UsersDatabaseDocument = User;
+
 export interface UsersDatabaseCollection {
-  getUsers(): Promise<UsersDatabaseDocument[]>;
-  findUserByEmail(email: string): Promise<UsersDatabaseDocument | null>;
+  getUsers(filters: GetUserFilters): Promise<UsersDatabaseDocument[]>;
   createUser(user: CreationDocument<UsersDatabaseDocument>): Promise<UsersDatabaseDocument>;
+  updateUser(userId: string, updates: UpdateUserPayload): Promise<void>;
 }

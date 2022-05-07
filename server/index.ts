@@ -1,24 +1,28 @@
 import env from 'shared/utils/dotenv';
 
-import type { UsersDatabaseCollection, UsersDatabaseDocument } from 'shared/types';
-import { ActionType, LogScope } from 'shared/constants';
+import { GetUserType } from 'global/constants';
+
+import type { Notification, UsersDatabaseCollection, UsersDatabaseDocument } from 'shared/types';
+import { ActionType, LogScope, NotificationType } from 'shared/constants';
+import { initialUser } from 'shared/config';
 import { logger } from 'shared/logger';
 
 import { startAppJobs } from 'services/jobs/app-jobs';
 import { runAction } from 'services/actions';
 
-import { setupDatabase } from 'api/database';
-import { setupTelegramWebhook } from 'api/telegram';
+import { setupTelegramWebhook } from 'api/telegram/setup';
+import { setupDatabase } from 'api/database/setup';
 import { AppUsers } from 'api/database/app-users';
 
 import { runServer } from './server';
 
 
-// import { RestApi } from 'api/brokers/currency_com/lib/rest-api';
-// const restApi = new RestApi('vEXLx3m2sAxKuGyF', 'E0uSoc&Ppm6+X4J&380IFmB5~DVxRTA7');
+// RestApi('vEXLx3m2sAxKuGyF', 'E0uSoc&Ppm6+X4J&380IFmB5~DVxRTA7');
 
 
-setupServer().catch(console.error);
+setupServer()
+  .then(setUncaughtException)
+  .catch(console.log);
 
 
 async function setupServer() {
@@ -38,7 +42,7 @@ async function setupServer() {
 
   if (process.env.NODE_ENV === 'development') {
     await setupDevUser();
-    logger.logInfo(LogScope.APP, `setup dev user (${process.env.DEV_USER_ID})`);
+    logger.logInfo(LogScope.APP, `setup dev user (${process.env.ADMIN_USER_ID})`);
   }
 
   const activateBotsCount: number = await setupActiveBots();
@@ -65,20 +69,47 @@ async function setupActiveBots(): Promise<number> {
 }
 
 async function setupDevUser(): Promise<void> {
-  if (!process.env.DEV_USER_EMAIL) {
-    throw new Error('No dev user email');
+  if (!process.env.ADMIN_TELEGRAM_CHAT_ID) {
+    throw new Error('No admin Telegram chat id');
   }
 
-  const devUserEmail: string = process.env.DEV_USER_EMAIL;
+  const adminUserTelegramChatId: number = Number(process.env.ADMIN_TELEGRAM_CHAT_ID);
 
   const appUsersCollection: UsersDatabaseCollection = await AppUsers.connect();
-  const foundDevUser: UsersDatabaseDocument | null = await appUsersCollection.findUserByEmail(devUserEmail);
 
-  if (foundDevUser) {
-    process.env.DEV_USER_ID = foundDevUser.id;
+  const [ foundAdminUser ]: UsersDatabaseDocument[] = await appUsersCollection.getUsers({
+    type: GetUserType.ONE,
+    telegramChatId: adminUserTelegramChatId,
+    isAdmin: true,
+  });
+
+  if (foundAdminUser) {
+    process.env.ADMIN_USER_ID = foundAdminUser.id;
+
     return;
   }
 
-  const createdDevUser: UsersDatabaseDocument = await appUsersCollection.createUser({ email: devUserEmail });
-  process.env.DEV_USER_ID = createdDevUser.id;
+  const createdAdminUser: UsersDatabaseDocument = await appUsersCollection.createUser({
+    ...initialUser,
+    telegramChatId: adminUserTelegramChatId,
+    isAdmin: true,
+  });
+
+  process.env.ADMIN_USER_ID = createdAdminUser.id;
+}
+
+function setUncaughtException(): void {
+  process.on('uncaughtException', async (e) => {
+    console.log(e);
+
+    await runAction<Notification, void>({
+      type: ActionType.NOTIFICATIONS_NOTIFY_ADMIN,
+      userId: '',
+      payload: {
+        type: NotificationType.ERROR,
+        forAdmin: true,
+        error: e,
+      },
+    });
+  });
 }
