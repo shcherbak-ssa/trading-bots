@@ -67,6 +67,7 @@ export interface BotBrokerMarket {
 export interface BotBrokerAccount {
   availableAmount: number;
   totalAmount: number;
+  updateAccount(): Promise<void>
 }
 
 
@@ -75,4 +76,7 @@ export interface BotJobs {
   startPositionCloseAtWeekEndJob(bot: BotWorker): Promise<void>;
   startPositionCloseAtDayEndJob(bot: BotWorker): Promise<void>;
   stopPositionCloseJob(botToken: string): void;
+
+  startUpdateAccountJob(bot: BotWorker): void;
+  stopUpdateAccountJob(botToken: string): void;
 }

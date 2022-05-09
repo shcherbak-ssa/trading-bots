@@ -2,7 +2,6 @@ import type { BotBrokerAccount, BotSettings } from 'modules/bot/types';
 import { BotErrorPlace, BotEvents } from 'modules/bot';
 
 import type { ParsedBalance } from './types';
-import { ACCOUNT_UPDATE_INTERVAL } from './constants';
 
 import type { RestApi } from './lib/rest-api';
 import { AccountApi } from './lib/account';
@@ -22,14 +21,13 @@ export class BotAccount implements BotBrokerAccount {
     const api: AccountApi = new AccountApi(restApi);
     const brokerAccount: BotAccount = new BotAccount(botSettings, api);
 
-    await brokerAccount.updateCurrentAccount(); // @TODO: add to job
-    setInterval(brokerAccount.updateCurrentAccount.bind(brokerAccount), ACCOUNT_UPDATE_INTERVAL);
+    await brokerAccount.updateAccount();
 
     return brokerAccount;
   }
 
 
-  async updateCurrentAccount(): Promise<void> {
+  async updateAccount(): Promise<void> {
     try {
       const { availableAmount, totalAmount }: ParsedBalance = await this.api.loadConcreteAccount({
         accountId: this.botSettings.brokerAccountId,
@@ -38,7 +36,7 @@ export class BotAccount implements BotBrokerAccount {
       this.availableAmount = availableAmount;
       this.totalAmount = totalAmount;
     } catch (e: any) {
-      BotEvents.processError(this.botSettings.token, BotErrorPlace.ACCOUNT_UPDATE, e);
+      await BotEvents.processError(this.botSettings.token, BotErrorPlace.ACCOUNT_UPDATE, e);
     }
   }
 }
