@@ -1,5 +1,4 @@
 export const QUERY_URL_SEPARATOR: string = '?';
-export const BOT_TOKEN_SEPARATOR: string = '-';
 
 
 export enum Currency {

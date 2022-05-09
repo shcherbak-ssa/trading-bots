@@ -1,7 +1,6 @@
 import mongoose from 'mongoose';
 
 import type { UpdateBotPayload } from 'global/types';
-import { BOT_TOKEN_SEPARATOR } from 'global/constants';
 
 import type {
   BotsDatabaseCollection,
@@ -13,6 +12,7 @@ import type {
 
 import { DatabaseCollection } from 'shared/constants';
 import { ApiError } from 'shared/exceptions';
+import { generateBotToken } from 'shared/utils';
 
 import { UserCollection } from './lib/user-collection';
 
@@ -88,8 +88,7 @@ export class UserBots extends UserCollection<BotsDatabaseDocument> implements Bo
   async createBot(newBot: CreationDocument<BotsDatabaseDocument>): Promise<BotsDatabaseDocument> {
     const createdBot = await this.collection.create({ ...newBot });
 
-    // @TODO: refactor
-    const botToken: string = createdBot.token + BOT_TOKEN_SEPARATOR + createdBot.id;
+    const botToken: string = generateBotToken(createdBot.token, createdBot.id);
 
     const updatedBot
       = await this.collection.findOneAndUpdate({ _id: createdBot.id }, { token: botToken }, { returnDocument: 'after' });

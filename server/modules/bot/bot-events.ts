@@ -1,5 +1,5 @@
 import type { UpdateBotPayload } from 'global/types';
-import { BOT_TOKEN_SEPARATOR, BotDeactivateReason, BotUpdateType } from 'global/constants';
+import { BotDeactivateReason, BotUpdateType } from 'global/constants';
 
 import type {
   NewOpenPosition,
@@ -11,6 +11,7 @@ import type {
 
 import { ActionType, LogScope, NotificationType } from 'shared/constants';
 import { logger } from 'shared/logger';
+import { parseBotToken } from 'shared/utils';
 
 import { runAction } from 'services/actions';
 
@@ -23,7 +24,7 @@ import { BotManager } from './bot-manager';
 export class BotEvents {
   static async processPositionOpen(botToken: string, position: BotPosition): Promise<void> {
     const { settings: botSettings }: Bot = BotManager.getBot(botToken);
-    const [ userId, botId ] = botToken.split(BOT_TOKEN_SEPARATOR);
+    const [ userId, botId ] = parseBotToken(botToken);
     const { id, ...newPosition } = position;
 
     const openPosition = await runAction<NewOpenPosition, OpenPosition>({
@@ -55,7 +56,7 @@ export class BotEvents {
 
   static async processPositionUpdate(botToken: string, position: BotPosition): Promise<void> {
     const { settings: botSettings }: Bot = BotManager.getBot(botToken);
-    const [ userId ] = botToken.split(BOT_TOKEN_SEPARATOR);
+    const [ userId ] = parseBotToken(botToken);
     const { id, stopLossPrice } = position;
 
     await runAction<OpenPositionUpdatePayload, void>({
@@ -85,7 +86,7 @@ export class BotEvents {
 
   static async processPositionClose(botToken: string, position: BotPosition): Promise<void> {
     const { settings: botSettings }: Bot = BotManager.getBot(botToken);
-    const [ userId ] = botToken.split(BOT_TOKEN_SEPARATOR);
+    const [ userId ] = parseBotToken(botToken);
 
     await runAction<OpenPositionDeletePayload, void>({
       type: ActionType.OPEN_POSITIONS_DELETE,
@@ -126,7 +127,7 @@ export class BotEvents {
     const bot: Bot = BotManager.getBot(botToken);
 
     const { settings: botSettings, currentPosition } = bot;
-    const [ userId, botId ] = botToken.split(BOT_TOKEN_SEPARATOR);
+    const [ userId, botId ] = parseBotToken(botToken);
 
     const position: BotPosition | null = currentPosition;
 
