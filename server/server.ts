@@ -3,7 +3,7 @@ import bodyParser from 'body-parser';
 import queryString from 'query-string';
 
 import type { User } from 'global/types';
-import { BOT_TOKEN_SEPARATOR, GetUserType, QUERY_URL_SEPARATOR, RequestMethod, StatusCode } from 'global/constants';
+import { GetUserType, QUERY_URL_SEPARATOR, RequestMethod, StatusCode } from 'global/constants';
 
 import type {
   ServerRequestPayload,
@@ -24,7 +24,7 @@ import {
 } from 'shared/constants';
 
 import { logger } from 'shared/logger';
-import { isCustomError } from 'shared/utils';
+import { isCustomError, parseBotToken } from 'shared/utils';
 
 import { validate } from 'services/validation';
 import { runAction } from 'services/actions';
@@ -210,7 +210,7 @@ function webhookRouteMiddleware(validation: Validation, handler: ServerRouteHand
       if (requestPayload.botToken) {
         const { botToken } = requestPayload as Signal;
 
-        userId = botToken.split(BOT_TOKEN_SEPARATOR)[0];
+        userId = parseBotToken(botToken)[0];
       } else if (requestPayload.telegramToken) {
         const { message: { chat } } = requestPayload as TelegramIncomeMessage;
 

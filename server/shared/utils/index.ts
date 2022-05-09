@@ -33,6 +33,32 @@ export function generateHmacSignature(secretKey: string, message: string): strin
     .digest("hex");
 }
 
+export function generateBotToken(userId: string, botId: string): string {
+  const splitUserId: string[] = userId.split('');
+  const splitBotId: string[] = botId.split('');
+
+  return splitUserId
+    .reduce((token, char, index) => {
+      token.push(char, splitBotId[index]);
+
+      return token;
+    }, [] as string[])
+    .join('');
+}
+
+/**
+ *  Return => [ userId, botId ]
+ * */
+export function parseBotToken(token: string): [string, string] {
+  return token
+    .split('')
+    .reduce((result, char, index) => {
+      result[index === 0 || index % 2 === 0 ? 0 : 1] += char;
+
+      return result;
+    }, ['', '']);
+}
+
 
 // Query
 export function stringifyPayload<Payload>(payload: Payload): string {
