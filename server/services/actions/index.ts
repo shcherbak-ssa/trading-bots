@@ -1,5 +1,3 @@
-import { StatusCode } from 'global/constants';
-
 import type { Action, ActionFunction, ActionList } from 'shared/types';
 import { LogScope } from 'shared/constants';
 import { logger } from 'shared/logger';
@@ -9,6 +7,7 @@ import { analyticsActions } from './analytics';
 import { botManagerActions } from './bot-manager';
 import { botsActions } from './bots';
 import { brokersActions } from './brokers';
+import { notificationsActions } from './notifications';
 import { openPositionsActions } from './open-positions';
 import { positionsActions } from './positions';
 import { signalsActions } from './signals';
@@ -21,6 +20,7 @@ const actions: ActionList = {
   ...botManagerActions,
   ...botsActions,
   ...brokersActions,
+  ...notificationsActions,
   ...openPositionsActions,
   ...positionsActions,
   ...signalsActions,
@@ -35,13 +35,13 @@ export async function runAction<Payload, Result>({ type, userId, payload }: Acti
   if (!action) {
     throw new AppError({
       message: `Action [${type}] not found`,
-      messageLabel: 'Application',
+      messageHeading: 'Application',
     });
   }
 
   logger.logInfo(LogScope.APP, {
     message: `start (${type})`,
-    messageLabel: 'Action',
+    messageHeading: 'Action',
     idLabel: 'user',
     id: userId,
     payload,
@@ -51,7 +51,7 @@ export async function runAction<Payload, Result>({ type, userId, payload }: Acti
 
   logger.logInfo(LogScope.APP, {
     message: `end (${type})`,
-    messageLabel: 'Action',
+    messageHeading: 'Action',
     idLabel: 'user',
     id: userId,
     payload: result,

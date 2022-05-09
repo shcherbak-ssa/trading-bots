@@ -19,7 +19,7 @@ export class ApiKeys {
     if (!canTrade) {
       throw new AppError({
         message: `API keys are valid, but you cannot use trade API.\n\nPlease, check permissions or wait account verification.`,
-        messageLabel: 'Broker Currency.com',
+        messageHeading: 'Broker Currency.com',
       }, StatusCode.BAD_REQUEST);
     }
   }

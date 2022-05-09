@@ -10,7 +10,7 @@ import { PositionApi as LibPositionApi } from './lib/position';
 
 
 export class PositionApi {
-  static async positionExist(
+  static async checkPositionClose(
     accountType: BrokerAccountType,
     { apiKey, secretKey }: BrokerApiKeys,
     position: OpenPosition,

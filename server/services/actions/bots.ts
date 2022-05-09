@@ -211,6 +211,7 @@ export const botsActions = {
         break;
       case BotUpdateType.UPDATE:
         if (currentBot.active) {
+          // @TODO: add max_loss property
           const needToUpdateActivation: boolean = updates.tradeCapitalPercent !== undefined;
 
           if (updates.tradeCapitalPercent !== undefined) {

@@ -16,7 +16,7 @@ export class BrokersData implements BrokersDataApi {
 
     throw new AppError({
       message: `data API not implemented yet`,
-      messageLabel: `Broker [${brokerName}]`,
+      messageHeading: `Broker [${brokerName}]`,
     }, StatusCode.NOT_IMPLEMENTED);
   }
 
@@ -30,7 +30,7 @@ export class BrokersData implements BrokersDataApi {
 
     throw new AppError({
       message: `data API not implemented yet`,
-      messageLabel: `Broker [${brokerName}]`,
+      messageHeading: `Broker [${brokerName}]`,
     }, StatusCode.NOT_IMPLEMENTED);
   }
 
@@ -44,7 +44,7 @@ export class BrokersData implements BrokersDataApi {
 
     throw new AppError({
       message: `data API not implemented yet`,
-      messageLabel: `Broker [${brokerName}]`,
+      messageHeading: `Broker [${brokerName}]`,
     }, StatusCode.NOT_IMPLEMENTED);
   }
 }

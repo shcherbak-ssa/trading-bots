@@ -1,21 +1,18 @@
 import cron from 'node-cron';
 
-import type { Bot, UpdateBotPayload } from 'global/types';
-import { BotRestartMode, BotUpdateType } from 'global/constants';
+import type { Bot, UpdateBotPayload, User } from 'global/types';
+import { BotRestartMode, BotUpdateType, GetUserType } from 'global/constants';
 
-import type { BotsGetFilters, UsersDatabaseDocument } from 'shared/types';
+import type { BotsGetFilters, GetUserFilters } from 'shared/types';
 import { ActionType, DATE_STRING_27_DAYS, JOB_TIMEZONE, JobExpression, LogScope } from 'shared/constants';
 import { logger } from 'shared/logger';
 import { convertDateStringToNumber, getMilliseconds } from 'shared/utils';
 
 import { runAction } from 'services/actions';
 
-import { BotEvents } from 'modules/bot';
-
 
 export function startAppJobs(): void {
   startCheckBotsRestartJob();
-  startCleanRestartBotCounts();
 }
 
 
@@ -23,10 +20,10 @@ function startCheckBotsRestartJob(): void {
   cron.schedule(JobExpression.CHECK_BOTS_RESTART, async () => {
     logger.logInfo(LogScope.JOB, `START check bots restart`);
 
-    const users: UsersDatabaseDocument[] = await runAction({
+    const users = await runAction<GetUserFilters, User[]>({
       type: ActionType.USERS_GET,
       userId: '',
-      payload: {},
+      payload: { type: GetUserType.ALL },
     });
 
     for (const { id: userId } of users) {
@@ -62,15 +59,5 @@ function startCheckBotsRestartJob(): void {
     }
 
     logger.logInfo(LogScope.JOB, `END check bots restart`);
-  }, { timezone: JOB_TIMEZONE });
-}
-
-function startCleanRestartBotCounts(): void {
-  cron.schedule(JobExpression.CLEAN_RESTART_BOT_COUNTS, () => {
-    logger.logInfo(LogScope.JOB, `START clean restart bot counts`);
-
-    BotEvents.restartCounts.clear();
-
-    logger.logInfo(LogScope.JOB, `END clean restart bot counts`);
   }, { timezone: JOB_TIMEZONE });
 }

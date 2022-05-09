@@ -12,12 +12,12 @@ export class BrokersPositions implements BrokersPositionsApi {
   ): Promise<number | null> {
     switch (brokerName) {
       case BrokerName.CURRENCY_COM:
-        return await CurrencyComPositionApi.positionExist(accountType, apiKeys, position);
+        return await CurrencyComPositionApi.checkPositionClose(accountType, apiKeys, position);
     }
 
     throw new AppError({
       message: `data API not implemented yet`,
-      messageLabel: `Broker [${brokerName}]`,
+      messageHeading: `Broker [${brokerName}]`,
     }, StatusCode.NOT_IMPLEMENTED);
   }
 }

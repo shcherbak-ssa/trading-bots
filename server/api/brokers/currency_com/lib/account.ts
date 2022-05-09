@@ -36,7 +36,7 @@ export class AccountApi {
 
     throw new ApiError({
       message: `Cannot found account (${accountId})`,
-      messageLabel: `Broker Currency.com`,
+      messageHeading: `Broker Currency.com`,
     });
   }
 

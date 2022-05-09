@@ -28,7 +28,7 @@ export class AccountApi {
 
     throw new ApiError({
       message: `Cannot found account (${accountId})`,
-      messageLabel: `Broker Capital.com`,
+      messageHeading: `Broker Capital.com`,
     });
   }
 

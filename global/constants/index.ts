@@ -6,6 +6,11 @@ export enum Currency {
   USD = 'USD',
 }
 
+export enum GetUserType {
+  ONE = 'ONE',
+  ALL = 'ALL',
+}
+
 
 // Client-Server
 export enum RequestMethod {
@@ -38,7 +43,7 @@ export enum ServerEndpoint {
   API_BROKERS_WITH_ID = '/api/brokers/:id',
 
   WEBHOOK_SIGNALS = '/webhook/signals',
-  WEBHOOK_TELEGRAM = '/webhook/telegram/:token',
+  WEBHOOK_TELEGRAM = '/webhook/telegram/:telegramToken',
 }
 
 
@@ -97,5 +102,5 @@ export enum BotDeactivateReason {
   EMPTY = '',
   USER = 'USER',
   MAX_LOSS = 'MAX_LOSS',
-  RESTART_LIMIT = 'RESTART_LIMIT',
+  INTERNAL_ERROR = 'INTERNAL_ERROR',
 }

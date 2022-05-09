@@ -61,7 +61,7 @@ export class MarketApi {
 
     throw new ApiError({
       message: `Cannot found broker symbol (${marketSymbol})`,
-      messageLabel: `Broker Currency.com`,
+      messageHeading: `Broker Currency.com`,
     });
   }
 
@@ -85,7 +85,7 @@ export class MarketApi {
     if (!this.wsApi) {
       throw new ApiError({
         message: `No connection by web-socket`,
-        messageLabel: `Broker Currency.com`,
+        messageHeading: `Broker Currency.com`,
       });
     }
 

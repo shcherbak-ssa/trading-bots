@@ -1,12 +1,7 @@
-import type { AnalyticsBotProgress } from 'global/types';
-
-
 export const API_PATHNAME: string = '/api';
 export const WEBHOOKS_PATHNAME: string = '/webhook';
 export const ENTRY_POINT_PATHNAME: string = '*';
-
 export const JOB_TIMEZONE: string = 'Etc/UTC';
-
 export const DATE_STRING_27_DAYS: string = '27 days';
 
 
@@ -14,23 +9,6 @@ export const ONE_HUNDRED: number = 100;
 export const FRACTION_DIGITS_TO_HUNDREDTHS: number = 2;
 export const MINUTES_BEFORE_MARKET_CLOSING: number = 5;
 
-
-export const emptyBotProgress: AnalyticsBotProgress = {
-  botActivationIndex: 0,
-  totalFee: 0,
-  totalLoss: 0,
-  totalProfit: 0,
-  totalResult: 0,
-  changePercent: 0,
-};
-
-
-export enum LogScope {
-  APP = 'APP',
-  API = 'API',
-  BOT = 'BOT',
-  JOB = 'JOB',
-}
 
 export enum ActionType {
   ANALYTICS_GET_BOT_PROGRESS = 'analytics/get-bot-progress',
@@ -68,7 +46,12 @@ export enum ActionType {
 
   TELEGRAM_PROCESS_INCOME_MESSAGE = 'telegram/process-income-message',
 
+  NOTIFICATIONS_NOTIFY_USER = 'notifications/notify-user',
+  NOTIFICATIONS_NOTIFY_ADMIN = 'notifications/notify-admin',
+
   USERS_GET = 'users/get',
+  USERS_CREATE = 'users/create',
+  USERS_UPDATE = 'users/update',
 }
 
 export enum DatabaseCollection {
@@ -103,6 +86,17 @@ export enum Validation {
   SIGNALS = 'signals',
 }
 
+
+// Logger
+export enum LogScope {
+  APP = 'APP',
+  API = 'API',
+  BOT = 'BOT',
+  JOB = 'JOB',
+}
+
+
+// Signals
 export enum SignalType {
   OPEN = 'OPEN',
   UPDATE = 'UPDATE',
@@ -114,7 +108,41 @@ export enum SignalDirection {
   SHORT = 'SHORT',
 }
 
+
+// Jobs
 export enum JobExpression {
   CHECK_BOTS_RESTART = '0 1 * * SAT',
-  CLEAN_RESTART_BOT_COUNTS = '0 1 * * *',
+}
+
+
+// Telegram
+export enum TelegramCommand {
+  START = '/start',
+  HELP = '/help',
+
+  REPORT = '/report',
+
+  USER = '/user',
+}
+
+export enum TelegramActionType {
+  CREATE_USER = 'CREATE_USER', // @TODO
+  CONNECT_USER_TELEGRAM = 'CONNECT_USER_TELEGRAM',
+
+  // @TODO
+  REPORT_TODAY = 'REPORT_TODAY',
+  REPORT_WEEK = 'REPORT_WEEK',
+  REPORT_MONTH = 'REPORT_MONTH',
+}
+
+
+// Notifications
+export enum NotificationType {
+  POSITION_OPEN = 'POSITION_OPEN',
+  POSITION_UPDATE = 'POSITION_UPDATE',
+  POSITION_CLOSE = 'POSITION_CLOSE',
+
+  BOT_DEACTIVATION = 'BOT_DEACTIVATION',
+
+  ERROR = 'ERROR',
 }

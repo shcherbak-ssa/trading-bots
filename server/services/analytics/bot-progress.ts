@@ -1,7 +1,8 @@
 import type { AnalyticsBotProgress, Bot } from 'global/types';
 
 import type { Position } from 'shared/types';
-import { emptyBotProgress, ONE_HUNDRED } from 'shared/constants';
+import { ONE_HUNDRED } from 'shared/constants';
+import { emptyBotProgress } from 'shared/config';
 
 
 export class BotProgress {

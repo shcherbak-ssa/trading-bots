@@ -1,3 +1,4 @@
+import { LogScope } from 'shared/constants';
 import { logger } from 'shared/logger';
 import { ApiError } from 'shared/exceptions';
 import { sleep } from 'shared/utils';
@@ -26,7 +27,6 @@ import {
 } from '../constants';
 
 import type { RestApi } from './rest-api';
-import { LogScope } from 'shared/constants';
 
 
 export class PositionApi {
@@ -43,11 +43,9 @@ export class PositionApi {
       );
 
     if (createdOrder.rejectMessage !== undefined) {
-      const { rejectMessage } = createdOrder;
-
       throw new ApiError({
-        message: `Something went wrong with open position.\nReason: ${rejectMessage}.\n\nPlease, check position in broker system.`,
-        messageLabel: 'Broker Currency.com',
+        message: `Failed to open a position.\nReason: ${createdOrder.rejectMessage}.`,
+        messageHeading: 'Broker Currency.com',
         payload: createdOrder,
       });
     }
@@ -75,8 +73,8 @@ export class PositionApi {
     }
 
     throw new ApiError({
-      message: `Something went wrong with open position.\nReason: no open positions found.\n\nPlease, check position in broker system.`,
-      messageLabel: 'Broker Currency.com',
+      message: `No open positions found.`,
+      messageHeading: 'Broker Currency.com',
       payload: createdOrder,
     });
   }
@@ -90,11 +88,9 @@ export class PositionApi {
         );
 
       if (closePositionResult.rejectReason !== undefined) {
-        const { rejectReason } = closePositionResult;
-
         throw new ApiError({
-          message: `Something went wrong with open position.\nReason: ${rejectReason}.\n\nPlease, check position in broker system.`,
-          messageLabel: 'Broker Currency.com',
+          message: `Failed to close a position.\nReason: ${closePositionResult.rejectReason}.`,
+          messageHeading: 'Broker Currency.com',
           payload: closePositionResult,
         });
       }
@@ -117,8 +113,8 @@ export class PositionApi {
     }
 
     throw new ApiError({
-      message: `Something went wrong with open position.\n\nPlease, check position in broker system.`,
-      messageLabel: 'Broker Currency.com',
+      message: `Something went wrong with position closing.`,
+      messageHeading: 'Broker Currency.com',
     });
   }
 

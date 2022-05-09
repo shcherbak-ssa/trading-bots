@@ -15,7 +15,7 @@ export class ApiKeys implements BrokersApiKeys {
 
     throw new AppError({
       message: `API not implemented yet`,
-      messageLabel: `Broker [${brokerName}]`,
+      messageHeading: `Broker [${brokerName}]`,
     }, StatusCode.NOT_IMPLEMENTED);
   }
 }

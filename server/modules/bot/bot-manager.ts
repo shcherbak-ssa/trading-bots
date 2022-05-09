@@ -23,8 +23,8 @@ export class BotManager {
 
     if (!bot) {
       throw new AppError({
-        message: `Bot with token '${botToken}' does not exist`,
-        messageLabel: 'Bot Manager',
+        message: `Bot with token "${botToken}" does not exist`,
+        messageHeading: 'Bot Manager',
         idLabel: 'token',
         id: botToken,
       });

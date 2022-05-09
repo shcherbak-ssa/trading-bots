@@ -1,4 +1,5 @@
 import type { ChatType } from '../constants';
+import exp from 'constants';
 
 
 // Requests
@@ -23,6 +24,12 @@ export type SetWebhook = {
 
 
 // Message
+export type Message = {
+  chat_id: number;
+  text: string;
+  parse_mode: 'Markdown' | 'HTML';
+}
+
 export type IncomeMessage = {
   message_id: number;
   from: User;
