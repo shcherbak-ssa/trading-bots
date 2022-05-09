@@ -1,6 +1,6 @@
 import cron from 'node-cron';
 
-import { JOB_TIMEZONE, LogScope } from 'shared/constants';
+import { JOB_TIMEZONE, JobExpression, LogScope } from 'shared/constants';
 import { logger } from 'shared/logger';
 
 import type { BotCloseTime, BotJobs as Jobs } from 'modules/bot/types';
@@ -8,7 +8,8 @@ import type { Bot } from 'modules/bot';
 
 
 export class BotJobs implements Jobs {
-  private tasks: Map<string, cron.ScheduledTask> = new Map([]);
+  private positionCloseTasks: Map<string, cron.ScheduledTask> = new Map([]);
+  private accountUpdateTasks: Map<string, cron.ScheduledTask> = new Map([]);
 
 
   async startPositionCloseAtDayEndJob(bot: Bot, day: number = BotJobs.getCurrentDay()): Promise<void> {
@@ -16,17 +17,19 @@ export class BotJobs implements Jobs {
     const jobExpression: string = BotJobs.getJobExpression(closeTime);
 
     const task: cron.ScheduledTask = cron.schedule(jobExpression, async () => {
-      logger.logInfo(LogScope.JOB, `START close position at day end`);
+      logger.logInfo(LogScope.JOB, `Run task - Close bot position at day end`);
 
       await bot.closeOpenPosition();
 
       await this.startPositionCloseAtDayEndJob(bot, closeTime.nextDay);
 
-      logger.logInfo(LogScope.JOB, `END close position at day end`);
+      logger.logInfo(LogScope.JOB, `End task - Close bot position at day end`);
     }, { timezone: JOB_TIMEZONE });
 
     this.stopPositionCloseJob(bot.settings.token);
-    this.tasks.set(bot.settings.token, task);
+    this.positionCloseTasks.set(bot.settings.token, task);
+
+    logger.logInfo(LogScope.JOB, `Start task - Close bot position at day end`);
   }
 
   async startPositionCloseAtWeekEndJob(bot: Bot): Promise<void> {
@@ -34,25 +37,49 @@ export class BotJobs implements Jobs {
     const jobExpression: string = BotJobs.getJobExpression(closeTime);
 
     const task: cron.ScheduledTask = cron.schedule(jobExpression, async () => {
-      logger.logInfo(LogScope.JOB, `START close position at week end`);
+      logger.logInfo(LogScope.JOB, `Run task - Close bot position at week end`);
 
       await bot.closeOpenPosition();
 
       await this.startPositionCloseAtWeekEndJob(bot);
 
-      logger.logInfo(LogScope.JOB, `END close position at week end`);
+      logger.logInfo(LogScope.JOB, `End task - Close bot position at week end`);
     }, { timezone: JOB_TIMEZONE });
 
     this.stopPositionCloseJob(bot.settings.token);
-    this.tasks.set(bot.settings.token, task);
+    this.positionCloseTasks.set(bot.settings.token, task);
+
+    logger.logInfo(LogScope.JOB, `Start task - Close bot position at week end`);
   }
 
   stopPositionCloseJob(botToken: string): void {
-    this.tasks.get(botToken)?.stop();
+    if (!this.positionCloseTasks.has(botToken)) return;
 
-    if (this.tasks.has(botToken)) {
-      this.tasks.delete(botToken);
-    }
+    this.positionCloseTasks.get(botToken)?.stop();
+    this.positionCloseTasks.delete(botToken);
+
+    logger.logInfo(LogScope.JOB, `Stop task - Close bot position`);
+  }
+
+
+  startUpdateAccountJob(bot: Bot): void {
+    const task: cron.ScheduledTask = cron.schedule(JobExpression.UPDATE_BOT_BROKER_ACCOUNT, async () => {
+      await bot.broker.account.updateAccount();
+    }, { timezone: JOB_TIMEZONE });
+
+    this.stopUpdateAccountJob(bot.settings.token);
+    this.accountUpdateTasks.set(bot.settings.token, task);
+
+    logger.logInfo(LogScope.JOB, `Start task - Update bot broker account`);
+  }
+
+  stopUpdateAccountJob(botToken: string): void {
+    if (!this.accountUpdateTasks.has(botToken)) return;
+
+    this.accountUpdateTasks.get(botToken)?.stop();
+    this.accountUpdateTasks.delete(botToken);
+
+    logger.logInfo(LogScope.JOB, `Stop task - Update bot broker account`);
   }
 
 

@@ -112,6 +112,7 @@ export enum SignalDirection {
 // Jobs
 export enum JobExpression {
   CHECK_BOTS_RESTART = '0 1 * * SAT',
+  UPDATE_BOT_BROKER_ACCOUNT = '* * * * *',
 }
 
 

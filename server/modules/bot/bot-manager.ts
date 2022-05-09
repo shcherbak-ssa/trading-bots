@@ -41,6 +41,9 @@ export class BotManager {
     }
 
     botJobs.stopPositionCloseJob(setting.token);
+    botJobs.stopUpdateAccountJob(setting.token);
+
+    botJobs.startUpdateAccountJob(createdBot);
 
     if (setting.positionCloseEnable) {
       setting.positionCloseMode === BotPositionCloseMode.DAY_END
@@ -59,6 +62,7 @@ export class BotManager {
     await bot.closeOpenPosition();
 
     botJobs.stopPositionCloseJob(botToken);
+    botJobs.stopUpdateAccountJob(botToken);
 
     BotManager.bots.delete(botToken);
 

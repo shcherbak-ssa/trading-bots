@@ -18,7 +18,7 @@ export function startAppJobs(): void {
 
 function startCheckBotsRestartJob(): void {
   cron.schedule(JobExpression.CHECK_BOTS_RESTART, async () => {
-    logger.logInfo(LogScope.JOB, `START check bots restart`);
+    logger.logInfo(LogScope.JOB, `Run task - Check bots restart`);
 
     const users = await runAction<GetUserFilters, User[]>({
       type: ActionType.USERS_GET,
@@ -58,6 +58,8 @@ function startCheckBotsRestartJob(): void {
       }
     }
 
-    logger.logInfo(LogScope.JOB, `END check bots restart`);
+    logger.logInfo(LogScope.JOB, `End task - Check bots restart`);
   }, { timezone: JOB_TIMEZONE });
+
+  logger.logInfo(LogScope.JOB, `Start task - Check bots restart`);
 }
