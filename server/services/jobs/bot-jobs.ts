@@ -1,6 +1,9 @@
 import cron from 'node-cron';
 
-import { JOB_TIMEZONE, JobExpression } from 'shared/constants';
+import type { Notification } from 'shared/types';
+import { ActionType, JOB_TIMEZONE, JobExpression, NotificationType } from 'shared/constants';
+
+import { runAction } from 'services/actions';
 
 import type { BotCloseTime, BotJobs as Jobs } from 'modules/bot/types';
 import type { Bot } from 'modules/bot';
@@ -65,12 +68,20 @@ export class BotJobs implements Jobs {
 
   startUpdateAccountJob(bot: Bot): void {
     const task: cron.ScheduledTask = cron.schedule(JobExpression.UPDATE_BOT_BROKER_ACCOUNT, async () => {
-      await bot.broker.account.updateAccount();
+      try {
+        await bot.broker.account.updateAccount();
+      } catch (e) {
+        await runAction<Notification, void>({
+          type: ActionType.NOTIFICATIONS_NOTIFY_ADMIN,
+          userId: '',
+          payload: {
+            type: NotificationType.ERROR,
+            forAdmin: true,
+            error: e,
+          },
+        });
+      }
     }, { timezone: JOB_TIMEZONE });
-
-    task.on('task-failed', (e) => {
-      throw e;
-    });
 
     this.stopUpdateAccountJob(bot.settings.token);
     this.accountUpdateTasks.set(bot.settings.token, task);
