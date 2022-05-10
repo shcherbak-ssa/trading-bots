@@ -3,9 +3,7 @@ import WebSocket from 'ws';
 import { BotErrorPlace, BotEvents } from 'modules/bot';
 
 import type { WsSubscribeResponse } from '../types';
-import { EndpointSubscription, WS_API_URL, WS_CLOSE_BY_TERMINATE_CODE, WS_PING_DELAY } from '../constants';
-import { logger } from 'shared/logger';
-import { LogScope } from 'shared/constants';
+import { EndpointSubscription, WS_API_URL, WS_PING_DELAY } from '../constants';
 
 
 type OpenCallback = (api: WsApi) => void;
@@ -45,8 +43,6 @@ export class WsApi {
 
   destroyWebSocket(): void {
     clearInterval(this.interval);
-
-    this.wsClient.terminate();
   }
 
 
@@ -64,12 +60,6 @@ export class WsApi {
     };
 
     this.wsClient.on('close', (code, reason) => {
-      if (code === WS_CLOSE_BY_TERMINATE_CODE) {
-        logger.logInfo(LogScope.API, `Currency.com WebSocket closed by terminate`);
-
-        return;
-      }
-
       this.destroyWebSocket();
 
       const webSocketError: any = new Error('Currency.com closed websocket');
