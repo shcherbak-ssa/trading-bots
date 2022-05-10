@@ -62,8 +62,8 @@ export class WsApi {
     this.wsClient.on('close', (code, reason) => {
       this.destroyWebSocket();
 
-      const webSocketError: any = new Error('Currency.com closed websocket');
-      webSocketError.name = 'WebSocket error';
+      const webSocketError: any = new Error(`Currency.com closed websocket [${code}]`);
+      webSocketError.name = 'WebSocket Error';
       webSocketError.reason = reason.toJSON();
       webSocketError.code = code;
 
@@ -74,7 +74,7 @@ export class WsApi {
       this.destroyWebSocket();
 
       const webSocketError: any = new Error('Something went wrong with Currency.com websocket');
-      webSocketError.name = 'WebSocket error';
+      webSocketError.name = 'WebSocket Error';
       webSocketError.error = err;
 
       BotEvents.processError(this.botToken, BotErrorPlace.MARKET_WS_ERROR, webSocketError);
