@@ -1,5 +1,7 @@
 import env from 'shared/utils/dotenv';
 
+import type { Server } from 'http';
+
 import { GetUserType } from 'global/constants';
 
 import type { Notification, UsersDatabaseCollection, UsersDatabaseDocument } from 'shared/types';
@@ -12,7 +14,7 @@ import { runAction } from 'services/actions';
 
 import { setupTelegramWebhook } from 'api/telegram/setup';
 import { setupDatabase } from 'api/database/setup';
-import { AppUsers } from 'api/database/app-users';
+import { AppUsers } from 'api/database';
 
 import { runServer } from './server';
 
@@ -25,7 +27,7 @@ setupServer()
   .catch(console.log);
 
 
-async function setupServer() {
+async function setupServer(): Promise<Server> {
   console.log('\n#################### Setup server [BEGIN] ####################');
 
   console.log('\n mode:', process.env.NODE_ENV);
@@ -54,10 +56,12 @@ async function setupServer() {
   startAppJobs();
   logger.logInfo(LogScope.APP, `start application jobs`);
 
-  await runServer()
+  const server: Server = await runServer()
   logger.logInfo(LogScope.APP, `run server`);
 
   console.log('\n#################### Setup server [END] ####################\n');
+
+  return server;
 }
 
 async function setupActiveBots(): Promise<number> {
@@ -98,18 +102,25 @@ async function setupDevUser(): Promise<void> {
   process.env.ADMIN_USER_ID = createdAdminUser.id;
 }
 
-function setUncaughtException(): void {
+function setUncaughtException(server: Server): void {
   process.on('uncaughtException', async (e) => {
     console.log(e);
 
-    await runAction<Notification, void>({
-      type: ActionType.NOTIFICATIONS_NOTIFY_ADMIN,
-      userId: '',
-      payload: {
-        type: NotificationType.ERROR,
-        forAdmin: true,
-        error: e,
-      },
-    });
+    try {
+      await runAction<Notification, void>({
+        type: ActionType.NOTIFICATIONS_NOTIFY_ADMIN,
+        userId: '',
+        payload: {
+          type: NotificationType.ERROR,
+          forAdmin: true,
+          error: e,
+        },
+      });
+    } catch (e) {
+      console.log(e);
+
+      server.close();
+      process.exit(1);
+    }
   });
 }

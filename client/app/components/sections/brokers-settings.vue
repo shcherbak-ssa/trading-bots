@@ -33,7 +33,7 @@
     <template v-else>
       <base-table
           v-if="storeState.user.brokers.length"
-          class="base-table section"
+          class="base-table brokers-table section"
           :value="storeState.user.brokers"
       >
         <base-table-column field="name" header="Name">
@@ -73,11 +73,24 @@
 
         <base-table-column field="expiresAt" header="Expires">
           <template #body="{ data }">
-            <div>{{ formDate(new Date(data.expiresAt)) }}</div>
+            <div>
+              <span>{{ formDate(new Date(data.expiresAt)) }}</span>
+
+              <span v-if="isExpired(data.expiresAt)" class="danger-status"> (expired)</span>
+
+              <span v-else :class="isExpireNear(data.expiresAt) ? 'danger-status' : ''">
+                 (in {{ getReadableDateString(getMillisecondsBeforeExpires(data.expiresAt)) }})
+              </span>
+            </div>
           </template>
         </base-table-column>
 
-        <base-table-column v-if="!storeState.actionSection.isActive" field="actions" header="Actions">
+        <base-table-column
+            v-if="!storeState.actionSection.isActive"
+            class="broker-actions"
+            field="actions"
+            header="Actions"
+        >
           <template #body="{ data }">
             <div class="actions-group">
               <button-action-edit @click="editBroker(data)" />
@@ -112,9 +125,10 @@ import { reactive, onMounted } from 'vue';
 
 import type { Broker, BrokerBot } from 'global/types';
 import { BotState } from 'global/constants';
+import { getReadableDateString } from 'global/utils';
 
 import { SectionComponent, ActionType } from 'shared/constants';
-import { formDate } from 'shared/utils';
+import { formDate, getMillisecondsBeforeExpires, isExpired, isExpireNear } from 'shared/utils';
 
 import { runAction } from 'services/actions';
 
@@ -212,5 +226,9 @@ function getDeleteMessage(id: string): string {
 
 .broker-bots {
   gap: 10px;
+}
+
+.danger-status {
+  color: var(--colors-secondary);
 }
 </style>

@@ -15,8 +15,8 @@ import { ActionType } from 'shared/constants';
 
 import { runAction } from 'services/actions';
 
-import { UserOpenPositions } from 'api/database/user-open-positions';
-import { BrokersPositions } from 'api/brokers/brokers-positions';
+import { UserOpenPositions } from 'api/database';
+import { BrokersPositions } from 'api/brokers';
 
 
 const brokersPositionsApi: BrokersPositionsApi = new BrokersPositions();

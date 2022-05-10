@@ -29,12 +29,13 @@ import type {
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
+import { Helpers } from 'shared/helpers';
 import { ApiError, AppError } from 'shared/exceptions';
 
 import { runAction } from 'services/actions';
 
 import { ApiKeys, BrokersData } from 'api/brokers';
-import { UserBrokers } from 'api/database/user-brokers';
+import { UserBrokers } from 'api/database';
 
 
 const brokersApiKeys: BrokersApiKeys = new ApiKeys();
@@ -205,11 +206,7 @@ export const brokersActions = {
     const brokersCollection: BrokersDatabaseCollection = await UserBrokers.connect(userId);
     await brokersCollection.updateBroker(id, updates);
 
-    const activeBots = await runAction<BotsGetFilters, Bot[]>({
-      type: ActionType.BOTS_GET,
-      userId,
-      payload: { active: true, withBrokerAccount: false },
-    });
+    const activeBots: Bot[] = await Helpers.getActiveBots(userId);
 
     for (const activeBot of activeBots) {
       await runAction<RestartBotPayload, void>({

@@ -11,7 +11,7 @@ import { UserCollection } from './lib/user-collection';
 
 const userBrokerSchema = new mongoose.Schema<BrokersDatabaseDocument>({
   name: { type: String, required: true },
-  expiresAt: { type: Date, required: true },
+  expiresAt: { type: String, required: true },
   apiKeys: { type: Map, of: String, required: true },
 });
 

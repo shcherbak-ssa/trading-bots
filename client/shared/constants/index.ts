@@ -1,8 +1,3 @@
-import { BotPositionCloseMode, BotRestartMode, BrokerAccountType, BrokerName } from 'global/constants';
-
-import type { BotActionState, InputState, StoreState } from 'shared/types'
-
-
 export const NOTIFICATION_LIFE_TIME: number = 5000;
 
 
@@ -60,65 +55,3 @@ export enum SectionComponent {
   BROKER = 'broker',
   BOT = 'bot',
 }
-
-
-export const initialInputState: InputState = {
-  value: '',
-  helpText: '',
-  isError: false,
-};
-
-export const initialBotActionState: BotActionState = {
-  active: false,
-  name: '',
-  brokerId: '',
-  brokerName: BrokerName.CURRENCY_COM,
-  brokerAccountId: '',
-  brokerAccountType: BrokerAccountType.REAL,
-  brokerAccountCurrency: '',
-  brokerMarketSymbol: '',
-  brokerMarketName: '',
-  tradeRiskPercent: 2,
-  tradeMaxLossPercent: 25,
-  tradeCapitalPercent: 100,
-  tradeWithTakeProfit: false,
-  tradeTakeProfitPL: 2,
-  tradeWithCustomMarketLeverage: false,
-  tradeCustomMarketLeverage: 0,
-  positionCloseEnable: false,
-  positionCloseMode: BotPositionCloseMode.NONE,
-  restartEnable: false,
-  restartMode: BotRestartMode.NONE,
-}
-
-export const initialStoreBrokerMarketLeverageState = {
-  current: 0,
-  available: [],
-};
-
-export const initialStoreState: StoreState = {
-  app: {
-    isMenuOpen: false, // @TODO: change to 'true'
-    notification: null,
-  },
-  actionSection: {
-    isActive: false,
-    component: SectionComponent.DEFAULT,
-    selectedBot: null,
-    selectedBroker: null,
-  },
-  itemSection: {
-    isActive: false,
-    component: SectionComponent.DEFAULT,
-    selectedBotId: null,
-  },
-  user: {
-    brokers: [],
-    bots: [],
-  },
-  broker: {
-    accounts: [],
-    markets: [],
-    marketLeverage: { ...initialStoreBrokerMarketLeverageState },
-  },
-};

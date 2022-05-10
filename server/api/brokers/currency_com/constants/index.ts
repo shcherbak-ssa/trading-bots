@@ -6,6 +6,7 @@ export const TRADING_HOURS_SEPARATOR: string = ';';
 
 
 export const WS_PING_DELAY: number = 5000;
+export const WS_CLOSE_BY_TERMINATE_CODE: number = 1006;
 export const POSITION_HISTORY_LIMIT: number = 10;
 export const POSITION_CHECK_LIMIT: number = 20;
 export const POSITION_ACTION_SLEEP_TIME: number = 5000;

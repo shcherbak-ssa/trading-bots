@@ -2,14 +2,6 @@ import type { BrokerAccount } from 'global/types';
 import { BotPositionCloseMode, BotRestartMode, BrokerAccountType, BrokerName } from 'global/constants';
 
 
-export type InputState = {
-  value: InputValue;
-  helpText: string;
-  isError: boolean;
-}
-
-export type InputValue = string | number | Date | null;
-
 export type InputConfig = {
   key: string;
   label: string;

@@ -1,9 +1,10 @@
 import crypto from 'crypto';
 import querystring from 'querystring';
 
-import { ErrorName, FRACTION_DIGITS_TO_HUNDREDTHS, ONE_HUNDRED } from 'shared/constants';
+import type { BrokerName } from 'global/constants';
+import { brokerConfigs } from 'global/config';
 
-const ms = require('ms');
+import { ErrorName, FRACTION_DIGITS_TO_HUNDREDTHS, ONE_HUNDRED } from 'shared/constants';
 
 
 // Currency
@@ -72,18 +73,14 @@ export function getTodayDateString(): string {
   return new Date(Date.now()).toISOString();
 }
 
-export function getMilliseconds(date: string): number {
-  return ms(date);
-}
-
-export function convertDateStringToNumber(date: string): number {
-  return Number(new Date(date));
-}
-
 
 // Helpers
 export async function sleep(milliseconds: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, milliseconds));
+}
+
+export function getBrokerLabel(brokerName: BrokerName): string {
+  return brokerConfigs[brokerName].label;
 }
 
 export function isCustomError(name: string): boolean {

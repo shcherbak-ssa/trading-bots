@@ -32,8 +32,8 @@
 
 <script setup lang="ts">
 import type { BrokerName } from 'global/constants';
+import { brokerConfigs } from 'global/config';
 
-import { brokerConfigs } from 'shared/config';
 import { getCurrencySymbol } from 'shared/utils';
 
 

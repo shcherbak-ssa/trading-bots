@@ -4,11 +4,15 @@ import type { BotClientInfo, Broker, BrokerAccount, BrokerMarket } from 'global/
 import { BrokerAccountType } from 'global/constants';
 
 import type { StoreState, DropdownBrokerOption, DropdownBrokerAccountOption } from 'shared/types';
+import { isExpired, isExpireNear } from 'shared/utils';
 
 import { Notifications } from 'services/notifications';
 
 
 export type Getters = {
+  isBrokerApiKeysExpired(state: StoreState): (bot: BotClientInfo) => boolean;
+  isBrokerApiKeysExpireHear(state: StoreState): (bot: BotClientInfo) => boolean;
+
   getUserBroker(state: StoreState): (brokerId: string) => Broker;
   getUserBot(state: StoreState): (botId: string) => BotClientInfo;
 
@@ -25,6 +29,23 @@ export type Getters = {
 
 
 export const getters: GetterTree<StoreState, StoreState> & Getters = {
+  isBrokerApiKeysExpired(state: StoreState) {
+    return (bot: BotClientInfo) => {
+      const botBroker: Broker = getters.getUserBroker(state)(bot.brokerId);
+
+      return isExpired(botBroker.expiresAt);
+    };
+  },
+
+  isBrokerApiKeysExpireHear(state: StoreState) {
+    return (bot: BotClientInfo) => {
+      const botBroker: Broker = getters.getUserBroker(state)(bot.brokerId);
+
+      return isExpireNear(botBroker.expiresAt);
+    };
+  },
+
+
   // User
   getUserBroker(state: StoreState) {
     return (brokerId: string) => {

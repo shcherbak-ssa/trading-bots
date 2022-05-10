@@ -60,6 +60,7 @@ export class BotManager {
     const bot: Bot = BotManager.getBot(botToken);
 
     await bot.closeOpenPosition();
+    bot.broker.market.destroyConnection();
 
     botJobs.stopPositionCloseJob(botToken);
     botJobs.stopUpdateAccountJob(botToken);

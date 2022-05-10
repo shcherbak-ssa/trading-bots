@@ -224,20 +224,15 @@ watch(() => storeState.itemSection.isActive, () => {
 
 
 // Hooks
-onMounted(() => loadBots());
+onMounted(() => loadBotsAndBrokers());
 
 
 // Fetch
-async function loadBots(): Promise<void> {
+async function loadBotsAndBrokers(): Promise<void> {
   await runAction<LoadBotsPayload>({
     type: ActionType.BOTS_LOAD,
     payload: {},
   });
-
-  if (storeState.user.bots.length) {
-    state.isLoading = false;
-    return;
-  }
 
   await loadBrokers();
 

@@ -4,7 +4,8 @@ import type { BotClientInfo, Broker, BrokerAccount, BrokerMarket } from 'global/
 import { BrokerDataType } from 'global/constants';
 
 import type { StoreNotification, StoreState } from 'shared/types';
-import { initialStoreBrokerMarketLeverageState, SectionComponent, StoreMutation } from 'shared/constants';
+import { SectionComponent, StoreMutation } from 'shared/constants';
+import { initialStoreBrokerMarketLeverageState } from 'shared/config';
 
 
 export type Mutations<State = StoreState> = {

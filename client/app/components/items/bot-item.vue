@@ -1,11 +1,23 @@
 <template>
   <item-container v-if="selectedBot" :heading="selectedBot.name">
     <div class="bot-status-panel flex-between">
-      <bot-status :bot="selectedBot" />
+      <div class="flex-align-center">
+        <bot-status :bot="selectedBot" />
+
+        <span v-if="!selectedBot.active" class="bot-deactivation-reason">
+          Reason: {{ selectedBot.deactivateReason }}
+        </span>
+      </div>
+
       <bot-action-buttons :bot="selectedBot" />
     </div>
 
+    <base-message v-if="storeGetters.isBrokerApiKeysExpired(selectedBot)" type="danger">
+      You cannot activate the bot because the broker's API keys expired.
+    </base-message>
+
     <group-container heading="Token">
+      // @TODO: refactor
       {{ selectedBot.token }}
     </group-container>
 
@@ -96,6 +108,12 @@ const selectedBot = computed(() => storeGetters.itemSectionSelectedBot);
   background: var(--colors-background-section);
   padding: 5px;
   margin-bottom: 20px;
+}
+
+.bot-deactivation-reason {
+  font-size: 0.89rem;
+  opacity: .7;
+  margin-left: 10px;
 }
 
 .bot-settings {

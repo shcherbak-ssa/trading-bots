@@ -8,10 +8,8 @@ import { BrokersApiPayload, CreationDocument } from 'shared/types';
 export type BrokersDatabaseDocument = {
   id: string;
   name: BrokerName;
-  expiresAt: Date;
-  apiKeys: {
-    [p: string]: string;
-  };
+  expiresAt: string;
+  apiKeys: BrokerApiKeys;
 }
 
 export interface BrokersDatabaseCollection {

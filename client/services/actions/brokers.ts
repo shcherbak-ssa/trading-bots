@@ -6,11 +6,12 @@ import type {
   NewBroker,
   UpdateBrokerPayload
 } from 'global/types';
+
 import { BrokerDataType } from 'global/constants';
+import { brokerConfigs } from 'global/config';
 
 import type { BrokerDeletePayload, BrokersApi, BrokersStore } from 'shared/types';
 import { ActionType } from 'shared/constants';
-import { brokerConfigs } from 'shared/config';
 
 import { Notifications } from 'services/notifications';
 import { Store } from 'services/store';

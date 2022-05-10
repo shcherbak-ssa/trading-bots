@@ -322,8 +322,8 @@ import type {
   DropdownPositionCloseModeOption
 } from 'shared/types';
 
-import { ActionType, initialBotActionState, StoreMutation } from 'shared/constants';
-import { botCreateConfigs, botCreateSettings } from 'shared/config';
+import { ActionType, StoreMutation } from 'shared/constants';
+import { botCreateConfigs, botCreateSettings, initialBotActionState } from 'shared/config';
 
 import { Notifications } from 'services/notifications';
 import { runAction } from 'services/actions';

@@ -62,6 +62,7 @@ export interface BotBrokerMarket {
   getCloseTime(day: number | 'last'): Promise<BotCloseTime>;
   subscribeToPriceUpdates(callback: () => void): void;
   unsubscribeToPriceUpdates(): void;
+  destroyConnection(): void;
 }
 
 export interface BotBrokerAccount {
