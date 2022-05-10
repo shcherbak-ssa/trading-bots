@@ -159,7 +159,7 @@ export class BotEvents {
       userId,
       payload: {
         type: NotificationType.BOT_DEACTIVATION,
-        bot: botSettings,
+        bots: [ botSettings ],
         reason: `Broker API error (${errorPlace}).`,
         message: (
           position ? 'You have open position. Please, close position manually before bot reactivation.' : ''

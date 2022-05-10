@@ -76,6 +76,8 @@ type ComponentProps = {
   placeholder?: string;
   disabled?: boolean;
   tooltip?: string;
+  useButton?: boolean;
+
   numberSuffix?: string;
   numberMax?: number;
   numberMin?: number;
@@ -83,13 +85,13 @@ type ComponentProps = {
   numberMaxFractionDigits?: number;
   numberUseSlider?: boolean;
   numberSliderStep?: number;
-  useButton?: boolean;
 }
 
 
 // Data
 const emits = defineEmits(['input']);
 const props = defineProps<ComponentProps>();
+
 const state = reactive<ComponentState>({
   value: props.value,
 });

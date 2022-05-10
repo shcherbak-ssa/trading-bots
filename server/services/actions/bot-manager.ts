@@ -8,12 +8,11 @@ import type {
   User
 } from 'global/types';
 
-import { AnalyticsBotProgressType, BotDeactivateReason, BotUpdateType, GetUserType } from 'global/constants';
+import { AnalyticsBotProgressType, BotDeactivateReason, BotUpdateType } from 'global/constants';
 
 import type {
-  BotsGetFilters,
   CheckMaxLossBotPayload,
-  DeactivateBotPayload, GetUserFilters,
+  DeactivateBotPayload,
   OpenPosition,
   OpenPositionCheckClosePayload,
   OpenPositionGetPayload,
@@ -22,6 +21,7 @@ import type {
 } from 'shared/types';
 
 import { ActionType, NotificationType } from 'shared/constants';
+import { Helpers } from 'shared/helpers';
 
 import { runAction } from 'services/actions';
 
@@ -31,20 +31,12 @@ import { BotManager } from 'modules/bot';
 
 export const botManagerActions = {
   async [ActionType.BOT_MANAGER_SETUP_ACTIVE_BOTS](): Promise<number> {
-    const users = await runAction<GetUserFilters, User[]>({
-      type: ActionType.USERS_GET,
-      userId: '',
-      payload: { type: GetUserType.ALL },
-    });
+    const users: User[] = await Helpers.getAllUsers();
 
     let activateBotsCount: number = 0;
 
     for (const { id: userId } of users) {
-      const activeBots = await runAction<BotsGetFilters, Bot[]>({
-        type: ActionType.BOTS_GET,
-        userId,
-        payload: { active: true, withBrokerAccount: false },
-      });
+      const activeBots: Bot[] = await Helpers.getActiveBots(userId);
 
       for (const activeBot of activeBots) {
         await runAction<Bot, void>({
@@ -87,7 +79,7 @@ export const botManagerActions = {
             userId,
             payload: {
               type: NotificationType.BOT_DEACTIVATION,
-              bot,
+              bots: [ bot ],
               reason: `Unexpected error (not all positions are closed).`,
               message: `You most likely have open positions. Please, close positions manually before bot reactivation.`,
             },
@@ -144,7 +136,7 @@ export const botManagerActions = {
         userId,
         payload: {
           type: NotificationType.BOT_DEACTIVATION,
-          bot,
+          bots: [ bot ],
           reason: 'Reason: Max loss.',
           message: '',
         },

@@ -101,6 +101,12 @@ td, th {
     }
   }
 
+  &.brokers-table {
+    .p-datatable-tbody .broker-actions {
+      width: 0;
+    }
+  }
+
   &.bots-table {
     .p-datatable-tbody .bot-active-status {
       width: 0;

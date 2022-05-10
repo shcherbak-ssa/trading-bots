@@ -4,14 +4,29 @@ import { getAmountWithCurrency, isCustomError } from 'shared/utils';
 
 
 export function getNotificationMessage(notification: Notification): TelegramMessage {
-  const telegramMessage: TelegramMessage = { type: 'message', message: '' };
+  let telegramMessage: string = '';
+
+  const contactAdminMessage: string = `\n\nContact admin for more details.`;
 
   switch (notification.type) {
+    case NotificationType.ATTENTION: {
+      const { message } = notification;
+
+      telegramMessage = (
+        '<b># Attention #</b>\n\n' +
+
+        message +
+
+        contactAdminMessage
+      );
+
+      break;
+    }
     case NotificationType.POSITION_OPEN: {
       const { bot, position } = notification;
       const { brokerAccountCurrency: currency } = bot;
 
-      telegramMessage.message = (
+      telegramMessage = (
         '<b># Position open #</b>\n\n' +
 
         `Position opened successfully.\n\n` +
@@ -34,7 +49,7 @@ export function getNotificationMessage(notification: Notification): TelegramMess
       const { bot, position } = notification;
       const { brokerAccountCurrency: currency } = bot;
 
-      telegramMessage.message = (
+      telegramMessage = (
         '<b># Position update #</b>\n\n' +
 
         `Position <i>Stop Loss</i> updated successfully.\n\n` +
@@ -57,7 +72,7 @@ export function getNotificationMessage(notification: Notification): TelegramMess
       const totalCommission: number = position.feeClose + position.feeOpen;
       const { brokerAccountCurrency: currency } = bot;
 
-      telegramMessage.message = (
+      telegramMessage = (
         '<b># Position close #</b>\n\n' +
 
         `Position closed successfully.\n\n` +
@@ -76,15 +91,19 @@ export function getNotificationMessage(notification: Notification): TelegramMess
       break;
     }
     case NotificationType.BOT_DEACTIVATION: {
-      const { bot, reason, message } = notification;
+      const { bots, reason, message } = notification;
 
-      telegramMessage.message = (
+      const deactivatedMessage: string = bots.length === 1
+        ? `Bot  <code>${bots[0].name}</code>  deactivated`
+        : `Bots  <code>${bots.map(({ name }) => name).join(', ')}</code>  deactivated`;
+
+      telegramMessage = (
         '<b># Bot deactivation #</b>\n\n' +
 
-        `Bot  <code>${bot.name}</code>  deactivated. Reason: <i>${reason}</i>` +
+        `${deactivatedMessage}. Reason: <i>${reason}</i>` +
         (message ? `\n${message}` : '') +
 
-        `\n\nContact admin for more details.`
+        contactAdminMessage
       );
 
       break;
@@ -117,7 +136,7 @@ export function getNotificationMessage(notification: Notification): TelegramMess
         userDescription += `${error.logPayload.messageHeading}:\n<pre>${error.logPayload.message}</pre>`;
       }
 
-      telegramMessage.message = (
+      telegramMessage = (
         `<b># Error${forAdmin ? ' [admin]' : ''} #</b>\n\n` +
 
         (
@@ -131,7 +150,7 @@ export function getNotificationMessage(notification: Notification): TelegramMess
 
         additionalInformation +
 
-        (forAdmin ? '' : `\n\nContact admin for more details.`) +
+        (forAdmin ? '' : contactAdminMessage) +
 
         (
           forAdmin || error.name === ErrorName.SIGNAL_ERROR
@@ -144,5 +163,8 @@ export function getNotificationMessage(notification: Notification): TelegramMess
     }
   }
 
-  return telegramMessage;
+  return {
+    type: 'message',
+    message: telegramMessage,
+  };
 }

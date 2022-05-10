@@ -127,4 +127,10 @@ export class BotMarket implements BotBrokerMarket {
   unsubscribeToPriceUpdates(): void {
     this.subscribeHandler = null;
   }
+
+  destroyConnection(): void {
+    if (this.api.wsApi) {
+      this.api.wsApi.destroyWebSocket();
+    }
+  }
 }

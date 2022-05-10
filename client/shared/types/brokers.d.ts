@@ -29,7 +29,7 @@ export type BrokerDeletePayload = {
 export interface BrokersStore {
   setBrokers(brokers: Broker[]): void;
   addBroker(broker: Broker): void;
-  updateBroker(id: string, expiresAt: Date): void;
+  updateBroker(id: string, expiresAt: string): void;
   updateBrokerAccounts(accounts: BrokerAccount[]): void;
   updateBrokerMarkets(markets: BrokerMarket[]): void;
   updateBrokerMarketLeverage(marketLeverage: Omit<BrokerMarketLeverages, 'dataType'>): void;

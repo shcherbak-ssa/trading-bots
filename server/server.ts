@@ -1,3 +1,4 @@
+import type { Server } from 'http';
 import express from 'express';
 import bodyParser from 'body-parser';
 import queryString from 'query-string';
@@ -46,7 +47,7 @@ declare global {
 }
 
 
-export async function runServer(): Promise<void> {
+export async function runServer(): Promise<Server> {
   const app: express.Application = express();
   app.disable('query parser');
 
@@ -58,7 +59,7 @@ export async function runServer(): Promise<void> {
   setupStaticServe(app);
   setupEntryPoint(app);
 
-  app.listen(serverConfig.server.port, serverConfig.server.host);
+  return app.listen(serverConfig.server.port, serverConfig.server.host);
 }
 
 
@@ -174,6 +175,7 @@ function apiRouteMiddleware(validation: Validation, handler: ServerRouteHandler)
     } catch (e: any) {
       logError(e);
 
+      // @TODO: refactor
       await sendNotifications(userId, e);
 
       response.result = {

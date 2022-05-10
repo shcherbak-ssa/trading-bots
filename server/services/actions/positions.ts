@@ -11,7 +11,7 @@ import type {
 import { ActionType } from 'shared/constants';
 import { getTodayDateString } from 'shared/utils';
 
-import { UserPositions } from 'api/database/user-positions';
+import { UserPositions } from 'api/database';
 
 
 export const positionsActions = {

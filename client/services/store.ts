@@ -53,7 +53,7 @@ export class Store implements BotsStore, BrokersStore {
     this.setBrokers(userBrokers);
   }
 
-  updateBroker(brokerId: string, expiresAt: Date): void {
+  updateBroker(brokerId: string, expiresAt: string): void {
     const updatedBrokers = store.state.user.brokers.map((broker) => {
       return broker.id === brokerId ? { ...broker, expiresAt } : broker;
     });

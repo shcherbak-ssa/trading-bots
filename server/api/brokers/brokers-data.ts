@@ -3,6 +3,7 @@ import { BrokerName, Currency, StatusCode } from 'global/constants';
 
 import type { BrokersDataApi, BrokersDataApiPayload, BrokerApiLeverageResponse } from 'shared/types';
 import { AppError } from 'shared/exceptions';
+import { getBrokerLabel } from 'shared/utils';
 
 import { CurrencyComDataApi } from './currency_com';
 
@@ -15,8 +16,8 @@ export class BrokersData implements BrokersDataApi {
     }
 
     throw new AppError({
-      message: `data API not implemented yet`,
-      messageHeading: `Broker [${brokerName}]`,
+      message: `${getBrokerLabel(brokerName)} data API not implemented yet`,
+      messageHeading: `Broker`,
     }, StatusCode.NOT_IMPLEMENTED);
   }
 
@@ -29,8 +30,8 @@ export class BrokersData implements BrokersDataApi {
     }
 
     throw new AppError({
-      message: `data API not implemented yet`,
-      messageHeading: `Broker [${brokerName}]`,
+      message: `${getBrokerLabel(brokerName)} data API not implemented yet`,
+      messageHeading: `Broker`,
     }, StatusCode.NOT_IMPLEMENTED);
   }
 
@@ -43,8 +44,8 @@ export class BrokersData implements BrokersDataApi {
     }
 
     throw new AppError({
-      message: `data API not implemented yet`,
-      messageHeading: `Broker [${brokerName}]`,
+      message: `${getBrokerLabel(brokerName)} data API not implemented yet`,
+      messageHeading: `Broker`,
     }, StatusCode.NOT_IMPLEMENTED);
   }
 }

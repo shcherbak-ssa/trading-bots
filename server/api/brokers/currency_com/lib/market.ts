@@ -24,7 +24,7 @@ import { WsApi } from './ws-api';
 
 export class MarketApi {
   private readonly restApi: RestApi;
-  private readonly wsApi: WsApi | undefined;
+  readonly wsApi: WsApi | undefined;
 
 
   constructor(restApi: RestApi, wsApi?: WsApi) {
@@ -84,7 +84,7 @@ export class MarketApi {
   subscribeToMarketPriceUpdates(marketSymbol: string, callback: (marketPrice: MarketPrice) => void): void {
     if (!this.wsApi) {
       throw new ApiError({
-        message: `No connection by web-socket`,
+        message: `No WebSocket connection.`,
         messageHeading: `Broker Currency.com`,
       });
     }

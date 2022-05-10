@@ -61,7 +61,7 @@ type ComponentState = {
   isLoading: boolean;
   selectedBroker: BrokerConnectConfig | null;
   selectedBrokerOption: DropdownBrokerOption | null;
-  inputs: { [p: string]: string | Date; };
+  inputs: { [p: string]: string; };
   message: string;
   messageType: string;
 }

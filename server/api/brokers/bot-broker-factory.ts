@@ -1,6 +1,7 @@
 import { BrokerName, StatusCode } from 'global/constants';
 
 import { AppError } from 'shared/exceptions';
+import { getBrokerLabel } from 'shared/utils';
 
 import type { BotBroker, BotBrokerFactory, BotSettings } from 'modules/bot/types';
 
@@ -15,8 +16,8 @@ export class BrokerFactory implements BotBrokerFactory {
     }
 
     throw new AppError({
-      message: `API not implemented yet`,
-      messageHeading: `Broker [${settings.brokerName}]`,
+      message: `${getBrokerLabel(settings.brokerName)} API not implemented yet`,
+      messageHeading: `Broker`,
     }, StatusCode.NOT_IMPLEMENTED);
   }
 }

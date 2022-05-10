@@ -8,7 +8,7 @@ import type {
   UpdateBotPayload
 } from 'global/types';
 
-import { BotDeactivateReason, BotRestartMode, BotState, BotUpdateType, BrokerDataType } from 'global/constants';
+import { BotDeactivateReason, BotState, BotUpdateType, BrokerDataType } from 'global/constants';
 
 import type {
   BotsDatabaseCollection,
@@ -17,16 +17,15 @@ import type {
   BotsGetFilters,
   DeactivateBotPayload,
   PositionsDeleteFilters,
-  RestartBotPayload,
-  UsersDatabaseDocument
+  RestartBotPayload
 } from 'shared/types';
 
-import { ActionType, DATE_STRING_27_DAYS } from 'shared/constants';
-import { calculateProportion, convertDateStringToNumber, getMilliseconds, getTodayDateString } from 'shared/utils';
+import { ActionType } from 'shared/constants';
+import { calculateProportion, getTodayDateString } from 'shared/utils';
 
 import { runAction } from 'services/actions';
 
-import { UserBots } from 'api/database/user-bots';
+import { UserBots } from 'api/database';
 
 
 export const botsActions = {

@@ -4,7 +4,7 @@ import { BotState, BrokerAccountType, BrokerDataType, BrokerName } from '../cons
 export type Broker = {
   id: string;
   name: BrokerName;
-  expiresAt: Date;
+  expiresAt: string;
   bots: BrokerBot[];
 }
 
@@ -16,7 +16,7 @@ export type BrokerBot = {
 
 export type NewBroker = {
   name: BrokerName;
-  expiresAt: Date;
+  expiresAt: string;
   apiKeys: BrokerApiKeys;
 }
 

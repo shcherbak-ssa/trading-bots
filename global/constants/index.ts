@@ -1,4 +1,6 @@
 export const QUERY_URL_SEPARATOR: string = '?';
+export const BROKER_API_KEYS_EXPIRES_START_NOTIFY_DAYS: string = '7 days';
+export const BROKER_API_KEYS_EXPIRES_DEACTIVATE_DAYS: string = '1 day';
 
 
 export enum Currency {
@@ -101,5 +103,6 @@ export enum BotDeactivateReason {
   EMPTY = '',
   USER = 'USER',
   MAX_LOSS = 'MAX_LOSS',
+  BROKER_API_KEYS_EXPIRED = 'BROKER_API_KEYS_EXPIRED',
   INTERNAL_ERROR = 'INTERNAL_ERROR',
 }

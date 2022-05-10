@@ -112,6 +112,7 @@ export enum SignalDirection {
 // Jobs
 export enum JobExpression {
   CHECK_BOTS_RESTART = '0 1 * * SAT',
+  CHECK_BROKER_API_KEYS_EXPIRES = '30 1 * * *',
   UPDATE_BOT_BROKER_ACCOUNT = '* * * * *',
 }
 
@@ -139,6 +140,8 @@ export enum TelegramActionType {
 
 // Notifications
 export enum NotificationType {
+  ATTENTION = 'ATTENTION',
+
   POSITION_OPEN = 'POSITION_OPEN',
   POSITION_UPDATE = 'POSITION_UPDATE',
   POSITION_CLOSE = 'POSITION_CLOSE',

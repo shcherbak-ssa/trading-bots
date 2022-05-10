@@ -14,13 +14,20 @@
       />
 
       <button-action
-          v-if="!props.bot.active"
+          v-if="!props.bot.active && !storeGetters.isBrokerApiKeysExpired(props.bot)"
           type="confirm"
-          icon="play"
-          actionClass="accent"
           tooltip="Activate"
-          popupType="confirm"
-          popupMessage="Are you sure you want to <strong>activate</strong> this bot?"
+          icon="play"
+          :actionClass="storeGetters.isBrokerApiKeysExpireHear(props.bot) ? 'danger' : 'accent'"
+          :popupType="storeGetters.isBrokerApiKeysExpireHear(props.bot) ? 'danger' : 'confirm'"
+          :popupMessage="(
+            (
+              storeGetters.isBrokerApiKeysExpireHear(props.bot)
+                ? `Broker API keys expire in <strong>${getReadableDateString(getMillisecondsBeforeExpires(botBroker.expiresAt))}</strong>.<br><br>`
+                : ''
+            )
+            + 'Are you sure you want to <strong>activate</strong> this bot?'
+          )"
           :blocked="state.isActionProcessing"
           :popupCommand="activateBot"
       />
@@ -64,13 +71,15 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { computed, reactive } from 'vue';
 
 import type { BotClientInfo } from 'global/types';
 import { BotState, BotUpdateType } from 'global/constants';
+import { getReadableDateString } from 'global/utils';
 
 import type { BotDeletePayload, BotUpdatePayload } from 'shared/types';
 import { ActionType, SectionComponent } from 'shared/constants';
+import { getMillisecondsBeforeExpires } from 'shared/utils';
 
 import { runAction } from 'services/actions';
 
@@ -105,6 +114,11 @@ const props = defineProps<ComponentProps>();
 const state = reactive<ComponentState>({
   isActionProcessing: false,
 });
+
+const botBroker = computed(() => {
+  return storeGetters.getUserBroker(props.bot.brokerId);
+});
+
 
 // Methods
 function editBot(): void {

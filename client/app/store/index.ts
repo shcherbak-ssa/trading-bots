@@ -2,7 +2,7 @@ import type { InjectionKey } from 'vue';
 import { createStore, useStore as baseUseStore, Store as BaseStore, CommitOptions } from 'vuex';
 
 import type { StoreState } from 'shared/types';
-import { initialStoreState } from 'shared/constants';
+import { initialStoreState } from 'shared/config';
 
 import { getters, Getters } from './getters';
 import { mutations, Mutations } from './mutations';

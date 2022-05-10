@@ -1,9 +1,71 @@
-import { BotPositionCloseMode, BotRestartMode, BrokerName } from 'global/constants';
+import { BotPositionCloseMode, BotRestartMode, BrokerAccountType, BrokerName } from 'global/constants';
 import { botDefaultSettings } from 'global/config';
 
-import type { AppMenuItem, BotCreateConfig, BrokerConnectConfig } from 'shared/types';
-import { IconList, Route } from 'shared/constants';
+import type {
+  AppMenuItem,
+  BotCreateConfig,
+  BrokerConnectConfig,
+  BotActionState,
+  StoreState
+} from 'shared/types';
 
+import { IconList, Route, SectionComponent } from 'shared/constants';
+
+
+export const initialBotActionState: BotActionState = {
+  active: false,
+  name: '',
+  brokerId: '',
+  brokerName: BrokerName.CURRENCY_COM,
+  brokerAccountId: '',
+  brokerAccountType: BrokerAccountType.REAL,
+  brokerAccountCurrency: '',
+  brokerMarketSymbol: '',
+  brokerMarketName: '',
+  tradeRiskPercent: 2,
+  tradeMaxLossPercent: 25,
+  tradeCapitalPercent: 100,
+  tradeWithTakeProfit: false,
+  tradeTakeProfitPL: 2,
+  tradeWithCustomMarketLeverage: false,
+  tradeCustomMarketLeverage: 0,
+  positionCloseEnable: false,
+  positionCloseMode: BotPositionCloseMode.NONE,
+  restartEnable: false,
+  restartMode: BotRestartMode.NONE,
+}
+
+export const initialStoreBrokerMarketLeverageState = {
+  current: 0,
+  available: [],
+};
+
+export const initialStoreState: StoreState = {
+  app: {
+    isMenuOpen: false, // @TODO: change to 'true'
+    notification: null,
+  },
+  actionSection: {
+    isActive: false,
+    component: SectionComponent.DEFAULT,
+    selectedBot: null,
+    selectedBroker: null,
+  },
+  itemSection: {
+    isActive: false,
+    component: SectionComponent.DEFAULT,
+    selectedBotId: null,
+  },
+  user: {
+    brokers: [],
+    bots: [],
+  },
+  broker: {
+    accounts: [],
+    markets: [],
+    marketLeverage: { ...initialStoreBrokerMarketLeverageState },
+  },
+};
 
 export const appMenuItems: AppMenuItem[] = [
   {
@@ -22,17 +84,6 @@ export const appMenuItems: AppMenuItem[] = [
     to: Route.SETTINGS,
   },
 ];
-
-export const brokerConfigs = {
-  [BrokerName.CAPITAL_COM]: {
-    label: 'Capital.com',
-    logo: '/images/capital-com-logo.jpeg',
-  },
-  [BrokerName.CURRENCY_COM]: {
-    label: 'Currency.com',
-    logo: '/images/currency-com-logo.png',
-  },
-};
 
 export const brokerConnectConfigs: { [p in BrokerName]: BrokerConnectConfig } = {
   [BrokerName.CURRENCY_COM]: {
