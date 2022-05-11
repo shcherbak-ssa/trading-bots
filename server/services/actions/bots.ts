@@ -251,12 +251,17 @@ export const botsActions = {
         break;
       case BotUpdateType.UPDATE:
         if (currentBot.active) {
-          // @TODO: add max_loss property
-          const needToUpdateActivation: boolean = updates.tradeCapitalPercent !== undefined;
+          const needToUpdateActivation: boolean = (
+            updates.tradeCapitalPercent !== undefined ||
+            updates.tradeMaxLossPercent !== undefined
+          );
 
-          if (updates.tradeCapitalPercent !== undefined) {
+          if (needToUpdateActivation) {
             updates.activateAt = today;
-            updates.initialCapital = calculateProportion(brokerAccount.amount, updates.tradeCapitalPercent);
+
+            if (updates.tradeCapitalPercent !== undefined) {
+              updates.initialCapital = calculateProportion(brokerAccount.amount, updates.tradeCapitalPercent);
+            }
 
             currentBot.activations.push(activation);
           }
