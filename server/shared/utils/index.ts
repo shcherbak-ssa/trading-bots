@@ -68,12 +68,6 @@ export function stringifyPayload<Payload>(payload: Payload): string {
 }
 
 
-// Date
-export function getTodayDateString(): string {
-  return new Date(Date.now()).toISOString();
-}
-
-
 // Helpers
 export async function sleep(milliseconds: number): Promise<void> {
   return new Promise(resolve => setTimeout(resolve, milliseconds));

@@ -18,6 +18,10 @@ export class BotManager {
   private static bots: Map<string, Bot> = new Map([]);
 
 
+  static hasBot(botToken: string): boolean {
+    return BotManager.bots.has(botToken);
+  }
+
   static getBot(botToken: string): Bot {
     const bot: Bot | undefined = BotManager.bots.get(botToken);
 

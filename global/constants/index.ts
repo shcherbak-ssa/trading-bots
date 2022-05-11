@@ -52,6 +52,7 @@ export enum ServerEndpoint {
 export enum AnalyticsBotProgressType {
   ALL = 'ALL',
   CURRENT = 'CURRENT',
+  TOTAL = 'TOTAL',
 }
 
 

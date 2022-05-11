@@ -24,6 +24,7 @@ export type BotsGetFilters = LoadBotsPayload & {
   id?: string;
   active?: boolean;
   withBrokerAccount?: boolean;
+  withAnalytics?: boolean;
 }
 
 export type BotsDeleteFilters = {

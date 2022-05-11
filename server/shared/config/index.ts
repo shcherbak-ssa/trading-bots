@@ -6,11 +6,12 @@ import { TelegramActionType, TelegramCommand } from 'shared/constants';
 
 export const emptyBotProgress: AnalyticsBotProgress = {
   botActivationIndex: 0,
+  changePercent: 0,
   totalFee: 0,
   totalLoss: 0,
   totalProfit: 0,
   totalResult: 0,
-  changePercent: 0,
+  state: 'empty',
 };
 
 export const initialUser: NewUser = {

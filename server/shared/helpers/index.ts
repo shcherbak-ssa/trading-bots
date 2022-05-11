@@ -20,7 +20,7 @@ export class Helpers {
     return await runAction<BotsGetFilters, Bot[]>({
       type: ActionType.BOTS_GET,
       userId,
-      payload: { active: true, withBrokerAccount: false },
+      payload: { active: true, withBrokerAccount: false, withAnalytics: false },
     });
   }
 }

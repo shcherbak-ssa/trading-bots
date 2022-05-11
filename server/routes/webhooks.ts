@@ -10,7 +10,7 @@ export const webhooksRoutes: ServerRoute[] = [
   {
     endpoint: ServerEndpoint.WEBHOOK_SIGNALS,
     method: RequestMethod.POST,
-    validation: Validation.SIGNALS,
+    validation: Validation.NONE,
     async handler(userId: string, payload: Signal): Promise<void> {
       return await runAction({
         type: ActionType.SIGNALS_PROCESS,

@@ -1,3 +1,5 @@
+import { getTodayDateString } from 'global/utils';
+
 import type {
   Position,
   PositionsCreatePayload,
@@ -9,7 +11,6 @@ import type {
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
-import { getTodayDateString } from 'shared/utils';
 
 import { UserPositions } from 'api/database';
 

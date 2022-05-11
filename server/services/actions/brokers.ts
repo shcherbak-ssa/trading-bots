@@ -53,7 +53,7 @@ export const brokersActions = {
       const bots = await runAction<BotsGetFilters, Bot[]>({
         type: ActionType.BOTS_GET,
         userId,
-        payload: { withBrokerAccount: false },
+        payload: { withBrokerAccount: false, withAnalytics: false },
       });
 
       userBots.push(...bots);

@@ -1,3 +1,5 @@
+import type { AnalyticsBotProgress } from 'global/types';
+
 import {
   BotDeactivateReason, BotPositionCloseMode,
   BotRestartMode,
@@ -62,6 +64,8 @@ export type NewBot = Omit<
 >;
 
 export type BotClientInfo = Bot & {
+  progress?: AnalyticsBotProgress[];
+  totalProgress?: AnalyticsBotProgress;
   brokerAccount?: {
     name: string;
     amount: number;

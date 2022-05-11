@@ -1,6 +1,7 @@
+import { getTodayDateString } from 'global/utils';
+
 import type { Logger as BaseLogger, LogPayload } from 'shared/types';
 import type { LogScope } from 'shared/constants';
-import { getTodayDateString } from 'shared/utils';
 
 
 class Logger implements BaseLogger {
