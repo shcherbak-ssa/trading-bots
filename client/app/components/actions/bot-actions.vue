@@ -275,15 +275,15 @@
 
         <base-message
             v-if="botUpdates !== null && state.bot.active"
-            :type="botUpdates.tradeCapitalPercent === undefined ? 'info' : 'danger'"
+            :type="isUpdatedImportantSettings ? 'danger' : 'info'"
         >
-          <span v-if="botUpdates.tradeCapitalPercent === undefined">
-            After the update, the bot will restart without resetting progress.
+          <span v-if="isUpdatedImportantSettings">
+            You updated important settings. After the update, the bot will restart.
+            Open position will be closed and progress will be reset.
           </span>
 
           <span v-else>
-            You updated important settings. After the update, the bot will restart.
-            Open position will be closed and progress will be reset.
+            After the update, the bot will restart without resetting progress.
           </span>
         </base-message>
 
@@ -440,6 +440,14 @@ const capitalInputValueTotal = computed<number>(() => {
 
 const isAllowedCapitalInputValueTotal = computed<boolean>(() => {
   return capitalInputValueTotal.value <= botDefaultSettings.tradeCapitalPercent.max
+});
+
+const isUpdatedImportantSettings = computed<boolean>(() => {
+  if (!botUpdates.value) return false;
+
+  const { tradeMaxLossPercent, tradeCapitalPercent } = botUpdates.value;
+
+  return tradeMaxLossPercent !== undefined || tradeCapitalPercent !== undefined;
 });
 
 const otherBotsForUpdate = computed<BotUpdatePayload[]>(() => {
