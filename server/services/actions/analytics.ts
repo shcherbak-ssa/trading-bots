@@ -1,4 +1,4 @@
-import type { AnalyticsGetBotProgressPayload, AnalyticsBotProgress, Bot } from 'global/types';
+import type { AnalyticsBotProgress, AnalyticsGetBotProgressPayload, Bot } from 'global/types';
 import { AnalyticsBotProgressType } from 'global/constants';
 
 import type { BotsGetFilters, Position, PositionsGetFilters } from 'shared/types';
@@ -18,7 +18,7 @@ export const analyticsActions = {
       : await runAction<BotsGetFilters, Bot[]>({
         type: ActionType.BOTS_GET,
         userId,
-        payload: { id: botId, withBrokerAccount: false },
+        payload: { id: botId, withBrokerAccount: false, withAnalytics: false },
       });
 
     const forCurrentActivation: boolean = type === AnalyticsBotProgressType.CURRENT;
@@ -34,12 +34,18 @@ export const analyticsActions = {
       payload: getPositionsFilters,
     });
 
+    if (type === AnalyticsBotProgressType.TOTAL) {
+      const progress: AnalyticsBotProgress = BotProgress.calculateTotal(positions, currentBot);
+
+      return [ progress ];
+    }
+
     if (forCurrentActivation) {
       const progress: AnalyticsBotProgress = BotProgress.calculateForOneActivation(positions, currentBot);
 
       return [ progress ];
     }
 
-    return []; // @TODO
+    return BotProgress.calculateForAllActivations(positions, currentBot);
   },
 };

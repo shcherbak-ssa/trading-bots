@@ -7,7 +7,7 @@
     </div>
 
     <base-scroll-panel class="item-scroll-panel">
-      <div class="item-content">
+      <div class="item-content relative">
         <slot />
       </div>
     </base-scroll-panel>

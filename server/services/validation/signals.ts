@@ -7,6 +7,7 @@ export const signalsValidation = {
   [Validation.SIGNALS]: Joi.object({
     botToken: Joi.string().required(),
     stopLossPrice: Joi.number().required(),
+    market: Joi.string().required(),
     type: Joi.string()
       .valid(
         SignalType.OPEN,

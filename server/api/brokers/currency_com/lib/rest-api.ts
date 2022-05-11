@@ -70,7 +70,7 @@ export class RestApi extends BrokerRestApi {
   }
 
   private preparingPayload<Payload>(payload: Payload): string {
-    const timestamp: number = Date.now() - 500; // @TODO: fix timestamp
+    const timestamp: number = Date.now() - 1000; // @TODO: fix timestamp
 
     const signature: string = generateHmacSignature(
       this.secretKey,

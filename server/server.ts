@@ -89,13 +89,13 @@ function setupApiRouter(app: express.Application): void {
 function setupWebhookRouter(app: express.Application): void {
   const webhookRouter: express.Router = express.Router();
 
-  for (const { endpoint, method, validation, handler } of webhooksRoutes) {
+  for (const { endpoint, method, handler } of webhooksRoutes) {
     const pathname: string = endpoint.replace(WEBHOOKS_PATHNAME, '');
 
     // @ts-ignore
     webhookRouter[method.toLowerCase()](
       pathname,
-      webhookRouteMiddleware(validation, handler),
+      webhookRouteMiddleware(handler),
     );
   }
 
@@ -191,7 +191,7 @@ function apiRouteMiddleware(validation: Validation, handler: ServerRouteHandler)
   }
 }
 
-function webhookRouteMiddleware(validation: Validation, handler: ServerRouteHandler) {
+function webhookRouteMiddleware(handler: ServerRouteHandler) {
   return async (request: express.Request, response: express.Response) => {
     response.status(StatusCode.SUCCESS).json({});
 
@@ -199,10 +199,6 @@ function webhookRouteMiddleware(validation: Validation, handler: ServerRouteHand
     const requestPayload: ServerRequestPayload = { ...params, ...query, ...body };
 
     try {
-      if (validation !== Validation.NONE) {
-        validate(validation, requestPayload);
-      }
-
       await handler('', requestPayload);
     } catch (e: any) {
       logError(e);

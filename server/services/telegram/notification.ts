@@ -75,7 +75,7 @@ export function getNotificationMessage(notification: Notification): TelegramMess
       telegramMessage = (
         '<b># Position close #</b>\n\n' +
 
-        `Position closed successfully.\n\n` +
+        `Position closed with <i>${(position.result + totalCommission) < 0 ? 'Loss' : 'Profit'}</i>.\n\n` +
 
         `<b>Bot</b>\n` +
         `Name:  <code>${bot.name}</code>\n` +
@@ -116,21 +116,20 @@ export function getNotificationMessage(notification: Notification): TelegramMess
       let userDescription: string = '';
 
       if (isCustom) {
-        switch (error.name) {
-          case ErrorName.SIGNAL_ERROR: {
-            const { bot, signal } = error.logPayload.payload;
+        if (error.name === ErrorName.SIGNAL_ERROR) {
+          const { bot, signal } = error.logPayload.payload;
 
+          if (bot) {
             additionalInformation += `\n\n<b>Bot</b>\n`;
             additionalInformation += `Name:  <code>${bot.name}</code>\n`;
-            additionalInformation += `Market:  <code>${bot.brokerMarketName}</code>\n\n`;
-
-            additionalInformation += `<b>Signal</b>\n`;
-            additionalInformation += `Type:  <code>${signal.type}</code>\n`
-            additionalInformation += `Direction:  <code>${signal.direction}</code>\n`;
-            additionalInformation += `Stop-loss:  <code>${signal.stopLossPrice}</code>`;
-
-            break;
+            additionalInformation += `Market:  <code>${bot.brokerMarketName}</code>`;
           }
+
+          additionalInformation += `\n\n<b>Signal</b>\n`;
+          additionalInformation += `Type:  <code>${signal.type}</code>\n`
+          additionalInformation += `Direction:  <code>${signal.direction}</code>\n`;
+          additionalInformation += `Stop Loss:  <code>${signal.stopLossPrice}</code>\n`;
+          additionalInformation += `Market:  <code>${signal.market}</code>`;
         }
 
         userDescription += `${error.logPayload.messageHeading}:\n<pre>${error.logPayload.message}</pre>`;

@@ -1,4 +1,6 @@
 import type {
+  AnalyticsBotProgress,
+  AnalyticsGetBotProgressPayload,
   Bot,
   BotActivation,
   BotClientInfo,
@@ -8,7 +10,15 @@ import type {
   UpdateBotPayload
 } from 'global/types';
 
-import { BotDeactivateReason, BotState, BotUpdateType, BrokerDataType } from 'global/constants';
+import {
+  AnalyticsBotProgressType,
+  BotDeactivateReason,
+  BotState,
+  BotUpdateType,
+  BrokerDataType
+} from 'global/constants';
+
+import { getTodayDateString } from 'global/utils';
 
 import type {
   BotsDatabaseCollection,
@@ -21,7 +31,7 @@ import type {
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
-import { calculateProportion, getTodayDateString } from 'shared/utils';
+import { calculateProportion } from 'shared/utils';
 
 import { runAction } from 'services/actions';
 
@@ -31,7 +41,7 @@ import { UserBots } from 'api/database';
 export const botsActions = {
   async [ActionType.BOTS_GET](
     userId: string,
-    { withBrokerAccount = true, ...filters }: BotsGetFilters
+    { withBrokerAccount = true, withAnalytics = true, ...filters }: BotsGetFilters
   ): Promise<BotClientInfo[]> {
     const botsCollection: BotsDatabaseCollection = await UserBots.connect(userId);
 
@@ -63,6 +73,38 @@ export const botsActions = {
 
       bots = bots.map((bot, index) => {
         return { ...bot, brokerAccount: brokerAccounts[index] };
+      });
+    }
+
+    if (withAnalytics) {
+      const botsProgress = await Promise.all(
+        bots.map(async (bot) => {
+          return runAction<AnalyticsGetBotProgressPayload, AnalyticsBotProgress[]>({
+            type: ActionType.ANALYTICS_GET_BOT_PROGRESS,
+            userId,
+            payload: { bot, type: AnalyticsBotProgressType.ALL },
+          });
+        })
+      );
+
+      const totalProgress = await Promise.all(
+        bots.map(async (bot) => {
+          const [ progress ] = await runAction<AnalyticsGetBotProgressPayload, AnalyticsBotProgress[]>({
+            type: ActionType.ANALYTICS_GET_BOT_PROGRESS,
+            userId,
+            payload: { bot, type: AnalyticsBotProgressType.TOTAL },
+          });
+
+          return progress;
+        })
+      );
+
+      bots = bots.map((bot, index) => {
+        return {
+          ...bot,
+          progress: botsProgress[index],
+          totalProgress: totalProgress[index],
+        };
       });
     }
 

@@ -60,7 +60,7 @@ export class Bot {
     }
 
     if (position.quantity === 0) {
-      throw new SignalError('Position stop-loss is too far.', this.settings, signal);
+      throw new SignalError('Position Stop Loss is too far.', this.settings, signal);
     }
 
     try {
@@ -87,7 +87,7 @@ export class Bot {
       ||
       (!isLong && (signalStopLossPrice >= stopLossPrice || signalStopLossPrice <= marketCurrentPrice))
     ) {
-      throw new SignalError('Received invalid stop-loss price for update.', this.settings, signal);
+      throw new SignalError('Received invalid Stop Loss price for update.', this.settings, signal);
     }
 
     this.currentPosition.stopLossPrice = signalStopLossPrice;

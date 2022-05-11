@@ -162,7 +162,9 @@ export class BotEvents {
         bots: [ botSettings ],
         reason: `Broker API error (${errorPlace}).`,
         message: (
-          position ? 'You have open position. Please, close position manually before bot reactivation.' : ''
+          position
+            ? 'You have open position. Please, close position manually before bot reactivation.'
+            : 'You may have an open position. Please, check broker system before bot reactivation.'
         ),
       },
     });

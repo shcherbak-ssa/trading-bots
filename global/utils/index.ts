@@ -2,6 +2,10 @@ import ms from 'ms';
 
 
 // Date
+export function getTodayDateString(): string {
+  return new Date(Date.now()).toISOString();
+}
+
 export function convertDateStringToNumber(date: string): number {
   return Number(new Date(date));
 }

@@ -45,12 +45,12 @@ export class SignalError extends AppError<SignalLogPayload> {
   name = ErrorName.SIGNAL_ERROR;
   scope = LogScope.BOT;
 
-  constructor(message: string, bot: Bot, signal: Signal) {
+  constructor(message: string, bot: Bot | null, signal: Signal) {
     super({
       message,
-      messageHeading: 'Bot Signal',
+      messageHeading: 'Strategy Signal',
       idLabel: 'token',
-      id: bot.token,
+      id: bot?.token,
       payload: { bot, signal },
     },
       StatusCode.BAD_REQUEST

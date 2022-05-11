@@ -8,9 +8,10 @@ export type Signal = {
   type: SignalType;
   direction: SignalDirection;
   stopLossPrice: number;
+  market: string;
 }
 
 export type SignalLogPayload = {
-  bot: Bot,
+  bot: Bot | null;
   signal: Signal;
 }

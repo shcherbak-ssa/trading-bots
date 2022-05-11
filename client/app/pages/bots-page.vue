@@ -1,7 +1,7 @@
 <template>
   <page-container heading="Bots">
     <template v-slot:actions>
-      <base-skeleton v-if="state.isLoading" class="button-circle" />
+      <base-skeleton v-if="state.isLoading" class="button-flow" />
 
       <base-button
           v-else-if="bots.length || brokers.length"
@@ -58,7 +58,11 @@
               </template>
             </base-table-column>
 
-            <base-table-column field="brokerName" header="Broker">
+            <base-table-column
+                v-if="!storeState.itemSection.isActive"
+                field="brokerName"
+                header="Broker"
+            >
               <template #body="{ data }">
                 <broker-data-view type="broker" :brokerName="data.brokerName" />
               </template>
@@ -92,35 +96,20 @@
             <base-table-column field="progress" header="Progress">
               <template #body="{ data }">
                 <base-status
-                    v-if="data.state === BotState.ARCHIVE"
+                    v-if="data.state === BotState.ARCHIVE && data.totalProgress"
                     status="neutral"
-                    :label="`+${getCurrencySymbol(data.brokerAccountCurrency)}210`"
-                    tooltip="Income (TODO)"
+                    :label="getProgressStatusLabel(data, data.totalProgress)"
+                    :tooltip="data.totalProgress.changePercent > 0 ? 'Income' : 'Loss'"
                 />
 
                 <base-status
-                    v-else-if="data.active"
-                    status="success"
-                    :label="`+${getCurrencySymbol(data.brokerAccountCurrency)}120 (10%)`"
-                    tooltip="Income (TODO)"
+                    v-else-if="data.state === BotState.ALIVE && getCurrentProgress(data)"
+                    :status="getCurrentProgress(data).changePercent > 0 ? 'success' : 'danger'"
+                    :tooltip="getCurrentProgress(data).changePercent > 0 ? 'Income' : 'Loss'"
+                    :label="getProgressStatusLabel(data, getCurrentProgress(data))"
                 />
 
-                <base-status
-                    v-else-if="!data.active"
-                    status="danger"
-                    :label="`-${getCurrencySymbol(data.brokerAccountCurrency)}15 (2%)`"
-                    tooltip="Loss (TODO)"
-                />
-              </template>
-            </base-table-column>
-
-            <base-table-column
-                v-if="!storeState.actionSection.isActive && !storeState.itemSection.isActive"
-                field="during"
-                header="During"
-            >
-              <template #body="{ data }">
-                @TODO
+                <div v-else>No data</div>
               </template>
             </base-table-column>
 
@@ -162,11 +151,10 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, watch } from 'vue';
 
-import type { BotClientInfo, LoadBotsPayload } from 'global/types';
+import type { AnalyticsBotProgress, BotClientInfo, LoadBotsPayload } from 'global/types';
 import { BotState } from 'global/constants';
 
 import { SectionComponent, ActionType } from 'shared/constants';
-import { getCurrencySymbol } from 'shared/utils';
 
 import { runAction } from 'services/actions';
 
@@ -264,6 +252,23 @@ function selectBot({ data, originalEvent }: { data: BotClientInfo, originalEvent
 function unselectBot(): void {
   state.selectedBot = null;
   closeItemSection();
+}
+
+function getCurrentProgress({ activations, progress }: BotClientInfo): AnalyticsBotProgress | null {
+  if (progress && progress.length) {
+    return progress.find(({ state, botActivationIndex }) => {
+      return state === 'filled' && botActivationIndex === activations.length;
+    }) || null;
+  }
+
+  return null;
+}
+
+function getProgressStatusLabel(
+  { brokerAccountCurrency }: BotClientInfo,
+  { changePercent, totalResult }:  AnalyticsBotProgress
+): string {
+  return `${totalResult} ${brokerAccountCurrency} (${changePercent}%)`;
 }
 </script>
 

@@ -13,7 +13,7 @@ export function getCurrencySymbol(currency: string): string {
 
 
 // Date
-export function formDate(date: Date, format: string = 'yyyy-mm-dd'): string {
+export function formDate(date: string, format: string = 'yyyy-mm-dd'): string {
   return dateFormat(date, format);
 }
 
