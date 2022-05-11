@@ -1,6 +1,6 @@
 <template>
   <div
-      class="base-input"
+      class="input-container"
       :class="{
         'is-error': props.validation && props.validation.$invalid && props.validation.$dirty,
       }"

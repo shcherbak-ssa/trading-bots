@@ -1,4 +1,4 @@
-.base-input {
+.input-container {
   margin-bottom: 20px;
 
   &.inline .input-content {
@@ -42,11 +42,19 @@
   height: 50px;
 }
 
+.input-content {
+  position: relative;
+}
+
 .input-icon {
-  border-radius: 100%;
+  color: var(--colors-primary);
+  cursor: pointer;
+  position: absolute;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
   width: 24px;
   height: 24px;
-  margin-right: 5px;
 }
 
 .input-label {

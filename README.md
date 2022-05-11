@@ -1,13 +1,6 @@
 # Trading Bots #
 
 
-## Bot ##
-
-Bot `token` field template:
-```dotenv
-[user_id]-[bot_id]
-```
-
 ## Database ##
 
 Filename template:
@@ -19,8 +12,8 @@ Filename template:
 
 ## Position calculations ##
 
-> For `SHORT` position add `market spread` to `stop-loss price`.
-> It because we use `big price` for strategy and calculations.
+> For `SHORT` position add `market spread` to `Stop Loss price`.
+> It because we use `bid price` for strategy and calculations.
 
 ### Common ###
 

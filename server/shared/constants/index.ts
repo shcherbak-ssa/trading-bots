@@ -5,8 +5,6 @@ export const JOB_TIMEZONE: string = 'Etc/UTC';
 export const DATE_STRING_27_DAYS: string = '27 days';
 
 
-export const ONE_HUNDRED: number = 100;
-export const FRACTION_DIGITS_TO_HUNDREDTHS: number = 2;
 export const MINUTES_BEFORE_MARKET_CLOSING: number = 5;
 
 
