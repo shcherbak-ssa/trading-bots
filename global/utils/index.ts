@@ -1,5 +1,17 @@
 import ms from 'ms';
 
+import { ONE_HUNDRED } from 'global/constants';
+
+
+// Math
+export function calculateProportion(from: number, percent: number): number {
+  return from * percent / ONE_HUNDRED;
+}
+
+export function roundNumber(num: number, fractionDigits: number): number {
+  return Number(num.toFixed(fractionDigits));
+}
+
 
 // Date
 export function getTodayDateString(): string {

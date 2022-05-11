@@ -18,7 +18,7 @@ import {
   BrokerDataType
 } from 'global/constants';
 
-import { getTodayDateString } from 'global/utils';
+import { calculateProportion, getTodayDateString } from 'global/utils';
 
 import type {
   BotsDatabaseCollection,
@@ -31,7 +31,6 @@ import type {
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
-import { calculateProportion } from 'shared/utils';
 
 import { runAction } from 'services/actions';
 

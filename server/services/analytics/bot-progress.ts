@@ -1,9 +1,9 @@
 import type { AnalyticsBotProgress, Bot } from 'global/types';
+import { ONE_HUNDRED, FRACTION_DIGITS_TO_HUNDREDTHS } from 'global/constants';
+import { roundNumber } from 'global/utils';
 
 import type { Position } from 'shared/types';
-import { FRACTION_DIGITS_TO_HUNDREDTHS, ONE_HUNDRED } from 'shared/constants';
 import { emptyBotProgress } from 'shared/config';
-import { roundNumber } from 'shared/utils';
 
 
 export class BotProgress {

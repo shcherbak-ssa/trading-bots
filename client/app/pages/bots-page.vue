@@ -268,7 +268,9 @@ function getProgressStatusLabel(
   { brokerAccountCurrency }: BotClientInfo,
   { changePercent, totalResult }:  AnalyticsBotProgress
 ): string {
-  return `${totalResult} ${brokerAccountCurrency} (${changePercent}%)`;
+  const prefix: string = changePercent > 0 ? '+' : '';
+
+  return `${prefix}${totalResult} ${brokerAccountCurrency} (${prefix}${changePercent}%)`;
 }
 </script>
 

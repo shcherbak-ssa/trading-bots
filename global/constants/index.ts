@@ -3,6 +3,10 @@ export const BROKER_API_KEYS_EXPIRES_START_NOTIFY_DAYS: string = '7 days';
 export const BROKER_API_KEYS_EXPIRES_DEACTIVATE_DAYS: string = '1 day';
 
 
+export const ONE_HUNDRED: number = 100;
+export const FRACTION_DIGITS_TO_HUNDREDTHS: number = 2;
+
+
 export enum Currency {
   USD = 'USD',
 }

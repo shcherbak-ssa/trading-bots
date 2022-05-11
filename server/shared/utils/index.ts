@@ -1,10 +1,11 @@
 import crypto from 'crypto';
 import querystring from 'querystring';
 
-import type { BrokerName } from 'global/constants';
+import { FRACTION_DIGITS_TO_HUNDREDTHS, BrokerName } from 'global/constants';
 import { brokerConfigs } from 'global/config';
+import { roundNumber } from 'global/utils';
 
-import { ErrorName, FRACTION_DIGITS_TO_HUNDREDTHS, ONE_HUNDRED } from 'shared/constants';
+import { ErrorName } from 'shared/constants';
 
 
 // Currency
@@ -16,14 +17,6 @@ export function getAmountWithCurrency(currency: string, amount: number): string 
 // Math
 export function getFractionDigits(num: string | number): number {
   return num.toString().split(/[.,]/)[1]?.length || 0;
-}
-
-export function roundNumber(num: number, fractionDigits: number): number {
-  return Number(num.toFixed(fractionDigits));
-}
-
-export function calculateProportion(from: number, percent: number): number {
-  return from * percent / ONE_HUNDRED;
 }
 
 

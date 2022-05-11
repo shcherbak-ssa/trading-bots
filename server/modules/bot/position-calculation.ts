@@ -1,5 +1,7 @@
-import { FRACTION_DIGITS_TO_HUNDREDTHS, ONE_HUNDRED } from 'shared/constants';
-import { calculateProportion, getFractionDigits, roundNumber } from 'shared/utils';
+import { ONE_HUNDRED, FRACTION_DIGITS_TO_HUNDREDTHS } from 'global/constants';
+import { calculateProportion, roundNumber } from 'global/utils';
+
+import { getFractionDigits } from 'shared/utils';
 
 import type { BotBroker, BotPosition, BotSettings, BotSignal } from './types';
 import { Position } from './position';

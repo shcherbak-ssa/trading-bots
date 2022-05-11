@@ -5,7 +5,7 @@
       :class="props.status ? 'w-full' : ''"
   >
     <div class="flex-align-center">
-      <img class="input-icon" :src="brokerConfigs[props.brokerName].logo" />
+      <img class="broker-logo" :src="brokerConfigs[props.brokerName].logo" />
       <div>{{ brokerConfigs[props.brokerName].label }}</div>
     </div>
 
@@ -72,5 +72,12 @@ const props = defineProps<ComponentProps>();
   &.table {
     max-width: 140px;
   }
+}
+
+.broker-logo {
+  border-radius: 100%;
+  width: 24px;
+  height: 24px;
+  margin-right: 5px;
 }
 </style>

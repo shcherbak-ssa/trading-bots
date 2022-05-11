@@ -11,6 +11,7 @@
         v-model="state.value"
         class="input"
         :placeholder="props.placeholder"
+        :disabled="props.disabled"
     />
 
     <template v-if="props.type === 'number'">
@@ -46,6 +47,14 @@
         :minDate="new Date()"
     />
 
+    <div
+        v-if="props.useIcon"
+        class="input-icon flex-center"
+        @click="$emit('icon-click')"
+    >
+      <base-icon type="pi" :icon="props.icon" />
+    </div>
+
     <slot name="button" />
   </input-container>
 </template>
@@ -77,6 +86,8 @@ type ComponentProps = {
   disabled?: boolean;
   tooltip?: string;
   useButton?: boolean;
+  icon?: string;
+  useIcon?: boolean;
 
   numberSuffix?: string;
   numberMax?: number;
@@ -89,7 +100,7 @@ type ComponentProps = {
 
 
 // Data
-const emits = defineEmits(['input']);
+const emits = defineEmits(['input', 'icon-click']);
 const props = defineProps<ComponentProps>();
 
 const state = reactive<ComponentState>({

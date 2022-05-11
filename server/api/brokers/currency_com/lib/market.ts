@@ -1,5 +1,7 @@
+import { roundNumber } from 'global/utils';
+
 import { ApiError } from 'shared/exceptions';
-import { getFractionDigits, roundNumber } from 'shared/utils';
+import { getFractionDigits } from 'shared/utils';
 
 import type {
   ExchangeInfo,
