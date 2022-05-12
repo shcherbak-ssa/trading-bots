@@ -1,6 +1,6 @@
-import type { AnalyticsBotProgress, NewUser } from 'global/types';
+import type { AnalyticsBotProgress } from 'global/types';
 
-import type { TelegramCommandConfig } from 'shared/types';
+import type { TelegramCommandConfig, NewUser } from 'shared/types';
 import { TelegramCommand } from 'shared/constants';
 
 
@@ -48,13 +48,13 @@ export const telegramCommands: TelegramCommandConfig[] = [
         command: TelegramCommand.LOGIN_USERNAME,
         description: 'get/set your username',
         parameterRequired: false,
-        parameter: 'new username',
+        parameter: 'username',
       },
       {
         command: TelegramCommand.LOGIN_PASSWORD,
-        description: 'get/set your password',
-        parameterRequired: false,
-        parameter: 'new password',
+        description: 'set new password',
+        parameterRequired: true,
+        parameter: 'password',
       },
     ],
   },

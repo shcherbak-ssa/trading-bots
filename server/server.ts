@@ -175,7 +175,7 @@ function apiRouteMiddleware(validation: Validation, handler: ServerRouteHandler)
     } catch (e: any) {
       logError(e);
 
-      // @TODO: refactor
+      // @TODO: refactor architecture
       await sendNotifications(userId, e);
 
       response.result = {

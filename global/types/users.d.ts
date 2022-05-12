@@ -3,7 +3,6 @@ export type User = {
   telegramChatId: number;
   isAdmin: boolean;
   username: string;
-  password: string;
 }
 
-export type NewUser = Omit<User, 'id'>;
+export type ClientUser = Omit<User, 'telegramChatId'>;

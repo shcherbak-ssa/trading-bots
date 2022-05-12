@@ -1,8 +1,9 @@
-import type { User } from 'global/types';
 import { GetUserType } from 'global/constants';
 
 import type { CreationDocument } from 'shared/types';
 
+
+export type NewUser = CreationDocument<UsersDatabaseDocument>;
 
 export type GetUserFilters = {
   type: GetUserType;
@@ -25,7 +26,13 @@ export type CheckUserPayload = {
 
 
 // Database Api
-export type UsersDatabaseDocument = User;
+export type UsersDatabaseDocument = {
+  id: string;
+  telegramChatId: number;
+  isAdmin: boolean;
+  username: string;
+  password: string;
+}
 
 export interface UsersDatabaseCollection {
   getUsers(filters: GetUserFilters): Promise<UsersDatabaseDocument[]>;

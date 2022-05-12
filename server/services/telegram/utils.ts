@@ -45,8 +45,12 @@ export class Utils {
 
         result[resultIndex] += `\n\n<i># ${heading}</i>`;
 
-        for (const { command, parameter, description } of commands) {
-          result[resultIndex] += `\n<code>${command}${parameter ? ` [${parameter}]` : ''}</code>  -  ${description}`;
+        for (const { command, parameter, parameterRequired, description } of commands) {
+          const parameterString: string = parameter
+            ? parameterRequired ? ` {${parameter}}` : ` [${parameter}]`
+            : '';
+
+          result[resultIndex] += `\n<code>${command}${parameterString}</code>  -  ${description}`;
         }
 
         return result;
