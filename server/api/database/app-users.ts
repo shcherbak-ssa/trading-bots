@@ -12,6 +12,7 @@ import type {
 } from 'shared/types';
 
 import { DatabaseCollection } from 'shared/constants';
+import { generateHash, verifyHash } from 'shared/utils';
 
 import type { MongoCollection } from './types';
 import { Database } from './lib/database';
@@ -60,13 +61,18 @@ export class AppUsers implements UsersDatabaseCollection {
   }
 
   async createUser(user: CreationDocument<UsersDatabaseDocument>): Promise<UsersDatabaseDocument> {
-    // @TODO: hide password
+    user.password = await generateHash(user.password);
+
     const createdUser = await this.collection.create(user);
 
     return createdUser.toObject();
   }
 
   async updateUser(userId: string, updates: UpdateUserPayload): Promise<void> {
+    if (updates.password) {
+      updates.password = await generateHash(updates.password);
+    }
+
     await this.collection.updateOne({ _id: userId }, updates);
   }
 
@@ -83,8 +89,8 @@ export class AppUsers implements UsersDatabaseCollection {
       return false;
     }
 
-    const { password: userPassword } = foundUser.toObject();
+    const { password: passwordHash } = foundUser.toObject();
 
-    return userPassword === password;
+    return await verifyHash(password, passwordHash);
   }
 }

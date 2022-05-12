@@ -3,6 +3,7 @@ export const WEBHOOKS_PATHNAME: string = '/webhook';
 export const ENTRY_POINT_PATHNAME: string = '*';
 export const JOB_TIMEZONE: string = 'Etc/UTC';
 export const DATE_STRING_27_DAYS: string = '27 days';
+export const HASH_SALT_SEPARATOR: string = ':';
 
 export const USERNAME_PASSWORD_SEPARATOR: string = '-';
 export const USERNAME_PASSWORD_TEST: RegExp = /\w{4,}-\w{8}$/;

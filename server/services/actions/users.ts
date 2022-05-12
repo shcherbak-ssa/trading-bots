@@ -1,6 +1,13 @@
-import type { User, NewUser } from 'global/types';
+import type { User } from 'global/types';
 
-import type { CheckUserPayload, GetUserFilters, UpdateUserPayload, UsersDatabaseCollection } from 'shared/types';
+import type {
+  NewUser,
+  CheckUserPayload,
+  GetUserFilters,
+  UpdateUserPayload,
+  UsersDatabaseCollection, UsersDatabaseDocument
+} from 'shared/types';
+
 import { ActionType } from 'shared/constants';
 import { ApiError } from 'shared/exceptions';
 
@@ -11,7 +18,9 @@ export const usersActions = {
   async [ActionType.USERS_GET](userId: string, filters: GetUserFilters): Promise<User[]> {
     const appUsersCollection: UsersDatabaseCollection = await AppUsers.connect();
 
-    return await appUsersCollection.getUsers(filters);
+    const users: UsersDatabaseDocument[] = await appUsersCollection.getUsers(filters);
+
+    return users.map(({ password, ...user }) => user);
   },
 
   async [ActionType.USERS_CREATE](userId: string, newUser: NewUser): Promise<User> {
@@ -20,7 +29,9 @@ export const usersActions = {
     const isUsernameUnique: boolean = await appUsersCollection.isUsernameUnique(newUser.username);
 
     if (isUsernameUnique) {
-      return await appUsersCollection.createUser(newUser);
+      const { password, ...createdUser } = await appUsersCollection.createUser(newUser);
+
+      return createdUser;
     }
 
     throw new ApiError({

@@ -1,7 +1,8 @@
-import type { NewUser, User } from 'global/types';
+import type { User } from 'global/types';
 import { GetUserType } from 'global/constants';
 
 import type {
+  NewUser,
   CheckUserPayload,
   ConnectUserAction,
   GetUserFilters,
@@ -39,7 +40,7 @@ export const telegramActions = {
       });
     }
 
-    if (payload.my_chat_member) {
+    if (payload.my_chat_member || !payload.message.text) {
       logger.logWarning(LogScope.API, {
         message: 'Received not message payload.',
         messageHeading: 'Telegram webhook',

@@ -52,7 +52,7 @@ export type CreateUserAction = {
 export type GetUserLoginAction = {
   type: 'action',
   action: TelegramActionType.GET_USER_LOGIN,
-  field: 'username' | 'password';
+  field: 'username';
   getMessage: (value: string) => string;
 }
 

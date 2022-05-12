@@ -46,7 +46,7 @@ export class Telegram implements TelegramService {
           `Use <i>username</i> and <i>password</i> to enter in <a href="${process.env.SERVER_URL}/">Dashboard</a>.\n\n` +
 
           `Username:  <code>${username}</code>\n` +
-          `Password:  <code>${password}</code>` +
+          `Password:  <code>${password}</code>  (remember it)` +
 
           '\n\n<i>It is recommended to change the password after connecting the account</i>.'
         );
@@ -112,11 +112,12 @@ export class Telegram implements TelegramService {
       case TelegramCommand.HELP:
         const [ userCommands, adminCommands ]: string[] = Utils.getHelpCommandsDescription(user);
 
-        message += 'I will notify you when something happens to your trading bots. ';
+        message += `I will notify you when something happens to your trading bots. `;
         message += `You can control my notifications on <a href="${process.env.SERVER_URL}/settings">Settings</a> page. `;
-        message += `Use this link to go on <a href="${process.env.SERVER_URL}/dashboard">Dashboard</a> page.\n\n`;
+        message += `Dashboard <a href="${process.env.SERVER_URL}/dashboard">here</a>.\n\n`;
 
-        message += `Command template is  <code>/[scope] [label] [parameter]</code>. <i>Parameter</i> may be optional.\n\n`;
+        message += `Command template is  <code>/command label parameter</code>. `;
+        message += `The <i>parameter</i> may be optional, depending on the brackets: <code>[]</code> - optional, <code>{}</code> - required.\n\n`;
 
         message += '<b>Available commands</b>';
         message += userCommands;
@@ -167,14 +168,16 @@ export class Telegram implements TelegramService {
           };
         }
 
-        return {
-          type: 'action',
-          action: TelegramActionType.GET_USER_LOGIN,
-          field,
-          getMessage: (value: string) => {
-            return `Your current <i>${field}</i>  -  <code>${value}</code>.`;
-          },
-        };
+        if (field === 'username') {
+          return {
+            type: 'action',
+            action: TelegramActionType.GET_USER_LOGIN,
+            field,
+            getMessage: (value: string) => {
+              return `Your current <i>${field}</i>  -  <code>${value}</code>.`;
+            },
+          };
+        }
     }
 
     return null;
