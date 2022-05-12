@@ -1,7 +1,7 @@
 import type { User } from 'global/types';
 
-import type { TelegramAction, TelegramCommandConfig, TelegramCommandParamConfig, TelegramMessage } from 'shared/types';
-import type { TelegramCommand } from 'shared/constants';
+import type { TelegramCommandConfig, TelegramCommandItemConfig, TelegramMessage } from 'shared/types';
+import { TelegramCommand } from 'shared/constants';
 import { telegramCommands } from 'shared/config';
 
 import { COMMAND_INITIAL_STRING, COMMAND_SEPARATOR } from 'api/telegram';
@@ -13,22 +13,25 @@ export class Utils {
   }
 
   static parseCommand(message: string): string[] {
-    return message.trim().split(COMMAND_SEPARATOR);
-  }
+    const commands: string[] = message.trim().split(COMMAND_SEPARATOR);
 
-  static checkParameter(config: TelegramCommandConfig, [ parameter ]: string[]): TelegramAction | null {
-    const parameterConfig: TelegramCommandParamConfig | undefined
-      = config.params.find(({ value }) => {
-      return value === parameter;
-    });
+    if (Utils.isBaseCommand(commands[0])) {
+      return commands;
+    }
 
-    return parameterConfig ? parameterConfig.action : null;
+    const [ scope, label, parameter ] = commands;
+
+    return [ `${scope} ${label}`, parameter ];
   }
 
   static getCommandConfig(command: TelegramCommand): TelegramCommandConfig | undefined {
-    return telegramCommands.find(({ command: configCommand }) => {
-      return command === configCommand;
+    return telegramCommands.find(({ commands }) => {
+      return !!commands.find(({ command: configCommand }) => command === configCommand);
     });
+  }
+
+  static getCommandItemConfig(command: TelegramCommand, config: TelegramCommandConfig): TelegramCommandItemConfig | undefined {
+    return config.commands.find(({ command: configCommand }) => command === configCommand);
   }
 
   static getHelpCommandsDescription(user: User): string[] {
@@ -37,40 +40,22 @@ export class Utils {
     });
 
     return commandConfigs
-    .reduce((result, { command, description, onlyAdmin, params }) => {
-      const resultIndex: number = onlyAdmin ? 1 : 0;
+      .reduce((result, { heading, onlyAdmin, commands }) => {
+        const resultIndex: number = onlyAdmin ? 1 : 0;
 
-      result[resultIndex] += `\n${command} - ${description}`;
+        result[resultIndex] += `\n\n<i># ${heading}</i>`;
 
-      for (const { value, description } of params) {
-        result[resultIndex] += `\n <code>${command} ${value}</code> - ${description}`;
-      }
+        for (const { command, parameter, description } of commands) {
+          result[resultIndex] += `\n<code>${command}${parameter ? ` [${parameter}]` : ''}</code>  -  ${description}`;
+        }
 
-      return result;
-    }, ['\n', '\n\n<b>Admin</b>']);
+        return result;
+      }, ['', '\n\n<b>Admin</b>']);
   }
 
-  static getUnknownCommandMessage(): TelegramMessage {
-    return {
-      type: 'message',
-      message: 'Unknown command!\nUse /help to see available commands.',
-    };
-  }
 
-  static getInvalidCommandParams({ command, params }: TelegramCommandConfig, paramsCount: number): TelegramMessage {
-    let paramsDescription: string = '\n\nAvailable parameters:';
-
-    for (const { value, description } of params) {
-      paramsDescription += `\n <code>${command} ${value}</code> - ${description}`;
-    }
-
-    return {
-      type: 'message',
-      message: (
-        (paramsCount ? 'Invalid command parameter.' : 'This command requires a parameter.') +
-        paramsDescription +
-        '\n\nUse /help to see all commands.'
-      ),
-    };
+  // Helpers
+  static isBaseCommand(command: string): boolean {
+    return command === TelegramCommand.START || command === TelegramCommand.HELP;
   }
 }

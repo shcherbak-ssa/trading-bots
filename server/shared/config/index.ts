@@ -21,48 +21,50 @@ export const initialUser: NewUser = {
 
 export const telegramCommands: TelegramCommandConfig[] = [
   {
-    command: TelegramCommand.REPORT,
+    heading: 'Trading reports',
     onlyAdmin: false,
-    description: 'get trading report',
-    params: [
+    commands: [
       {
-        value: 'today',
-        description: 'trading report for current day',
-        action: {
-          type: 'action',
-          action: TelegramActionType.REPORT_TODAY,
-        },
+        command: TelegramCommand.REPORT_TODAY,
+        description: 'get trading report for current day',
       },
       {
-        value: 'week',
-        description: 'trading report for current week',
-        action: {
-          type: 'action',
-          action: TelegramActionType.REPORT_WEEK,
-        },
+        command: TelegramCommand.REPORT_WEEK,
+        description: 'get trading report for current week',
       },
       {
-        value: 'month',
-        description: 'trading report for last 4 weeks',
-        action: {
-          type: 'action',
-          action: TelegramActionType.REPORT_MONTH,
-        },
+        command: TelegramCommand.REPORT_MONTH,
+        description: 'get trading report for last 4 weeks',
       },
     ],
   },
   {
-    command: TelegramCommand.USER,
-    onlyAdmin: true,
-    description: 'manage users',
-    params: [
+    heading: 'Manage login/password',
+    onlyAdmin: false,
+    commands: [
       {
-        value: 'create',
+        command: TelegramCommand.SECURITY_LOGIN,
+        description: 'get/set your login',
+        parameterRequired: false,
+        parameter: 'new login',
+      },
+      {
+        command: TelegramCommand.SECURITY_PASSWORD,
+        description: 'get/set your password',
+        parameterRequired: false,
+        parameter: 'new password',
+      },
+    ],
+  },
+  {
+    heading: 'Manage users',
+    onlyAdmin: true,
+    commands: [
+      {
+        command: TelegramCommand.USER_CREATE,
         description: 'create new user',
-        action: {
-          type: 'action',
-          action: TelegramActionType.CREATE_USER,
-        },
+        parameterRequired: true,
+        parameter: 'login',
       },
     ],
   },

@@ -1,9 +1,11 @@
 import type { User } from 'global/types';
 
 import type {
+  Notification,
   TelegramAction,
   TelegramCommandConfig,
-  TelegramMessage, Notification,
+  TelegramCommandItemConfig,
+  TelegramMessage,
   TelegramService
 } from 'shared/types';
 
@@ -32,7 +34,7 @@ export class Telegram implements TelegramService {
     if (!password) {
       return {
         type: 'message',
-        message: 'Invalid command! Expected <code>password</code> parameter.',
+        message: 'Invalid command! Expected  <code>password</code>  parameter.',
       };
     }
 
@@ -61,51 +63,37 @@ export class Telegram implements TelegramService {
       };
     }
 
-    const [ command, ...params ]: string[] = Utils.parseCommand(message);
+    const [ command, parameter ]: string[] = Utils.parseCommand(message);
+    const baseCommandMessage: TelegramMessage | null = Telegram.checkBaseCommands(command as TelegramCommand, user);
 
-    switch (command) {
-      case TelegramCommand.START:
-        return {
-          type: 'message',
-          message: 'Your account is already exist.\nUse /help to see available commands.',
-        };
-      case TelegramCommand.HELP:
-        const [ userCommands, adminCommands ]: string[] = Utils.getHelpCommandsDescription(user);
-
-        return {
-          type: 'message',
-          message: (
-            'TODO: add description\n\n' +
-            'Available commands:' +
-            userCommands +
-            (user.isAdmin ? adminCommands : '')
-          ),
-        };
-      case TelegramCommand.USER:
-      case TelegramCommand.REPORT:
-        const config: TelegramCommandConfig | undefined = Utils.getCommandConfig(command);
-
-        if (!config) {
-          return {
-            type: 'message',
-            message: '<b>Internal Server Error</b>\n\nPlease, contact developer.',
-          };
-        }
-
-        if (!user.isAdmin && config.onlyAdmin) {
-          return Utils.getUnknownCommandMessage();
-        }
-
-        if (!params.length) {
-          return Utils.getInvalidCommandParams(config, 0);
-        }
-
-        const action: TelegramAction | null = Utils.checkParameter(config, params);
-
-        return action || Utils.getInvalidCommandParams(config, params.length);
+    if (baseCommandMessage) {
+      return baseCommandMessage;
     }
 
-    return Utils.getUnknownCommandMessage();
+    const config: TelegramCommandConfig | undefined = Utils.getCommandConfig(command as TelegramCommand);
+
+    if (!config || (config.onlyAdmin && !user.isAdmin)) {
+      return Telegram.getUnknownCommandMessage();
+    }
+
+    const commandItemConfig: TelegramCommandItemConfig | undefined
+      = Utils.getCommandItemConfig(command as TelegramCommand, config);
+
+    if (!commandItemConfig) {
+      return Telegram.getInternalErrorMessage();
+    }
+
+    if (commandItemConfig.parameterRequired && !parameter) {
+      return Telegram.getRequiredParameterMessage(commandItemConfig);
+    }
+
+    const commandAction: TelegramAction | null = Telegram.checkCommand(command as TelegramCommand, parameter);
+
+    if (commandAction) {
+      return commandAction;
+    }
+
+    return Telegram.getUnknownCommandMessage();
   }
 
   getNotificationMessage(notification: Notification): TelegramMessage {
@@ -114,5 +102,77 @@ export class Telegram implements TelegramService {
 
   async sendMessage(chatId: number, message: TelegramMessage): Promise<void> {
     return await sendMessage(chatId, message);
+  }
+
+
+  private static checkBaseCommands(command: TelegramCommand, user: User): TelegramMessage | null {
+    let message: string = '';
+
+    switch (command) {
+      case TelegramCommand.START:
+        message = 'Your account is already exist.\nUse /help to see available commands.';
+
+        break;
+      case TelegramCommand.HELP:
+        const [ userCommands, adminCommands ]: string[] = Utils.getHelpCommandsDescription(user);
+
+        message += 'I will notify you when something happens to your trading bots. ';
+        message += `You can control my notifications in <a href="${process.env.SERVER_URL}/settings">Settings</a> page.\n\n`;
+        message += `Command template is  <code>/[scope] [label] [parameter]</code>. <i>Parameter</i> may be optional.\n\n`;
+
+        message += '<b>Available commands</b>';
+        message += userCommands;
+
+        if (user.isAdmin) {
+          message += adminCommands;
+        }
+
+        message += '\n\n<i>Note: You can copy a command by clicking on it.</i>';
+
+        break;
+      default:
+        return null;
+    }
+
+    return { type: 'message', message };
+  }
+
+  private static checkCommand(command: string, parameter: string): TelegramAction | null {
+    switch (command) {
+      case TelegramCommand.USER_CREATE:
+        return {
+          type: 'action',
+          action: TelegramActionType.CREATE_USER,
+          login: parameter.trim(),
+        };
+    }
+
+    return null;
+  }
+
+  private static getUnknownCommandMessage(): TelegramMessage {
+    return {
+      type: 'message',
+      message: 'Unknown command!\nUse /help to see available commands.',
+    };
+  }
+
+  private static getInternalErrorMessage(): TelegramMessage {
+    return {
+      type: 'message',
+      message: 'Internal Server Error! Please, contact admin.',
+    };
+  }
+
+  private static getRequiredParameterMessage({ parameter, command }: TelegramCommandItemConfig): TelegramMessage {
+    return {
+      type: 'message',
+      message: (
+        `Invalid command! Missing parameter <i>${parameter}</i>.\n` +
+        `Valid command is  <code>${command} [${parameter}]</code>.` +
+
+        '\n\nUse /help to see all available commands.'
+      ),
+    };
   }
 }
