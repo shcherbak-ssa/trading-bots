@@ -1,7 +1,7 @@
 import type { AnalyticsBotProgress, NewUser } from 'global/types';
 
 import type { TelegramCommandConfig } from 'shared/types';
-import { TelegramActionType, TelegramCommand } from 'shared/constants';
+import { TelegramCommand } from 'shared/constants';
 
 
 export const emptyBotProgress: AnalyticsBotProgress = {
@@ -17,6 +17,8 @@ export const emptyBotProgress: AnalyticsBotProgress = {
 export const initialUser: NewUser = {
   telegramChatId: 0,
   isAdmin: false,
+  username: '[username]',
+  password: '[password]',
 };
 
 export const telegramCommands: TelegramCommandConfig[] = [
@@ -39,17 +41,17 @@ export const telegramCommands: TelegramCommandConfig[] = [
     ],
   },
   {
-    heading: 'Manage login/password',
+    heading: 'Manage login data',
     onlyAdmin: false,
     commands: [
       {
-        command: TelegramCommand.SECURITY_LOGIN,
-        description: 'get/set your login',
+        command: TelegramCommand.LOGIN_USERNAME,
+        description: 'get/set your username',
         parameterRequired: false,
-        parameter: 'new login',
+        parameter: 'new username',
       },
       {
-        command: TelegramCommand.SECURITY_PASSWORD,
+        command: TelegramCommand.LOGIN_PASSWORD,
         description: 'get/set your password',
         parameterRequired: false,
         parameter: 'new password',
@@ -64,7 +66,7 @@ export const telegramCommands: TelegramCommandConfig[] = [
         command: TelegramCommand.USER_CREATE,
         description: 'create new user',
         parameterRequired: true,
-        parameter: 'login',
+        parameter: 'username',
       },
     ],
   },

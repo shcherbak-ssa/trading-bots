@@ -5,66 +5,62 @@ import type {
   TelegramAction,
   TelegramCommandConfig,
   TelegramCommandItemConfig,
-  TelegramMessage,
   TelegramService
 } from 'shared/types';
 
-import { TelegramActionType, TelegramCommand } from 'shared/constants';
+import { USERNAME_PASSWORD_SEPARATOR, USERNAME_PASSWORD_TEST, TelegramActionType, TelegramCommand } from 'shared/constants';
 
-import { sendMessage } from 'api/telegram';
+import { BOT_URL, sendMessage } from 'api/telegram';
 
 import { getNotificationMessage } from './notification';
 import { Utils } from './utils';
 
 
 export class Telegram implements TelegramService {
-  private static newUsers: Map<string, string> = new Map([]);
+  getUnknownUserMessage(): string {
+    return 'I don\'t know who you are!';
+  }
 
-
-  parseUnknownUserCommand(message: string): TelegramMessage | TelegramAction {
+  parseUnknownUserCommand(message: string): string | TelegramAction {
     if (!message.startsWith(TelegramCommand.START)) {
-      return {
-        type: 'message',
-        message: 'Oops... I don\'t know who you are!'
-      };
+      return this.getUnknownUserMessage();
     }
 
-    const [ , password ]: string[] = Utils.parseCommand(message);
+    const [ , loginWithPassword ]: string[] = Utils.parseCommand(message);
 
-    if (!password) {
-      return {
-        type: 'message',
-        message: 'Invalid command! Expected  <code>password</code>  parameter.',
-      };
+    if (!loginWithPassword || !USERNAME_PASSWORD_TEST.test(loginWithPassword)) {
+      return this.getUnknownUserMessage();
     }
 
-    const newUserId: string | undefined = Telegram.newUsers.get(password);
-
-    if (!newUserId) {
-      return {
-        type: 'message',
-        message: 'Invalid password!',
-      };
-    }
+    const [ username, password ] = loginWithPassword.split(USERNAME_PASSWORD_SEPARATOR);
 
     return {
       type: 'action',
       action: TelegramActionType.CONNECT_USER_TELEGRAM,
-      userId: newUserId,
-      message: 'Your account is created! TODO: add link to dashboard', // @TODO
+      username,
+      password,
+      getMessage: () => {
+        return (
+          `Your account connected successfully! ` +
+          'Use /help to see all available commands. ' +
+          `Use <i>username</i> and <i>password</i> to enter in <a href="${process.env.SERVER_URL}/">Dashboard</a>.\n\n` +
+
+          `Username:  <code>${username}</code>\n` +
+          `Password:  <code>${password}</code>` +
+
+          '\n\n<i>It is recommended to change the password after connecting the account</i>.'
+        );
+      },
     };
   }
 
-  parseUserCommand(user: User, message: string): TelegramMessage | TelegramAction {
+  parseUserCommand(user: User, message: string): string | TelegramAction {
     if (!Utils.isCommand(message)) {
-      return {
-        type: 'message',
-        message: 'Only commands that start with <b>"/"</b> are allowed.\nUse /help to see available commands.',
-      };
+      return 'Only commands that start with <b>"/"</b> are allowed.\nUse /help to see available commands.';
     }
 
     const [ command, parameter ]: string[] = Utils.parseCommand(message);
-    const baseCommandMessage: TelegramMessage | null = Telegram.checkBaseCommands(command as TelegramCommand, user);
+    const baseCommandMessage: string | null = Telegram.checkBaseCommand(command as TelegramCommand, user);
 
     if (baseCommandMessage) {
       return baseCommandMessage;
@@ -96,16 +92,16 @@ export class Telegram implements TelegramService {
     return Telegram.getUnknownCommandMessage();
   }
 
-  getNotificationMessage(notification: Notification): TelegramMessage {
+  getNotificationMessage(notification: Notification): string {
     return getNotificationMessage(notification);
   }
 
-  async sendMessage(chatId: number, message: TelegramMessage): Promise<void> {
+  async sendMessage(chatId: number, message: string): Promise<void> {
     return await sendMessage(chatId, message);
   }
 
 
-  private static checkBaseCommands(command: TelegramCommand, user: User): TelegramMessage | null {
+  private static checkBaseCommand(command: TelegramCommand, user: User): string | null {
     let message: string = '';
 
     switch (command) {
@@ -117,7 +113,9 @@ export class Telegram implements TelegramService {
         const [ userCommands, adminCommands ]: string[] = Utils.getHelpCommandsDescription(user);
 
         message += 'I will notify you when something happens to your trading bots. ';
-        message += `You can control my notifications in <a href="${process.env.SERVER_URL}/settings">Settings</a> page.\n\n`;
+        message += `You can control my notifications on <a href="${process.env.SERVER_URL}/settings">Settings</a> page. `;
+        message += `Use this link to go on <a href="${process.env.SERVER_URL}/dashboard">Dashboard</a> page.\n\n`;
+
         message += `Command template is  <code>/[scope] [label] [parameter]</code>. <i>Parameter</i> may be optional.\n\n`;
 
         message += '<b>Available commands</b>';
@@ -134,45 +132,68 @@ export class Telegram implements TelegramService {
         return null;
     }
 
-    return { type: 'message', message };
+    return message;
   }
 
-  private static checkCommand(command: string, parameter: string): TelegramAction | null {
+  private static checkCommand(command: TelegramCommand, parameter: string): TelegramAction | null {
     switch (command) {
       case TelegramCommand.USER_CREATE:
         return {
           type: 'action',
           action: TelegramActionType.CREATE_USER,
-          login: parameter.trim(),
+          username: parameter.trim(),
+          getMessage: (username: string, password: string) => {
+            const startLinkUrl: string = `${BOT_URL}?start=${username}${USERNAME_PASSWORD_SEPARATOR}${password}`;
+
+            return `New user created! Use this <a href="${startLinkUrl}">link</a> to connect Telegram account.`;
+          },
+        };
+      case TelegramCommand.LOGIN_USERNAME:
+      case TelegramCommand.LOGIN_PASSWORD:
+        const field = command === TelegramCommand.LOGIN_USERNAME ? 'username' : 'password';
+
+        if (parameter) {
+          return {
+            type: 'action',
+            action: TelegramActionType.SET_USER_LOGIN,
+            newValue: parameter,
+            field,
+            getMessage: () => {
+              return `Your <i>${field}</i> updated successfully!`;
+            },
+            getValidationMessage: (field: string, minLength: number) => {
+              return `Invalid value! Minimum length of <i>${field}</i> is ${minLength} symbols.`;
+            },
+          };
+        }
+
+        return {
+          type: 'action',
+          action: TelegramActionType.GET_USER_LOGIN,
+          field,
+          getMessage: (value: string) => {
+            return `Your current <i>${field}</i>  -  <code>${value}</code>.`;
+          },
         };
     }
 
     return null;
   }
 
-  private static getUnknownCommandMessage(): TelegramMessage {
-    return {
-      type: 'message',
-      message: 'Unknown command!\nUse /help to see available commands.',
-    };
+  private static getUnknownCommandMessage(): string {
+    return 'Unknown command!\nUse /help to see available commands.';
   }
 
-  private static getInternalErrorMessage(): TelegramMessage {
-    return {
-      type: 'message',
-      message: 'Internal Server Error! Please, contact admin.',
-    };
+  private static getInternalErrorMessage(): string {
+    return 'Internal Server Error! Please, contact admin.';
   }
 
-  private static getRequiredParameterMessage({ parameter, command }: TelegramCommandItemConfig): TelegramMessage {
-    return {
-      type: 'message',
-      message: (
-        `Invalid command! Missing parameter <i>${parameter}</i>.\n` +
-        `Valid command is  <code>${command} [${parameter}]</code>.` +
+  private static getRequiredParameterMessage({ parameter, command }: TelegramCommandItemConfig): string {
+    return (
+      `Invalid command! Missing parameter <i>${parameter}</i>.\n` +
+      `Valid command is  <code>${command} [${parameter}]</code>.` +
 
-        '\n\nUse /help to see all available commands.'
-      ),
-    };
+      '\n\nUse /help to see all available commands.'
+    );
   }
 }

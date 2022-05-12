@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import { GetUserType } from 'global/constants';
 
 import type {
+  CheckUserPayload,
   GetUserFilters,
   UsersDatabaseCollection,
   UsersDatabaseDocument,
@@ -17,8 +18,10 @@ import { Database } from './lib/database';
 
 
 const appUsersSchema = new mongoose.Schema<UsersDatabaseDocument>({
-  telegramChatId: { type: Number, unique: true, required: true },
+  telegramChatId: { type: Number, required: true },
   isAdmin: { type: Boolean, required: true },
+  username: { type: String, unique: true, required: true },
+  password: { type: String, required: true },
 });
 
 
@@ -57,6 +60,7 @@ export class AppUsers implements UsersDatabaseCollection {
   }
 
   async createUser(user: CreationDocument<UsersDatabaseDocument>): Promise<UsersDatabaseDocument> {
+    // @TODO: hide password
     const createdUser = await this.collection.create(user);
 
     return createdUser.toObject();
@@ -64,5 +68,23 @@ export class AppUsers implements UsersDatabaseCollection {
 
   async updateUser(userId: string, updates: UpdateUserPayload): Promise<void> {
     await this.collection.updateOne({ _id: userId }, updates);
+  }
+
+  async isUsernameUnique(username: string): Promise<boolean> {
+    const foundUser = await this.collection.findOne({ username });
+
+    return !foundUser;
+  }
+
+  async isValidUser({ username, password }: CheckUserPayload): Promise<boolean> {
+    const foundUser = await this.collection.findOne({ username });
+
+    if (!foundUser) {
+      return false;
+    }
+
+    const { password: userPassword } = foundUser.toObject();
+
+    return userPassword === password;
   }
 }

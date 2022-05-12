@@ -1,7 +1,7 @@
 import type { User } from 'global/types';
 import { GetUserType } from 'global/constants';
 
-import type { GetUserFilters, Notification, TelegramMessage } from 'shared/types';
+import type { GetUserFilters, Notification } from 'shared/types';
 import { ActionType, ErrorName, NotificationType } from 'shared/constants';
 import { AppError } from 'shared/exceptions';
 
@@ -20,7 +20,7 @@ export const notificationsActions = {
     if (currentUser) {
       // @TODO: check notification settings
 
-      const telegramMessage: TelegramMessage = telegramService.getNotificationMessage(notification);
+      const telegramMessage: string = telegramService.getNotificationMessage(notification);
 
       await telegramService.sendMessage(currentUser.telegramChatId, telegramMessage);
     } else {
@@ -46,7 +46,7 @@ export const notificationsActions = {
       }
     }
 
-    const telegramMessage: TelegramMessage = telegramService.getNotificationMessage(notification);
+    const telegramMessage: string = telegramService.getNotificationMessage(notification);
 
     await telegramService.sendMessage(Number(process.env.ADMIN_TELEGRAM_CHAT_ID), telegramMessage);
   },
