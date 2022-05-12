@@ -11,6 +11,7 @@ import type {
 
 import { ActionType, TelegramActionType } from 'shared/constants';
 import { AppError } from 'shared/exceptions';
+import { generateRandomPassword } from 'shared/utils';
 
 import { runAction } from 'services/actions';
 import { telegramService } from 'services/telegram';
@@ -61,7 +62,15 @@ export const telegramActions = {
       return await telegramService.sendMessage(chat.id, parseResult);
     }
 
-    // @TODO
-    console.log(parseResult.action);
+    switch (parseResult.action) {
+      case TelegramActionType.CREATE_USER: {
+        const { login } = parseResult;
+        const password: string = generateRandomPassword();
+
+        // @TODO
+
+        break;
+      }
+    }
   },
 };

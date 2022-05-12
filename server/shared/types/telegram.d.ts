@@ -6,16 +6,16 @@ import { IncomeMessage } from 'api/telegram/types';
 
 
 export type TelegramCommandConfig = {
-  command: TelegramCommand;
+  heading: string;
   onlyAdmin: boolean;
-  description: string;
-  params: TelegramCommandParamConfig[];
+  commands: TelegramCommandItemConfig[];
 }
 
-export type TelegramCommandParamConfig = {
-  value: string;
+export type TelegramCommandItemConfig = {
+  command: TelegramCommand;
   description: string;
-  action: TelegramAction;
+  parameterRequired?: boolean;
+  parameter?: string;
 }
 
 export type TelegramIncomeMessage = {
@@ -48,6 +48,7 @@ type ConnectUserAction = {
 type CreateUserAction = {
   type: 'action',
   action: TelegramActionType.CREATE_USER,
+  login: string;
 }
 
 type TodayReportAction = {

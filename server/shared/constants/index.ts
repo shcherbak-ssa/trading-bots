@@ -119,10 +119,14 @@ export enum JobExpression {
 export enum TelegramCommand {
   START = '/start',
   HELP = '/help',
-
-  REPORT = '/report',
-
-  USER = '/user',
+  // User
+  REPORT_TODAY = '/report today',
+  REPORT_WEEK = '/report week',
+  REPORT_MONTH = '/report month',
+  SECURITY_LOGIN = '/security login',
+  SECURITY_PASSWORD = '/security password',
+  // Admin
+  USER_CREATE = '/user create',
 }
 
 export enum TelegramActionType {

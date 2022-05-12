@@ -27,6 +27,10 @@ export function generateHmacSignature(secretKey: string, message: string): strin
     .digest("hex");
 }
 
+export function generateRandomPassword(): string {
+  return Math.random().toString(36).slice(-8);
+}
+
 export function generateBotToken(userId: string, botId: string): string {
   const splitUserId: string[] = userId.split('');
   const splitBotId: string[] = botId.split('');
