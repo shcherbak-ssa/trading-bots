@@ -1,6 +1,6 @@
 import type { User } from 'global/types';
 
-import type { TelegramCommandConfig, TelegramCommandItemConfig, TelegramMessage } from 'shared/types';
+import type { TelegramCommandConfig, TelegramCommandItemConfig } from 'shared/types';
 import { TelegramCommand } from 'shared/constants';
 import { telegramCommands } from 'shared/config';
 

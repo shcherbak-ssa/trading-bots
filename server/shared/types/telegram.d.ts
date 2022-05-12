@@ -1,5 +1,6 @@
 import type { User } from 'global/types';
 
+import { Notification } from 'shared/types';
 import { TelegramActionType, TelegramCommand } from 'shared/constants';
 
 import { IncomeMessage } from 'api/telegram/types';
@@ -22,11 +23,7 @@ export type TelegramIncomeMessage = {
   telegramToken: string;
   update_id: number;
   message: IncomeMessage;
-}
-
-export type TelegramMessage = {
-  type: 'message',
-  message: string;
+  my_chat_member?: IncomeMessage;
 }
 
 
@@ -34,43 +31,46 @@ export type TelegramMessage = {
 export type TelegramAction =
   | ConnectUserAction
   | CreateUserAction
-  | TodayReportAction
-  | WeekReportAction
-  | MonthReportAction;
+  | GetUserLoginAction
+  | SetUserLoginAction;
 
-type ConnectUserAction = {
+export type ConnectUserAction = {
   type: 'action',
   action: TelegramActionType.CONNECT_USER_TELEGRAM;
-  userId: string;
-  message: string;
+  username: string;
+  password: string;
+  getMessage: () => string;
 }
 
-type CreateUserAction = {
+export type CreateUserAction = {
   type: 'action',
   action: TelegramActionType.CREATE_USER,
-  login: string;
+  username: string;
+  getMessage: (username: string, password: string) => string;
 }
 
-type TodayReportAction = {
+export type GetUserLoginAction = {
   type: 'action',
-  action: TelegramActionType.REPORT_TODAY,
+  action: TelegramActionType.GET_USER_LOGIN,
+  field: 'username' | 'password';
+  getMessage: (value: string) => string;
 }
 
-type WeekReportAction = {
+export type SetUserLoginAction = {
   type: 'action',
-  action: TelegramActionType.REPORT_WEEK,
-}
-
-type MonthReportAction = {
-  type: 'action',
-  action: TelegramActionType.REPORT_MONTH,
+  action: TelegramActionType.SET_USER_LOGIN,
+  field: 'username' | 'password';
+  newValue: string;
+  getMessage: () => string;
+  getValidationMessage: (field: string, minLength: number) => string;
 }
 
 
 // Service
 export interface TelegramService {
-  parseUnknownUserCommand(message: string): TelegramMessage | TelegramAction;
-  parseUserCommand(user: User, message: string): TelegramMessage | TelegramAction;
-  getNotificationMessage(notification: Notification): TelegramMessage;
-  sendMessage(chatId: number, message: TelegramMessage): Promise<void>;
+  getUnknownUserMessage(): string;
+  parseUnknownUserCommand(message: string): string | TelegramAction;
+  parseUserCommand(user: User, message: string): string | TelegramAction;
+  getNotificationMessage(notification: Notification): string;
+  sendMessage(chatId: number, message: string): Promise<void>;
 }

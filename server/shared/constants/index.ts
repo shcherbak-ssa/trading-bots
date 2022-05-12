@@ -4,8 +4,13 @@ export const ENTRY_POINT_PATHNAME: string = '*';
 export const JOB_TIMEZONE: string = 'Etc/UTC';
 export const DATE_STRING_27_DAYS: string = '27 days';
 
+export const USERNAME_PASSWORD_SEPARATOR: string = '-';
+export const USERNAME_PASSWORD_TEST: RegExp = /\w{4,}-\w{8}$/;
+
 
 export const MINUTES_BEFORE_MARKET_CLOSING: number = 5;
+export const USERNAME_MIN_LENGTH: number = 4;
+export const PASSWORD_MIN_LENGTH: number = 8;
 
 
 export enum ActionType {
@@ -50,6 +55,7 @@ export enum ActionType {
   USERS_GET = 'users/get',
   USERS_CREATE = 'users/create',
   USERS_UPDATE = 'users/update',
+  USERS_CHECK = 'users/check',
 }
 
 export enum DatabaseCollection {
@@ -123,32 +129,30 @@ export enum TelegramCommand {
   REPORT_TODAY = '/report today',
   REPORT_WEEK = '/report week',
   REPORT_MONTH = '/report month',
-  SECURITY_LOGIN = '/security login',
-  SECURITY_PASSWORD = '/security password',
+  LOGIN_USERNAME = '/login username',
+  LOGIN_PASSWORD = '/login password',
   // Admin
   USER_CREATE = '/user create',
 }
 
 export enum TelegramActionType {
-  CREATE_USER = 'CREATE_USER', // @TODO
+  CREATE_USER = 'CREATE_USER',
   CONNECT_USER_TELEGRAM = 'CONNECT_USER_TELEGRAM',
 
-  // @TODO
-  REPORT_TODAY = 'REPORT_TODAY',
-  REPORT_WEEK = 'REPORT_WEEK',
-  REPORT_MONTH = 'REPORT_MONTH',
+  GET_USER_LOGIN = 'GET_USER_LOGIN',
+  SET_USER_LOGIN = 'SET_USER_LOGIN',
 }
 
 
 // Notifications
 export enum NotificationType {
   ATTENTION = 'ATTENTION',
+  INFO = 'INFO',
+  ERROR = 'ERROR',
 
   POSITION_OPEN = 'POSITION_OPEN',
   POSITION_UPDATE = 'POSITION_UPDATE',
   POSITION_CLOSE = 'POSITION_CLOSE',
 
   BOT_DEACTIVATION = 'BOT_DEACTIVATION',
-
-  ERROR = 'ERROR',
 }

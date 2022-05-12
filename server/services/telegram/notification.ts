@@ -1,9 +1,9 @@
-import type { Notification, TelegramMessage } from 'shared/types';
+import type { Notification } from 'shared/types';
 import { ErrorName, NotificationType } from 'shared/constants';
 import { getAmountWithCurrency, isCustomError } from 'shared/utils';
 
 
-export function getNotificationMessage(notification: Notification): TelegramMessage {
+export function getNotificationMessage(notification: Notification): string {
   let telegramMessage: string = '';
 
   const contactAdminMessage: string = `\n\nContact admin for more details.`;
@@ -12,12 +12,19 @@ export function getNotificationMessage(notification: Notification): TelegramMess
     case NotificationType.ATTENTION: {
       const { message } = notification;
 
+      telegramMessage = '<b># Attention #</b>\n\n' + message + contactAdminMessage;
+
+      break;
+    }
+    case NotificationType.INFO: {
+      const { message, forAdmin } = notification;
+
       telegramMessage = (
-        '<b># Attention #</b>\n\n' +
+        `<b># Info${forAdmin ? ' [admin]' : ''} #</b>\n\n` +
 
         message +
 
-        contactAdminMessage
+        (forAdmin ? '' : contactAdminMessage)
       );
 
       break;
@@ -162,8 +169,5 @@ export function getNotificationMessage(notification: Notification): TelegramMess
     }
   }
 
-  return {
-    type: 'message',
-    message: telegramMessage,
-  };
+  return telegramMessage;
 }

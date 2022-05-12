@@ -19,7 +19,7 @@ import { AppUsers } from 'api/database';
 import { runServer } from './server';
 
 
-// RestApi('vEXLx3m2sAxKuGyF', 'E0uSoc&Ppm6+X4J&380IFmB5~DVxRTA7');
+// 'vEXLx3m2sAxKuGyF', 'E0uSoc&Ppm6+X4J&380IFmB5~DVxRTA7'
 
 
 setupServer()
@@ -30,8 +30,7 @@ setupServer()
 async function setupServer(): Promise<Server> {
   console.log('\n#################### Setup server [BEGIN] ####################');
 
-  console.log('\n mode:', process.env.NODE_ENV);
-  console.log('\n environment:\n')
+  console.log(`\n mode: ${process.env.NODE_ENV}\n`);
 
   for (const [key, value] of Object.entries(env.env)) {
     console.log(` ${key} = ${value}`);
@@ -42,10 +41,8 @@ async function setupServer(): Promise<Server> {
   setupDatabase();
   logger.logInfo(LogScope.APP, 'setup database');
 
-  if (process.env.NODE_ENV === 'development') {
-    await setupDevUser();
-    logger.logInfo(LogScope.APP, `setup dev user (${process.env.ADMIN_USER_ID})`);
-  }
+  await setupAdminUser();
+  logger.logInfo(LogScope.APP, `setup admin user (${process.env.ADMIN_USER_ID})`);
 
   const activateBotsCount: number = await setupActiveBots();
   logger.logInfo(LogScope.APP, `setup active bots (${activateBotsCount})`);
@@ -72,7 +69,7 @@ async function setupActiveBots(): Promise<number> {
   });
 }
 
-async function setupDevUser(): Promise<void> {
+async function setupAdminUser(): Promise<void> {
   if (!process.env.ADMIN_TELEGRAM_CHAT_ID) {
     throw new Error('No admin Telegram chat id');
   }

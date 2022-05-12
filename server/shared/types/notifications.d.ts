@@ -7,16 +7,29 @@ import { BotPosition } from 'modules/bot/types';
 
 export type Notification =
   | AttentionNotification
+  | InfoNotification
+  | ErrorNotification
   | PositionOpenNotification
   | PositionUpdateNotification
   | PositionCloseNotification
-  | BotDeactivationNotification
-  | ErrorNotification;
+  | BotDeactivationNotification;
 
 
 type AttentionNotification = {
   type: NotificationType.ATTENTION,
   message: string;
+}
+
+type InfoNotification = {
+  type: NotificationType.INFO,
+  forAdmin: boolean;
+  message: string;
+}
+
+type ErrorNotification = {
+  type: NotificationType.ERROR,
+  forAdmin: boolean;
+  error: any;
 }
 
 type PositionOpenNotification = {
@@ -42,10 +55,4 @@ type BotDeactivationNotification = {
   bots: Bot[];
   reason: string;
   message: string;
-}
-
-type ErrorNotification = {
-  type: NotificationType.ERROR,
-  forAdmin: boolean;
-  error: any;
 }
