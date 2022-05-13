@@ -30,7 +30,7 @@ class Logger implements BaseLogger {
       console.log(`${timestamp} \x1b[33m[${scope}]\x1b[0m ${level} ${messageHeading} - ${message}`);
 
       if (idLabel) {
-        console.log(` - ${idLabel}: ${id}`);
+        console.log(` - ${idLabel}: ${id || 'undefined'}`);
       }
 
       if (payload) {

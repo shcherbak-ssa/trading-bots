@@ -7,30 +7,34 @@ import type { User } from 'global/types';
 import { GetUserType, QUERY_URL_SEPARATOR, RequestMethod, StatusCode } from 'global/constants';
 
 import type {
+  GetUserFilters,
+  Notification,
+  ServerAuthPayload,
   ServerRequestPayload,
   ServerResponsePayload,
   ServerResponseResult,
   ServerRouteHandler,
-  Notification, Signal, TelegramIncomeMessage,
-  GetUserFilters,
+  Signal,
+  TelegramIncomeMessage,
 } from 'shared/types';
 
 import {
   ActionType,
-  API_PATHNAME,
+  API_PATHNAME, AUTH_PATHNAME,
   ENTRY_POINT_PATHNAME,
-  LogScope, NotificationType,
+  LogScope,
+  NotificationType,
   Validation,
   WEBHOOKS_PATHNAME
 } from 'shared/constants';
 
 import { logger } from 'shared/logger';
-import { isCustomError, parseBotToken } from 'shared/utils';
+import { isCustomError, parseBotToken, parseToken } from 'shared/utils';
 
 import { validate } from 'services/validation';
 import { runAction } from 'services/actions';
 
-import { apiRoutes, webhooksRoutes } from './routes';
+import { apiRoutes, authRoutes, webhooksRoutes } from './routes';
 import { serverConfig } from './config';
 
 
@@ -55,6 +59,7 @@ export async function runServer(): Promise<Server> {
   app.use(queryParserMiddleware);
 
   setupApiRouter(app);
+  setupAuthRouter(app);
   setupWebhookRouter(app);
   setupStaticServe(app);
   setupEntryPoint(app);
@@ -71,17 +76,32 @@ function setupApiRouter(app: express.Application): void {
     const pathname: string = endpoint.replace(API_PATHNAME, '');
 
     // @ts-ignore
-    apiRouter[method.toLowerCase()](
-      pathname,
-      apiRouteMiddleware(validation, handler),
-    );
+    apiRouter[method.toLowerCase()](pathname, apiRouteMiddleware(validation, handler));
   }
 
   app.use(
     API_PATHNAME,
-    authMiddleware(),
     loggerMiddleware,
+    authMiddleware,
     apiRouter,
+    responseMiddleware,
+  );
+}
+
+function setupAuthRouter(app: express.Application): void {
+  const authRouter: express.Router = express.Router();
+
+  for (const { endpoint, method, validation, handler } of authRoutes) {
+    const pathname: string = endpoint.replace(AUTH_PATHNAME, '');
+
+    // @ts-ignore
+    authRouter[method.toLowerCase()](pathname, authRouteMiddleware(validation, handler));
+  }
+
+  app.use(
+    AUTH_PATHNAME,
+    loggerMiddleware,
+    authRouter,
     responseMiddleware,
   );
 }
@@ -93,10 +113,7 @@ function setupWebhookRouter(app: express.Application): void {
     const pathname: string = endpoint.replace(WEBHOOKS_PATHNAME, '');
 
     // @ts-ignore
-    webhookRouter[method.toLowerCase()](
-      pathname,
-      webhookRouteMiddleware(handler),
-    );
+    webhookRouter[method.toLowerCase()](pathname, webhookRouteMiddleware(handler));
   }
 
   app.use(
@@ -129,37 +146,58 @@ function queryParserMiddleware(request: express.Request, response: express.Respo
   next();
 }
 
-function authMiddleware() {
-  if (process.env.NODE_ENV === 'development') {
-    return (request: express.Request, response: express.Response, next: express.NextFunction) => {
-      request.userId = process.env.ADMIN_USER_ID;
-
-      next();
-    }
-  }
-
-  return (request: express.Request, response: express.Response, next: express.NextFunction) => {
-    // @TODO: implement
-  }
-}
-
 function loggerMiddleware(request: express.Request, response: express.Response, next: express.NextFunction): void {
-  const { userId, method, baseUrl, url, params, query, body } = request;
+  const { method, baseUrl, url, params, query, body } = request;
   const data = { ...params, ...query, ...body };
 
   logger.logInfo(LogScope.APP, {
     message: `${method} ${baseUrl + url}`,
     messageHeading: `Request`,
-    idLabel: 'user',
-    id: userId,
     payload: data,
   });
 
   next();
 }
 
+function authMiddleware(request: express.Request, response: express.Response, next: express.NextFunction): void {
+  try {
+    if (!request.headers.authorization) {
+      response.result = {
+        status: StatusCode.FORBIDDEN,
+        payload: {
+          heading: 'Auth error',
+          message: 'Authorization fell',
+        },
+      };
+
+      return next();
+    }
+
+    const authToken: string = request.headers.authorization.split(' ')[1];
+    const authPayload: ServerAuthPayload = parseToken(authToken);
+
+    request.userId = authPayload.userId;
+  } catch (e: any) {
+    logError(e);
+
+    response.result = {
+      status: StatusCode.FORBIDDEN,
+      payload: {
+        heading: 'Auth error',
+        message: 'Authorization fell',
+      },
+    };
+  } finally {
+    next();
+  }
+}
+
 function apiRouteMiddleware(validation: Validation, handler: ServerRouteHandler) {
   return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+    if (response.result) {
+      return next();
+    }
+
     const { userId = '', params, query, body } = request;
     const requestPayload: ServerRequestPayload = { ...params, ...query, ...body };
 
@@ -177,6 +215,36 @@ function apiRouteMiddleware(validation: Validation, handler: ServerRouteHandler)
 
       // @TODO: refactor architecture
       await sendNotifications(userId, e);
+
+      response.result = {
+        status: e.status || StatusCode.INTERNAL_SERVER_ERROR,
+        payload: {
+          heading: e.errorHeading || '',
+          message: e.message,
+        },
+      };
+    } finally {
+      next();
+    }
+  }
+}
+
+function authRouteMiddleware(validation: Validation, handler: ServerRouteHandler) {
+  return async (request: express.Request, response: express.Response, next: express.NextFunction) => {
+    const { params, query, body } = request;
+    const requestPayload: ServerRequestPayload = { ...params, ...query, ...body };
+
+    try {
+      validate(validation, requestPayload);
+
+      const responsePayload: ServerResponsePayload = await handler('', requestPayload);
+
+      response.result = {
+        status: StatusCode.SUCCESS,
+        payload: responsePayload || {},
+      };
+    } catch (e: any) {
+      logError(e);
 
       response.result = {
         status: e.status || StatusCode.INTERNAL_SERVER_ERROR,

@@ -5,4 +5,8 @@ export type User = {
   username: string;
 }
 
-export type ClientUser = Omit<User, 'telegramChatId'>;
+export type ClientUser = Omit<User, 'id' | 'telegramChatId'>;
+
+export type UserAccess = {
+  token: string;
+}

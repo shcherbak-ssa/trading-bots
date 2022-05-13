@@ -56,13 +56,13 @@ export async function verifyHash(value: string, hash: string): Promise<boolean> 
 export function generateToken<Payload>(payload: Payload, expires: string): string {
   return jwt.sign(
     payload as jwt.JwtPayload,
-    process.env.SERVER_SECRET_KEY || '',
+    process.env.SERVER_SECRET || '',
     { expiresIn: expires },
   );
 }
 
 export function parseToken<Payload>(token: string): Payload {
-  const payload = jwt.verify(token, process.env.SERVER_SECRET_KEY || '') as jwt.JwtPayload;
+  const payload = jwt.verify(token, process.env.SERVER_SECRET || '') as jwt.JwtPayload;
 
   return payload as Payload;
 }

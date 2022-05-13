@@ -1,91 +1,37 @@
-import 'primeicons/primeicons.css';
-import 'primevue/resources/primevue.min.css';
+import type { ClientUser } from 'global/types';
 
-import 'primeicons/fonts/primeicons.eot';
-import 'primeicons/fonts/primeicons.svg';
-import 'primeicons/fonts/primeicons.ttf';
-import 'primeicons/fonts/primeicons.woff';
-import '../assets';
+import type { UsersApi } from 'shared/types';
+import { LOCAL_STORAGE_TOKEN_KEY } from 'shared/constants';
 
-import { createApp } from 'vue';
-import { addIcon } from '@iconify/vue';
-
-import PrimeVue from 'primevue/config';
-import PrimeVueTooltip from 'primevue/tooltip';
-
-import PrimeVueToastService from 'primevue/toastservice';
-import PrimeVueConfirmationService from 'primevue/confirmationservice';
-
-import PrimeVueSpeedDial from 'primevue/speeddial';
-import PrimeVueProgressSpinner from 'primevue/progressspinner';
-import PrimeVueDataTable from 'primevue/datatable';
-import PrimeVueColumn from 'primevue/column';
-import PrimeVueSkeleton from 'primevue/skeleton';
-import PrimeVueScrollPanel from 'primevue/scrollpanel';
-
-import roundDashboard from '@iconify-icons/ic/round-dashboard';
-import roundSmartToy from '@iconify-icons/ic/round-smart-toy';
-import roundInsertChart from '@iconify-icons/ic/round-insert-chart';
-import baselineSettings from '@iconify-icons/ic/baseline-settings';
-import roundMenu from '@iconify-icons/ic/round-menu';
-import roundMenuOpen from '@iconify-icons/ic/round-menu-open';
-
-import { IconList } from 'shared/constants';
-
-import BaseIcon from 'components/base/base-icon.vue';
-import BaseButton from 'components/base/base-button.vue';
-import BaseCheckbox from 'components/base/base-checkbox.vue';
-import BaseInput from 'components/base/base-input.vue';
-import BaseDropdown from 'components/base/base-dropdown.vue';
-import BaseStatus from 'components/base/base-status.vue';
-import BaseMessage from 'components/base/base-message.vue';
-import AppLayout from 'components/app-layout.vue';
-
-import { router } from './router';
-import { store, storeKey } from './store';
+import { Users } from 'api/server/users';
 
 
-drawApp();
+setupApp().catch(console.error);
 
 
-function drawApp() {
-  const app = createApp(AppLayout);
+async function setupApp(): Promise<void> {
+  let currentUser: ClientUser;
 
-  app.use(router);
-  app.use(store, storeKey);
+  try {
+    const isTokenExist: boolean = !!localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY);
 
-  app.use(PrimeVue, { ripple: true });
-  app.use(PrimeVueToastService);
-  app.use(PrimeVueConfirmationService);
+    if (!isTokenExist) {
+      throw new Error('Token not found');
+    }
 
-  app.directive('tooltip', PrimeVueTooltip);
+    const users: UsersApi = new Users();
+    currentUser = await users.getUser();
+  } catch (e: any) {
+    console.error(e);
 
-  app.component('base-actions', PrimeVueSpeedDial);
-  app.component('base-progress-spinner', PrimeVueProgressSpinner);
-  app.component('base-table', PrimeVueDataTable);
-  app.component('base-table-column', PrimeVueColumn);
-  app.component('base-skeleton', PrimeVueSkeleton);
-  app.component('base-scroll-panel', PrimeVueScrollPanel);
+    history.pushState({}, '', location.origin + '/');
 
-  app.component('base-icon', BaseIcon);
-  app.component('base-button', BaseButton);
-  app.component('base-checkbox', BaseCheckbox);
-  app.component('base-input', BaseInput);
-  app.component('base-dropdown', BaseDropdown);
-  app.component('base-status', BaseStatus);
-  app.component('base-message', BaseMessage);
+    const { setup } = await import('./login');
 
-  setupIcons();
+    return setup();
+  }
 
-  app.mount('#app');
-}
+  const { setup } = await import('./app');
 
-function setupIcons() {
-  addIcon(IconList.DASHBOARD, roundDashboard);
-  addIcon(IconList.BOTS, roundSmartToy);
-  addIcon(IconList.ANALYTICS, roundInsertChart);
-  addIcon(IconList.SETTINGS, baselineSettings);
-
-  addIcon(IconList.MENU_CLOSE, roundMenu);
-  addIcon(IconList.MENU_OPEN, roundMenuOpen);
+  setup(currentUser);
 }

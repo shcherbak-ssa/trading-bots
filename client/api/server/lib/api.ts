@@ -2,7 +2,9 @@ import type { ErrorPayload, EmptyResponse } from 'global/types';
 import { QUERY_URL_SEPARATOR, RequestMethod, ServerEndpoint, StatusCode } from 'global/constants';
 
 import type { ServerApiRequest } from 'shared/types';
+import { LOCAL_STORAGE_TOKEN_KEY } from 'shared/constants';
 import { AppError } from 'shared/exceptions';
+import { logout } from 'shared/utils';
 
 
 export class Api {
@@ -40,6 +42,7 @@ export class Api {
       method,
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem(LOCAL_STORAGE_TOKEN_KEY)}`,
       },
       body: isGetRequest ? undefined : JSON.stringify(body),
     });
@@ -52,6 +55,10 @@ export class Api {
       }
 
       return await response.json() as Response;
+    }
+
+    if (response.status === StatusCode.FORBIDDEN) {
+      logout();
     }
 
     const { heading, message } = await response.json() as ErrorPayload;

@@ -1,5 +1,5 @@
 import type { User } from 'global/types';
-import { GetUserType } from 'global/constants';
+import { GetUserType, PASSWORD_MIN_LENGTH, USERNAME_MIN_LENGTH } from 'global/constants';
 
 import type {
   NewUser,
@@ -12,15 +12,7 @@ import type {
   Notification
 } from 'shared/types';
 
-import {
-  ActionType,
-  ErrorName,
-  LogScope, NotificationType,
-  PASSWORD_MIN_LENGTH,
-  TelegramActionType,
-  USERNAME_MIN_LENGTH
-} from 'shared/constants';
-
+import { ActionType, ErrorName, LogScope, NotificationType, TelegramActionType } from 'shared/constants';
 import { initialUser } from 'shared/config';
 import { AppError } from 'shared/exceptions';
 import { logger } from 'shared/logger';

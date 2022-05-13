@@ -14,6 +14,15 @@
         :disabled="props.disabled"
     />
 
+    <prime-vue-password
+        v-if="props.type === 'password'"
+        v-model="state.value"
+        class="input"
+        :toggleMask="true"
+        :feedback="false"
+        :placeholder="props.placeholder"
+    />
+
     <template v-if="props.type === 'number'">
       <prime-vue-input-number
           v-model="state.value"
@@ -66,6 +75,7 @@ import { reactive, watch } from 'vue';
 // Components
 import InputContainer from 'components/containers/input-container.vue';
 import PrimeVueInputText from 'primevue/inputtext';
+import PrimeVuePassword from 'primevue/password';
 import PrimeVueInputNumber from 'primevue/inputnumber';
 import PrimeVueCalendar from 'primevue/calendar';
 import PrimeVueSlider from 'primevue/slider';

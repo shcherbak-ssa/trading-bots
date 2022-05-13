@@ -43,7 +43,7 @@ export class Telegram implements TelegramService {
         return (
           `Your account connected successfully! ` +
           'Use /help to see all available commands. ' +
-          `Use <i>username</i> and <i>password</i> to enter in <a href="${process.env.SERVER_URL}/">Dashboard</a>.\n\n` +
+          `Use <i>username</i> and <i>password</i> to enter in <a href="${process.env.SERVER_URL}/dashboard">Dashboard</a>.\n\n` +
 
           `Username:  <code>${username}</code>\n` +
           `Password:  <code>${password}</code>  (remember it)` +
@@ -123,6 +123,7 @@ export class Telegram implements TelegramService {
         message += userCommands;
 
         if (user.isAdmin) {
+          message += '\n\n<b>Admin commands</b>';
           message += adminCommands;
         }
 

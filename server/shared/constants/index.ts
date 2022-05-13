@@ -1,17 +1,18 @@
 export const API_PATHNAME: string = '/api';
+export const AUTH_PATHNAME: string = '/auth';
 export const WEBHOOKS_PATHNAME: string = '/webhook';
 export const ENTRY_POINT_PATHNAME: string = '*';
+
 export const JOB_TIMEZONE: string = 'Etc/UTC';
 export const DATE_STRING_27_DAYS: string = '27 days';
-export const HASH_SALT_SEPARATOR: string = ':';
+export const ACCESS_TOKEN_EXPIRES: string = '1 day';
 
+export const HASH_SALT_SEPARATOR: string = ':';
 export const USERNAME_PASSWORD_SEPARATOR: string = '-';
 export const USERNAME_PASSWORD_TEST: RegExp = /\w{4,}-\w{8}$/;
 
 
 export const MINUTES_BEFORE_MARKET_CLOSING: number = 5;
-export const USERNAME_MIN_LENGTH: number = 4;
-export const PASSWORD_MIN_LENGTH: number = 8;
 
 
 export enum ActionType {
@@ -53,7 +54,9 @@ export enum ActionType {
   NOTIFICATIONS_NOTIFY_USER = 'notifications/notify-user',
   NOTIFICATIONS_NOTIFY_ADMIN = 'notifications/notify-admin',
 
+  USERS_LOGIN = 'users/login',
   USERS_GET = 'users/get',
+  USERS_GET_CLIENT = 'users/get-client',
   USERS_CREATE = 'users/create',
   USERS_UPDATE = 'users/update',
   USERS_CHECK = 'users/check',
@@ -78,6 +81,8 @@ export enum Validation {
   NONE = 'none',
   EMPTY = 'empty',
   ONLY_ID = 'only-id',
+
+  AUTH_LOGIN = 'auth/login',
 
   BOTS_GET = 'bots/get',
   BOTS_CREATE = 'bots/create',

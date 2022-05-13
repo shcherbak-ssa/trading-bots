@@ -42,7 +42,7 @@ async function setupServer(): Promise<Server> {
   logger.logInfo(LogScope.APP, 'setup database');
 
   await setupAdminUser();
-  logger.logInfo(LogScope.APP, `setup admin user (${process.env.ADMIN_USER_ID})`);
+  logger.logInfo(LogScope.APP, `setup admin user`);
 
   const activateBotsCount: number = await setupActiveBots();
   logger.logInfo(LogScope.APP, `setup active bots (${activateBotsCount})`);
@@ -85,18 +85,14 @@ async function setupAdminUser(): Promise<void> {
   });
 
   if (foundAdminUser) {
-    process.env.ADMIN_USER_ID = foundAdminUser.id;
-
     return;
   }
 
-  const createdAdminUser: UsersDatabaseDocument = await appUsersCollection.createUser({
+  await appUsersCollection.createUser({
     ...initialUser,
     telegramChatId: adminUserTelegramChatId,
     isAdmin: true,
   });
-
-  process.env.ADMIN_USER_ID = createdAdminUser.id;
 }
 
 function setUncaughtException(server: Server): void {

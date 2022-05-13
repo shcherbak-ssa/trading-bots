@@ -44,6 +44,7 @@ export const initialStoreState: StoreState = {
   app: {
     isMenuOpen: false, // @TODO: change to 'true'
     notification: null,
+    user: null,
   },
   actionSection: {
     isActive: false,
@@ -70,17 +71,20 @@ export const initialStoreState: StoreState = {
 export const appMenuItems: AppMenuItem[] = [
   {
     label: 'Dashboard',
-    icon: IconList.DASHBOARD,
+    icon: 'th-large',
+    isMiIcon: false,
     to: Route.DASHBOARD,
   },
   {
     label: 'Bots',
     icon: IconList.BOTS,
+    isMiIcon: true,
     to: Route.BOTS,
   },
   {
     label: 'Settings',
-    icon: IconList.SETTINGS,
+    icon: 'cog',
+    isMiIcon: false,
     to: Route.SETTINGS,
   },
 ];

@@ -7,6 +7,10 @@ import SettingsPage from 'app/pages/settings-page.vue';
 
 export const routes = [
   {
+    path: Route.ROOT,
+    redirect: Route.DASHBOARD,
+  },
+  {
     path: Route.DASHBOARD,
     component: DashboardPage,
   },

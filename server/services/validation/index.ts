@@ -5,6 +5,7 @@ import type { ServerRequestPayload } from 'shared/types';
 import { Validation } from 'shared/constants';
 import { ValidationError } from 'shared/exceptions';
 
+import { authValidation } from './auth';
 import { brokersValidation } from './brokers';
 import { botsValidation } from './bots';
 import { signalsValidation } from './signals';
@@ -18,6 +19,7 @@ const validations: { [p in Validation]: Schema } = {
     id: Joi.string().required(),
   }),
 
+  ...authValidation,
   ...brokersValidation,
   ...botsValidation,
   ...signalsValidation,
