@@ -25,7 +25,8 @@ import type {
   BrokersDataApi,
   BrokersDatabaseCollection,
   BrokersDatabaseDocument,
-  RestartBotPayload
+  BrokersWithParsedKeysDatabaseDocument,
+  RestartBotPayload,
 } from 'shared/types';
 
 import { ActionType } from 'shared/constants';
@@ -45,7 +46,7 @@ const brokersDataApi: BrokersDataApi = new BrokersData();
 export const brokersActions = {
   async [ActionType.BROKERS_GET](userId: string, { withBots }: LoadBrokersPayload): Promise<Broker[]> {
     const brokersCollection: BrokersDatabaseCollection = await UserBrokers.connect(userId);
-    const brokers: BrokersDatabaseDocument[] = await brokersCollection.getBrokers();
+    const brokers: BrokersWithParsedKeysDatabaseDocument[] = await brokersCollection.getBrokers();
 
     const userBots: BotsDatabaseDocument[] = [];
 
@@ -80,7 +81,9 @@ export const brokersActions = {
     { id: brokerId, ...filters }: GetBrokerDataPayload,
   ): Promise<GetBrokerDataResult> {
     const brokersCollection: BrokersDatabaseCollection = await UserBrokers.connect(userId);
-    const { name: brokerName, apiKeys }: BrokersDatabaseDocument = await brokersCollection.getBroker(brokerId);
+
+    const { name: brokerName, apiKeys }: BrokersWithParsedKeysDatabaseDocument
+      = await brokersCollection.getBroker(brokerId);
 
     if (filters.dataType === BrokerDataType.ACCOUNT) {
       const result: BrokerAccounts = {
@@ -145,7 +148,9 @@ export const brokersActions = {
     { id: brokerId, ...filters }: GetBrokerDataPayload
   ): Promise<BrokerAccount> {
     const brokersCollection: BrokersDatabaseCollection = await UserBrokers.connect(userId);
-    const { name: brokerName, apiKeys }: BrokersDatabaseDocument = await brokersCollection.getBroker(brokerId);
+
+    const { name: brokerName, apiKeys }: BrokersWithParsedKeysDatabaseDocument
+      = await brokersCollection.getBroker(brokerId);
 
     const brokerAccounts: BrokerAccount[] = await brokersDataApi.getAccounts({
       accountType: filters.accountType || BrokerAccountType.REAL,

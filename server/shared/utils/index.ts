@@ -1,11 +1,13 @@
 import crypto from 'crypto';
 import querystring from 'querystring';
+import jwt from 'jsonwebtoken';
 
 import { FRACTION_DIGITS_TO_HUNDREDTHS, BrokerName } from 'global/constants';
 import { brokerConfigs } from 'global/config';
 import { roundNumber } from 'global/utils';
 
 import { ErrorName, HASH_SALT_SEPARATOR } from 'shared/constants';
+import type { Payload } from 'vuex';
 
 
 // Currency
@@ -49,6 +51,20 @@ export async function verifyHash(value: string, hash: string): Promise<boolean> 
       resolve(key === derivedKey.toString('hex'))
     });
   })
+}
+
+export function generateToken<Payload>(payload: Payload, expires: string): string {
+  return jwt.sign(
+    payload as jwt.JwtPayload,
+    process.env.SERVER_SECRET_KEY || '',
+    { expiresIn: expires },
+  );
+}
+
+export function parseToken<Payload>(token: string): Payload {
+  const payload = jwt.verify(token, process.env.SERVER_SECRET_KEY || '') as jwt.JwtPayload;
+
+  return payload as Payload;
 }
 
 export function generateRandomPassword(): string {

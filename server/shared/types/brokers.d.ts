@@ -9,14 +9,21 @@ export type BrokersDatabaseDocument = {
   id: string;
   name: BrokerName;
   expiresAt: string;
+  apiKeys: string;
+}
+
+export type BrokersWithParsedKeysDatabaseDocument = {
+  id: string;
+  name: BrokerName;
+  expiresAt: string;
   apiKeys: BrokerApiKeys;
 }
 
 export interface BrokersDatabaseCollection {
-  getBroker(id: string): Promise<BrokersDatabaseDocument>;
-  getBrokers(): Promise<BrokersDatabaseDocument[]>;
+  getBroker(id: string): Promise<BrokersWithParsedKeysDatabaseDocument>;
+  getBrokers(): Promise<BrokersWithParsedKeysDatabaseDocument[]>;
   getApiKeys(id: string): Promise<BrokerApiKeys>;
-  createBroker(broker: CreationDocument<BrokersDatabaseDocument>): Promise<BrokersDatabaseDocument>;
+  createBroker(broker: CreationDocument<BrokersWithParsedKeysDatabaseDocument>): Promise<BrokersDatabaseDocument>;
   updateBroker(id: string, updates: UpdateBrokerPayload['updates']): Promise<void>;
   deleteBroker(id: string): Promise<void>;
 }
