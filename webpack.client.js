@@ -7,8 +7,10 @@ const { VueLoaderPlugin } = require('vue-loader');
 const CssUrlRelativePlugin = require('css-url-relative-plugin');
 
 
-module.exports = (env = {}) => {
+module.exports = () => {
   const isDev = process.env.NODE_ENV === 'development';
+
+  console.log(isDev, process.env.NODE_ENV);
 
   const config = {
     mode: isDev ? 'development' : 'production',
@@ -86,6 +88,7 @@ module.exports = (env = {}) => {
         },
         {
           test: /\.(woff|woff2|eot|ttf|svg)$/,
+          exclude: /pwa/,
           use: [
             {
               loader: 'file-loader',
@@ -97,13 +100,37 @@ module.exports = (env = {}) => {
           ],
         },
         {
-          test: /\.(jpg|jpeg|png|svg|ico)$/,
+          test: /\.(jpg|jpeg|png)$/,
           use: [
             {
               loader: 'file-loader',
               options: {
                 name: '[name].[ext]',
                 outputPath: 'images',
+              },
+            },
+          ],
+        },
+        {
+          test: /\.(xml|svg|webmanifest)$/,
+          include: /pwa/,
+          use: [
+            {
+              loader: 'file-loader',
+              options: {
+                name: '[name].[ext]',
+                outputPath: 'pwa',
+              },
+            },
+          ],
+        },
+        {
+          test: /\.ico$/,
+          use: [
+            {
+              loader: 'file-loader',
+              options: {
+                name: '[name].[ext]',
               },
             },
           ],
