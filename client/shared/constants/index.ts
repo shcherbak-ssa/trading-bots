@@ -1,3 +1,6 @@
+export const LOCAL_STORAGE_TOKEN_KEY: string = 'token';
+
+
 export const NOTIFICATION_LIFE_TIME: number = 5000;
 
 
@@ -18,6 +21,7 @@ export enum StoreMutation {
   APP_TOGGLE_MENU = 'app/toggle-menu',
   APP_SHOW_NOTIFICATION = 'app/show-notification',
   APP_HIDE_NOTIFICATION = 'app/hide-notification',
+  APP_SET_USER = 'app/set-user',
 
   ACTION_SECTION_OPEN = 'action-section/open',
   ACTION_SECTION_CLOSE = 'action-section/close',
@@ -35,17 +39,14 @@ export enum StoreMutation {
 }
 
 export enum IconList {
-  DASHBOARD = 'dashboard',
   BOTS = 'bots',
-  ANALYTICS = 'analytics',
-  SETTINGS = 'settings',
-
   MENU_OPEN = 'menu-open',
   MENU_CLOSE = 'menu-close',
 }
 
 export enum Route {
-  DASHBOARD = '/',
+  ROOT = '/',
+  DASHBOARD = '/dashboard',
   BOTS = '/bots',
   SETTINGS = '/settings',
 }

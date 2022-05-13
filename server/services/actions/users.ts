@@ -1,20 +1,69 @@
-import type { User } from 'global/types';
+import type { ClientUser, User, UserAccess } from 'global/types';
+import { GetUserType, StatusCode } from 'global/constants';
 
 import type {
-  NewUser,
   CheckUserPayload,
   GetUserFilters,
+  NewUser,
   UpdateUserPayload,
-  UsersDatabaseCollection, UsersDatabaseDocument
+  UsersDatabaseCollection,
+  UsersDatabaseDocument,
+  ServerAuthPayload
 } from 'shared/types';
 
-import { ActionType } from 'shared/constants';
-import { ApiError } from 'shared/exceptions';
+import { ACCESS_TOKEN_EXPIRES, ActionType } from 'shared/constants';
+import { ApiError, AppError } from 'shared/exceptions';
+import { generateToken } from 'shared/utils';
 
 import { AppUsers } from 'api/database/app-users';
 
 
 export const usersActions = {
+  async [ActionType.USERS_LOGIN](userId: string, payload: CheckUserPayload): Promise<UserAccess> {
+    const appUsersCollection: UsersDatabaseCollection = await AppUsers.connect();
+    const isValidUser: boolean = await appUsersCollection.isValidUser(payload);
+
+    if (isValidUser) {
+      const [ foundUser ]: UsersDatabaseDocument[] = await appUsersCollection.getUsers({
+        type: GetUserType.ONE,
+        username: payload.username,
+      });
+
+      const authPayload: ServerAuthPayload = { userId: foundUser.id };
+      const token: string = generateToken(authPayload, ACCESS_TOKEN_EXPIRES);
+
+      return { token };
+    }
+
+    throw new AppError({
+      message: 'Invalid username or password',
+      messageHeading: 'Login',
+      payload,
+    }, StatusCode.BAD_REQUEST);
+  },
+
+  async [ActionType.USERS_GET_CLIENT](userId: string): Promise<ClientUser> {
+    const appUsersCollection: UsersDatabaseCollection = await AppUsers.connect();
+
+    const [ foundUser ]: UsersDatabaseDocument[] = await appUsersCollection.getUsers({
+      type: GetUserType.ONE,
+      id: userId,
+    });
+
+    if (foundUser) {
+      const { id, telegramChatId, password, ...user } = foundUser;
+
+      return user;
+    }
+
+    throw new ApiError({
+      message: 'User not found',
+      messageHeading: 'Database (Get User)',
+      idLabel: 'user',
+      id: userId,
+    });
+  },
+
   async [ActionType.USERS_GET](userId: string, filters: GetUserFilters): Promise<User[]> {
     const appUsersCollection: UsersDatabaseCollection = await AppUsers.connect();
 

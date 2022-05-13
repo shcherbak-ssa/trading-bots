@@ -1,6 +1,6 @@
 import type { MutationTree } from 'vuex';
 
-import type { BotClientInfo, Broker, BrokerAccount, BrokerMarket } from 'global/types';
+import type { BotClientInfo, Broker, BrokerAccount, BrokerMarket, ClientUser } from 'global/types';
 import { BrokerDataType } from 'global/constants';
 
 import type { StoreNotification, StoreState } from 'shared/types';
@@ -12,6 +12,7 @@ export type Mutations<State = StoreState> = {
   [StoreMutation.APP_TOGGLE_MENU](state: State): void;
   [StoreMutation.APP_SHOW_NOTIFICATION](state: State, notification: StoreNotification): void;
   [StoreMutation.APP_HIDE_NOTIFICATION](state: State): void;
+  [StoreMutation.APP_SET_USER](state: State, payload: { user: ClientUser }): void;
 
   [StoreMutation.ACTION_SECTION_OPEN](state: State, payload: { component: SectionComponent, bot?: BotClientInfo, broker?: Broker }): void;
   [StoreMutation.ACTION_SECTION_CLOSE](state: State): void;
@@ -41,6 +42,10 @@ export const mutations: MutationTree<StoreState> & Mutations = {
 
   [StoreMutation.APP_HIDE_NOTIFICATION](state: StoreState): void {
     state.app.notification = null;
+  },
+
+  [StoreMutation.APP_SET_USER](state: StoreState, { user }: { user: ClientUser }): void {
+    state.app.user = user;
   },
 
 

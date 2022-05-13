@@ -2,6 +2,10 @@ import { RequestMethod, ServerEndpoint, StatusCode } from 'global/constants';
 import { Validation } from 'shared/constants';
 
 
+export type ServerAuthPayload = {
+  userId: string;
+}
+
 // @TODO: refactor architecture
 export type ServerRequestPayload<Payload = any> = any;
 export type ServerResponsePayload = any;

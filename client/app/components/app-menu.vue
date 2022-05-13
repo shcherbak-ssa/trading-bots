@@ -21,10 +21,35 @@
             }"
             @click="handleMenuItemClick(item)"
         >
-          <base-icon type="mi" class="menu-icon" :icon="item.icon" />
+          <base-icon
+              class="menu-icon flex-center"
+              :type="item.isMiIcon ? 'mi' : 'pi'"
+              :icon="item.icon"
+          />
 
           <div v-if="isMenuOpen" class="menu-label">
             {{ item.label }}
+          </div>
+        </div>
+
+        <div class="menu-divider w-full" />
+
+        <div
+            class="menu-item flex relative w-full cursor-pointer select-none"
+            v-tooltip.right="{
+              value: 'Logout',
+              class: isMenuOpen ? 'hide' : '',
+            }"
+            @click="processLogout"
+        >
+          <base-icon
+              type="pi"
+              class="menu-icon flex-center"
+              icon="sign-out"
+          />
+
+          <div v-if="isMenuOpen" class="menu-label">
+            Logout
           </div>
         </div>
       </div>
@@ -44,10 +69,12 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import { useRouter } from 'vue-router';
+import { useConfirm } from 'primevue/useconfirm';
 
 import type { AppMenuItem } from 'shared/types';
 import { IconList, StoreMutation } from 'shared/constants';
 import { appMenuItems } from 'shared/config';
+import { logout } from 'shared/utils';
 
 import { useCloseActionSection, useCloseItemSection } from 'app/hooks';
 import { Store, useStore } from 'app/store';
@@ -56,6 +83,7 @@ import { Store, useStore } from 'app/store';
 // Data
 const { state: storeState, commit }: Store = useStore();
 const router = useRouter();
+const confirmPopup = useConfirm();
 
 const closeActionSection = useCloseActionSection();
 const closeItemSection = useCloseItemSection();
@@ -78,6 +106,20 @@ function handleMenuItemClick(item: AppMenuItem): void {
 
   closeActionSection();
   closeItemSection();
+}
+
+function processLogout(e: Event): void {
+  confirmPopup.require({
+    // @ts-ignore
+    target: e.currentTarget,
+    message: 'Are you sure you want to logout?',
+    group: 'confirm',
+    acceptClass: 'primary',
+    accept: () => {
+      logout();
+    },
+    reject: () => {},
+  });
 }
 
 function toggleMenu(): void {
@@ -135,11 +177,21 @@ function toggleMenu(): void {
 
 .menu-icon {
   margin-right: 14px;
+  width: 24px;
+  height: 24px;
+  font-size: 1.2rem;
 }
 
 .menu-label {
   font-weight: 500;
   line-height: 1.25rem;
+}
+
+.menu-divider {
+  background: var(--colors-text);
+  opacity: .2;
+  height: 1px;
+  margin-bottom: var(--sizes-space-default);
 }
 
 .menu-toggle {

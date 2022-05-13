@@ -17,7 +17,7 @@
   }
 }
 
-.p-inputnumber, .p-calendar {
+.p-inputnumber, .p-calendar, .p-password {
   .p-inputtext {
     background: transparent;
     font: inherit;
@@ -76,6 +76,25 @@ input::placeholder,
 .input-help {
   font: 400 .79rem/1rem 'DM Sans';
   margin-top: 10px;
+}
+
+
+// Password
+.p-password {
+  .pi {
+    color: var(--colors-primary);
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    margin: 0;
+  }
 }
 
 

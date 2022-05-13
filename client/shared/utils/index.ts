@@ -5,6 +5,8 @@ import getSymbolFromCurrency from 'currency-symbol-map'
 import { convertDateStringToNumber, getMilliseconds } from 'global/utils';
 import { BROKER_API_KEYS_EXPIRES_DEACTIVATE_DAYS, BROKER_API_KEYS_EXPIRES_START_NOTIFY_DAYS } from 'global/constants';
 
+import { LOCAL_STORAGE_TOKEN_KEY } from 'shared/constants';
+
 
 // Currency
 export function getCurrencySymbol(currency: string): string {
@@ -29,4 +31,12 @@ export function isExpired(expiresAt: string): boolean {
 
 export function isExpireNear(expiresAt: string): boolean {
   return getMillisecondsBeforeExpires(expiresAt) <= getMilliseconds(BROKER_API_KEYS_EXPIRES_START_NOTIFY_DAYS);
+}
+
+
+// Other
+export function logout(): void {
+  localStorage.removeItem(LOCAL_STORAGE_TOKEN_KEY);
+
+  location.reload();
 }

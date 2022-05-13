@@ -54,7 +54,7 @@ export class Utils {
         }
 
         return result;
-      }, ['', '\n\n<b>Admin</b>']);
+      }, ['', '']);
   }
 
 

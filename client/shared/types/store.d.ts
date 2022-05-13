@@ -1,4 +1,11 @@
-import type { BotClientInfo, Broker, BrokerAccount, BrokerMarket, BrokerMarketLeverages } from 'global/types';
+import type {
+  BotClientInfo,
+  Broker,
+  BrokerAccount,
+  BrokerMarket,
+  BrokerMarketLeverages,
+  ClientUser
+} from 'global/types';
 
 import { SectionComponent } from 'shared/constants';
 
@@ -7,6 +14,7 @@ export interface StoreState {
   app: {
     isMenuOpen: boolean;
     notification: null | StoreNotification;
+    user: ClientUser | null;
   };
   actionSection: {
     isActive: boolean;

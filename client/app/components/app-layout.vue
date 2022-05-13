@@ -26,6 +26,12 @@
 </template>
 
 <script setup lang="ts">
+import { onMounted } from 'vue';
+
+import type { ClientUser } from 'global/types';
+
+import { StoreMutation } from 'shared/constants';
+
 import { useActionSectionComponent, useItemSectionComponent } from 'app/hooks';
 import { Store, useStore } from 'app/store';
 
@@ -36,11 +42,27 @@ import AppNotification from 'components/app-notification.vue';
 import AppConfirmPopup from 'components/app-confirm-popup.vue';
 
 
+// Types
+type ComponentProps = {
+  user: ClientUser;
+}
+
+
 // Data
-const { state: storeState }: Store = useStore();
+const { state: storeState, commit }: Store = useStore();
+const props = defineProps<ComponentProps>();
 
 const actionSectionComponent = useActionSectionComponent();
 const itemSectionComponent = useItemSectionComponent();
+
+
+// Hooks
+onMounted(() => {
+  commit({
+    type: StoreMutation.APP_SET_USER,
+    user: props.user,
+  });
+});
 </script>
 
 <style lang="scss" scoped>

@@ -5,6 +5,8 @@ export const BROKER_API_KEYS_EXPIRES_DEACTIVATE_DAYS: string = '1 day';
 
 export const ONE_HUNDRED: number = 100;
 export const FRACTION_DIGITS_TO_HUNDREDTHS: number = 2;
+export const USERNAME_MIN_LENGTH: number = 4;
+export const PASSWORD_MIN_LENGTH: number = 8;
 
 
 export enum Currency {
@@ -42,10 +44,13 @@ export enum StatusCode {
 }
 
 export enum ServerEndpoint {
+  AUTH_LOGIN = '/auth/login',
+
   API_BOTS = '/api/bots',
   API_BOTS_WITH_ID = '/api/bots/:id',
   API_BROKERS = '/api/brokers',
   API_BROKERS_WITH_ID = '/api/brokers/:id',
+  API_USERS = '/api/users',
 
   WEBHOOK_SIGNALS = '/webhook/signals',
   WEBHOOK_TELEGRAM = '/webhook/telegram/:telegramToken',
