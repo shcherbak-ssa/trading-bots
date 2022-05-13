@@ -1,10 +1,18 @@
 import mongoose from 'mongoose';
 
 import type { BrokerApiKeys, UpdateBrokerPayload } from 'global/types';
+import { convertDateStringToNumber, getReadableDateString } from 'global/utils';
 
-import type { BrokersDatabaseCollection, BrokersDatabaseDocument, CreationDocument } from 'shared/types';
+import type {
+  BrokersDatabaseCollection,
+  BrokersDatabaseDocument,
+  CreationDocument,
+  BrokersWithParsedKeysDatabaseDocument
+} from 'shared/types';
+
 import { DatabaseCollection } from 'shared/constants';
 import { ApiError } from 'shared/exceptions';
+import { generateToken, parseToken } from 'shared/utils';
 
 import { UserCollection } from './lib/user-collection';
 
@@ -12,7 +20,7 @@ import { UserCollection } from './lib/user-collection';
 const userBrokerSchema = new mongoose.Schema<BrokersDatabaseDocument>({
   name: { type: String, required: true },
   expiresAt: { type: String, required: true },
-  apiKeys: { type: Map, of: String, required: true },
+  apiKeys: { type: String, required: true },
 });
 
 
@@ -28,30 +36,46 @@ export class UserBrokers extends UserCollection<BrokersDatabaseDocument> impleme
   }
 
 
-  // Implementation
-  async getBroker(brokerId: string): Promise<BrokersDatabaseDocument> {
-    const broker = await this.collection.findOne({ _id: brokerId });
+  private static generateApiKeysToken(apiKeys: BrokerApiKeys, expiresAt: string): string {
+    const expires: string = getReadableDateString(convertDateStringToNumber(expiresAt) - Date.now());
 
-    if (!broker) {
-      throw new ApiError({
-        message: `Cannot found broker (${brokerId})`,
-        messageHeading: 'Database',
-        idLabel: 'user',
-        id: this.userId,
-        payload: { brokerId },
-      });
-    }
-
-    // @ts-ignore
-    const parsedApiKeys = Object.fromEntries(broker.apiKeys.entries())
-
-    return { ...broker.toObject(), apiKeys: parsedApiKeys };
+    return generateToken(apiKeys, expires);
   }
 
-  async getBrokers(): Promise<BrokersDatabaseDocument[]> {
+
+  // Implementation
+  async getBroker(brokerId: string): Promise<BrokersWithParsedKeysDatabaseDocument> {
+    const broker = await this.collection.findOne({ _id: brokerId });
+
+    if (broker) {
+      const { apiKeys, ...brokerWithoutKeys } = broker.toObject();
+
+      return {
+        ...brokerWithoutKeys,
+        apiKeys: parseToken(apiKeys),
+      };
+    }
+
+    throw new ApiError({
+      message: `Cannot found broker (${brokerId})`,
+      messageHeading: 'Database',
+      idLabel: 'user',
+      id: this.userId,
+      payload: { brokerId },
+    });
+  }
+
+  async getBrokers(): Promise<BrokersWithParsedKeysDatabaseDocument[]> {
     const brokers = await this.collection.find();
 
-    return brokers.map((broker) => broker.toObject());
+    return brokers.map((broker) => {
+      const { apiKeys, ...brokerWithoutKeys } = broker.toObject();
+
+      return {
+        ...brokerWithoutKeys,
+        apiKeys: parseToken(apiKeys),
+      };
+    });
   }
 
   async getApiKeys(brokerId: string): Promise<BrokerApiKeys> {
@@ -60,15 +84,18 @@ export class UserBrokers extends UserCollection<BrokersDatabaseDocument> impleme
     return broker.apiKeys;
   }
 
-  async createBroker(broker: CreationDocument<BrokersDatabaseDocument>): Promise<BrokersDatabaseDocument> {
-    // @TODO: hide api keys
-    const createdBroker = await this.collection.create(broker);
+  async createBroker(broker: CreationDocument<BrokersWithParsedKeysDatabaseDocument>): Promise<BrokersDatabaseDocument> {
+    const apiKeys: string = UserBrokers.generateApiKeysToken(broker.apiKeys, broker.expiresAt);
+
+    const createdBroker = await this.collection.create({ ...broker, apiKeys });
 
     return createdBroker.toObject();
   }
 
   async updateBroker(id: string, updates: UpdateBrokerPayload['updates']): Promise<void> {
-    await this.collection.updateOne({ _id: id }, updates);
+    const apiKeys: string = UserBrokers.generateApiKeysToken(updates.apiKeys, updates.expiresAt);
+
+    await this.collection.updateOne({ _id: id }, { ...updates, apiKeys });
   }
 
   async deleteBroker(id: string): Promise<void> {
