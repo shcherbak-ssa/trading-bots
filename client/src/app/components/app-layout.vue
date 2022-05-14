@@ -41,17 +41,22 @@ import { Store, useStore } from 'app/store';
 import AppMenu from 'components/app-menu.vue';
 import AppNotification from 'components/app-notification.vue';
 import AppConfirmPopup from 'components/app-confirm-popup.vue';
+import ActionContainer from 'components/containers/action-container.vue';
+import ItemContainer from 'components/containers/item-container.vue';
 
-const botItemComponent = defineAsyncComponent(() => {
-  return import('components/items/bot-item.vue');
+const botItemComponent = defineAsyncComponent({
+  loader: () => import('components/items/bot-item.vue'),
+  loadingComponent: ItemContainer,
 });
 
-const botActionComponent = defineAsyncComponent(() => {
-  return import('components/actions/bot-actions.vue');
+const botActionComponent = defineAsyncComponent({
+  loader: () => import('components/actions/bot-actions.vue'),
+  loadingComponent: ActionContainer,
 });
 
-const brokerActionComponent = defineAsyncComponent(() => {
-  return import('components/actions/broker-actions.vue');
+const brokerActionComponent = defineAsyncComponent({
+  loader: () => import('components/actions/broker-actions.vue'),
+  loadingComponent: ActionContainer,
 });
 
 
