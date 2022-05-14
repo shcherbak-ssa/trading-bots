@@ -44,7 +44,7 @@ class Logger implements BaseLogger {
       }
     }
 
-    console.log('\n');
+    console.log('');
   }
 }
 
