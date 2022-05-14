@@ -1,7 +1,7 @@
 <template>
   <div class="action-container absolute full">
     <div class="action-header flex-between">
-      <div class="action-heading">{{ props.heading }}</div>
+      <div class="action-heading">{{ props.heading || 'Loading...' }}</div>
 
       <button-close @close="closeActionSection" />
     </div>

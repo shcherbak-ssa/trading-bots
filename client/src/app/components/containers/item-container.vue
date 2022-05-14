@@ -1,7 +1,7 @@
 <template>
   <section-container class="full">
     <div class="item-header flex-between">
-      <div class="item-heading">{{ props.heading }}</div>
+      <div class="item-heading">{{ props.heading || 'Loading...' }}</div>
 
       <button-close @close="closeItemSection" />
     </div>
