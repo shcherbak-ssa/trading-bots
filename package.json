@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node build/server/index.js",
+    "build": "node scripts/build.js",
     "build:server": "cross-env NODE_ENV=production webpack --config webpack.server.js",
     "dev:server": "cross-env NODE_ENV=development nodemon --config nodemon.json"
   },
