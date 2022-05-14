@@ -7,7 +7,6 @@ import { brokerConfigs } from 'global/config';
 import { roundNumber } from 'global/utils';
 
 import { ErrorName, HASH_SALT_SEPARATOR } from 'shared/constants';
-import type { Payload } from 'vuex';
 
 
 // Currency
