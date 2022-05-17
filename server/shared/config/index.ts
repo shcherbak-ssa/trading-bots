@@ -1,7 +1,11 @@
 import type { AnalyticsBotProgress } from 'global/types';
+import { BrokerName } from 'global/constants';
 
-import type { TelegramCommandConfig, NewUser } from 'shared/types';
-import { TelegramCommand } from 'shared/constants';
+import type { Signal, TelegramCommandConfig, NewUser } from 'shared/types';
+import { EXCHANGE_TICKER_DIVIDER, TelegramCommand } from 'shared/constants';
+import { SignalError } from 'shared/exceptions';
+
+import type { Bot } from 'modules/bot';
 
 
 export const emptyBotProgress: AnalyticsBotProgress = {
@@ -71,3 +75,35 @@ export const telegramCommands: TelegramCommandConfig[] = [
     ],
   },
 ];
+
+export const signalMarketValidators: { [p in BrokerName]: { validate(signal: Signal, bot: Bot): void } } = {
+  [BrokerName.CURRENCY_COM]: {
+    validate(signal: Signal, bot: Bot): void {
+      const [ exchange, market = '' ] = signal.market.split(EXCHANGE_TICKER_DIVIDER);
+
+      if (exchange !== 'CURRENCYCOMLEV') {
+        throw new SignalError(
+          `Invalid market exchange: expected "CURRENCYCOMLEV", received "${exchange}".`,
+          bot.settings,
+          signal,
+        );
+      }
+
+      const brokerMarket: string = bot.settings.brokerMarketSymbol
+        .replace('_LEVERAGE', '')
+        .replace(/[.\/\s]/g, '')
+        .toLowerCase();
+
+      const signalMarket: string = market
+        .replace(/[\s]/g, '')
+        .toLowerCase();
+
+      if (signalMarket !== brokerMarket) {
+        throw new SignalError(`Invalid market.`, bot.settings, signal);
+      }
+    },
+  },
+  [BrokerName.CAPITAL_COM]: {
+    validate(signal: Signal, bot: Bot): void {}
+  },
+};

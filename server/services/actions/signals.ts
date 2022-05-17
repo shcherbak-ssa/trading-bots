@@ -1,7 +1,9 @@
-import type { Signal } from 'shared/types';
-import { ActionType, SignalDirection, SignalType, Validation } from 'shared/constants';
+import type { Signal, Notification } from 'shared/types';
+import { ActionType, NotificationType, SignalDirection, SignalType, Validation } from 'shared/constants';
+import { signalMarketValidators } from 'shared/config';
 import { SignalError } from 'shared/exceptions';
 
+import { runAction } from 'services/actions';
 import { validate } from 'services/validation';
 
 import type { BotSignal } from 'modules/bot/types';
@@ -23,6 +25,21 @@ export const signalsActions = {
     }
 
     const bot: Bot = BotManager.getBot(botToken);
+
+    if (type === SignalType.PING) {
+      signalMarketValidators[bot.settings.brokerName].validate(signal, bot);
+
+      return await runAction<Notification, void>({
+        type: ActionType.NOTIFICATIONS_NOTIFY_USER,
+        userId,
+        payload: {
+          type: NotificationType.SIGNAL_PING,
+          bot: bot.settings,
+          signal,
+        },
+      });
+    }
+
     const botSignal: BotSignal = { isLong: direction === SignalDirection.LONG, stopLossPrice };
 
     switch (type) {

@@ -10,6 +10,7 @@ export const signalsValidation = {
     market: Joi.string().required(),
     type: Joi.string()
       .valid(
+        SignalType.PING,
         SignalType.OPEN,
         SignalType.UPDATE,
         SignalType.CLOSE,

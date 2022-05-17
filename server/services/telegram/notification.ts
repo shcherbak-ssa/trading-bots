@@ -3,29 +3,47 @@ import { ErrorName, NotificationType } from 'shared/constants';
 import { getAmountWithCurrency, isCustomError } from 'shared/utils';
 
 
+const contactAdminMessage: string = `\n\nContact admin for more details.`;
+
+
 export function getNotificationMessage(notification: Notification): string {
   let telegramMessage: string = '';
-
-  const contactAdminMessage: string = `\n\nContact admin for more details.`;
 
   switch (notification.type) {
     case NotificationType.ATTENTION: {
       const { message } = notification;
 
-      telegramMessage = '<b># Attention #</b>\n\n' + message + contactAdminMessage;
+      telegramMessage += '<b># Attention #</b>\n\n';
+      telegramMessage += message;
+      telegramMessage += contactAdminMessage;
 
       break;
     }
     case NotificationType.INFO: {
       const { message, forAdmin } = notification;
 
-      telegramMessage = (
-        `<b># Info${forAdmin ? ' [admin]' : ''} #</b>\n\n` +
+      telegramMessage += `<b># Info${forAdmin ? ' [admin]' : ''} #</b>\n\n`;
+      telegramMessage += message;
 
-        message +
+      if (!forAdmin) {
+        telegramMessage += contactAdminMessage;
+      }
 
-        (forAdmin ? '' : contactAdminMessage)
-      );
+      break;
+    }
+    case NotificationType.SIGNAL_PING: {
+      const { bot, signal } = notification;
+
+      telegramMessage += '<b># Signal Ping #</b>\n\n';
+      telegramMessage += `Ping success.\n\n`;
+
+      telegramMessage += `<b>Bot</b>\n`;
+      telegramMessage += `Name:  <code>${bot.name}</code>\n`;
+      telegramMessage += `Market:  <code>${bot.brokerMarketName}</code>\n\n`;
+
+      telegramMessage += `<b>Signal</b>\n`;
+      telegramMessage += `Bot Token:  <code>${signal.botToken}</code>\n`;
+      telegramMessage += `Market:  <code>${signal.market}</code>`;
 
       break;
     }
@@ -33,22 +51,22 @@ export function getNotificationMessage(notification: Notification): string {
       const { bot, position } = notification;
       const { brokerAccountCurrency: currency } = bot;
 
-      telegramMessage = (
-        '<b># Position open #</b>\n\n' +
+      telegramMessage += '<b># Position open #</b>\n\n';
+      telegramMessage += `Position opened successfully.\n\n`;
 
-        `Position opened successfully.\n\n` +
+      telegramMessage += `<b>Bot</b>\n`;
+      telegramMessage += `Name:  <code>${bot.name}</code>\n`;
+      telegramMessage += `Market:  <code>${bot.brokerMarketName}</code>\n\n`;
 
-        `<b>Bot</b>\n` +
-        `Name:  <code>${bot.name}</code>\n` +
-        `Market:  <code>${bot.brokerMarketName}</code>\n\n` +
+      telegramMessage += `<b>Position</b>\n`;
+      telegramMessage += `Direction:  <code>${position.isLong ? 'LONG' : 'SHORT'}</code>\n`;
+      telegramMessage += `Quantity:  <code>${position.quantity}</code>\n`;
+      telegramMessage += `Risk:  <code>${getAmountWithCurrency(currency, position.riskSize)}</code>\n`;
+      telegramMessage += `Stop Loss:  <code>${position.stopLossPrice}</code>\n`;
 
-        `<b>Position</b>\n` +
-        `Direction:  <code>${position.isLong ? 'LONG' : 'SHORT'}</code>\n` +
-        `Quantity:  <code>${position.quantity}</code>\n` +
-        `Risk:  <code>${getAmountWithCurrency(currency, position.riskSize)}</code>\n` +
-        `Stop Loss:  <code>${position.stopLossPrice}</code>\n` +
-        (position.takeProfitPrice ? `Take Profit:  <code>${position.takeProfitPrice}</code>` : '')
-      );
+      if (position.takeProfitPrice) {
+        telegramMessage += `Take Profit:  <code>${position.takeProfitPrice}</code>`;
+      }
 
       break;
     }
@@ -56,44 +74,42 @@ export function getNotificationMessage(notification: Notification): string {
       const { bot, position } = notification;
       const { brokerAccountCurrency: currency } = bot;
 
-      telegramMessage = (
-        '<b># Position update #</b>\n\n' +
+      telegramMessage += '<b># Position update #</b>\n\n';
+      telegramMessage += `Position <i>Stop Loss</i> updated successfully.\n\n`;
 
-        `Position <i>Stop Loss</i> updated successfully.\n\n` +
+      telegramMessage += `<b>Bot</b>\n`;
+      telegramMessage += `Name:  <code>${bot.name}</code>\n`;
+      telegramMessage += `Market:  <code>${bot.brokerMarketName}</code>\n\n`;
 
-        `<b>Bot</b>\n` +
-        `Name:  <code>${bot.name}</code>\n` +
-        `Market:  <code>${bot.brokerMarketName}</code>\n\n` +
-
-        `<b>Position</b>\n` +
-        `Direction:  <code>${position.isLong ? 'LONG' : 'SHORT'}</code>\n` +
-        `Quantity:  <code>${position.quantity}</code>\n` +
-        `Stop Loss:  <code>${position.stopLossPrice}</code>`
-      );
+      telegramMessage += `<b>Position</b>\n`;
+      telegramMessage += `Direction:  <code>${position.isLong ? 'LONG' : 'SHORT'}</code>\n`;
+      telegramMessage += `Quantity:  <code>${position.quantity}</code>\n`;
+      telegramMessage += `Stop Loss:  <code>${position.stopLossPrice}</code>`;
 
       break;
     }
     case NotificationType.POSITION_CLOSE: {
       const { bot, position } = notification;
 
-      const totalCommission: number = position.feeClose + position.feeOpen;
+      const totalFee: number = position.feeClose + position.feeOpen;
       const { brokerAccountCurrency: currency } = bot;
 
-      telegramMessage = (
-        '<b># Position close #</b>\n\n' +
+      telegramMessage += '<b># Position close #</b>\n\n';
+      telegramMessage += `Position closed with <i>${(position.result + totalFee) < 0 ? 'Loss' : 'Profit'}</i>.\n\n`;
 
-        `Position closed with <i>${(position.result + totalCommission) < 0 ? 'Loss' : 'Profit'}</i>.\n\n` +
+      telegramMessage += `<b>Bot</b>\n`;
+      telegramMessage += `Name:  <code>${bot.name}</code>\n`;
+      telegramMessage += `Market:  <code>${bot.brokerMarketName}</code>\n\n`;
 
-        `<b>Bot</b>\n` +
-        `Name:  <code>${bot.name}</code>\n` +
-        `Market:  <code>${bot.brokerMarketName}</code>\n\n` +
+      telegramMessage += `<b>Position</b>\n`;
+      telegramMessage += `Direction:  <code>${position.isLong ? 'LONG' : 'SHORT'}</code>\n`;
+      telegramMessage += `Quantity:  <code>${position.quantity}</code>\n`;
 
-        `<b>Position</b>\n` +
-        `Direction:  <code>${position.isLong ? 'LONG' : 'SHORT'}</code>\n` +
-        `Quantity:  <code>${position.quantity}</code>\n` +
-        (totalCommission ? `Commission:  <code>${getAmountWithCurrency(currency, totalCommission)}</code>\n` : '') +
-        `Result:  <code>${getAmountWithCurrency(currency, position.result)}</code>${totalCommission ? '  (without commission)' : ''}`
-      );
+      if (totalFee) {
+        telegramMessage += `Fee:  <code>${getAmountWithCurrency(currency, totalFee)}</code>\n`;
+      }
+
+      telegramMessage += `Result:  <code>${getAmountWithCurrency(currency, position.result)}</code>${totalFee ? '  (without commission)' : ''}`;
 
       break;
     }
@@ -104,14 +120,11 @@ export function getNotificationMessage(notification: Notification): string {
         ? `Bot  <code>${bots[0].name}</code>  deactivated`
         : `Bots  <code>${bots.map(({ name }) => name).join(', ')}</code>  deactivated`;
 
-      telegramMessage = (
-        '<b># Bot deactivation #</b>\n\n' +
+      telegramMessage += '<b># Bot deactivation #</b>\n\n';
+      telegramMessage += `${deactivatedMessage}. Reason: <i>${reason}</i>.`;
+      telegramMessage += message ? `\n${message}` : '';
 
-        `${deactivatedMessage}. Reason: <i>${reason}</i>` +
-        (message ? `\n${message}` : '') +
-
-        contactAdminMessage
-      );
+      telegramMessage += contactAdminMessage;
 
       break;
     }
@@ -142,28 +155,24 @@ export function getNotificationMessage(notification: Notification): string {
         userDescription += `${error.logPayload.messageHeading}:\n<pre>${error.logPayload.message}</pre>`;
       }
 
-      telegramMessage = (
-        `<b># Error${forAdmin ? ' [admin]' : ''} #</b>\n\n` +
+      telegramMessage += `<b># Error${forAdmin ? ' [admin]' : ''} #</b>\n\n`;
 
-        (
-          forAdmin
-            ? (
-              `${isCustom ? error.logPayload.messageHeading : error.name}:\n` +
-              `<pre>${isCustom ? error.logPayload.message : error.message}</pre>`
-            )
-            : (userDescription || 'Internal Server Error.')
-        ) +
+      if (forAdmin) {
+        telegramMessage += `${isCustom ? error.logPayload.messageHeading : error.name}:\n`;
+        telegramMessage += `<pre>${isCustom ? error.logPayload.message : error.message}</pre>`;
+      } else {
+        telegramMessage += userDescription || 'Internal Server Error.';
+      }
 
-        additionalInformation +
+      telegramMessage += additionalInformation;
 
-        (forAdmin ? '' : contactAdminMessage) +
+      if (!forAdmin) {
+        telegramMessage += contactAdminMessage;
+      }
 
-        (
-          forAdmin || error.name === ErrorName.SIGNAL_ERROR
-            ? ''
-            : `\n\n<i>Note: The admin will also be notified.</i>`
-        )
-      );
+      if (!forAdmin || error.name !== ErrorName.SIGNAL_ERROR) {
+        telegramMessage += `\n\n<i>Note: The admin will also be notified.</i>`;
+      }
 
       break;
     }
