@@ -11,6 +11,8 @@ export const HASH_SALT_SEPARATOR: string = ':';
 export const USERNAME_PASSWORD_SEPARATOR: string = '-';
 export const USERNAME_PASSWORD_TEST: RegExp = /\w{4,}-\w{8}$/;
 
+export const EXCHANGE_TICKER_DIVIDER: string = ':';
+
 
 export const MINUTES_BEFORE_MARKET_CLOSING: number = 5;
 
@@ -108,6 +110,7 @@ export enum LogScope {
 
 // Signals
 export enum SignalType {
+  PING = 'PING',
   OPEN = 'OPEN',
   UPDATE = 'UPDATE',
   CLOSE = 'CLOSE',
@@ -153,12 +156,11 @@ export enum TelegramActionType {
 // Notifications
 export enum NotificationType {
   ATTENTION = 'ATTENTION',
+  BOT_DEACTIVATION = 'BOT_DEACTIVATION',
   INFO = 'INFO',
   ERROR = 'ERROR',
-
+  SIGNAL_PING = 'SIGNAL_PING',
   POSITION_OPEN = 'POSITION_OPEN',
   POSITION_UPDATE = 'POSITION_UPDATE',
   POSITION_CLOSE = 'POSITION_CLOSE',
-
-  BOT_DEACTIVATION = 'BOT_DEACTIVATION',
 }
