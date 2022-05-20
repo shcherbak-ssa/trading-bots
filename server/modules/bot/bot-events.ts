@@ -129,6 +129,7 @@ export class BotEvents {
     const { settings: botSettings, currentPosition } = bot;
     const [ userId, botId ] = parseBotToken(botToken);
 
+    // @TODO: maybe change
     const position: BotPosition | null = currentPosition;
 
     if (position) {

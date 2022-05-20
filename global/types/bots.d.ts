@@ -33,6 +33,7 @@ export type Bot = {
   tradeRiskPercent: number;
   tradeMaxLossPercent: number;
   tradeCapitalPercent: number;
+  tradeWithStopLoss: boolean;
   tradeWithTakeProfit: boolean;
   tradeTakeProfitPL: number;
   tradeWithCustomMarketLeverage: boolean;
@@ -92,6 +93,7 @@ export type UpdateBotPayload = {
     tradeRiskPercent?: number;
     tradeMaxLossPercent?: number;
     tradeCapitalPercent?: number;
+    tradeWithStopLoss?: boolean;
     tradeWithTakeProfit?: boolean;
     tradeTakeProfitPL?: number;
     tradeWithCustomMarketLeverage?: boolean;

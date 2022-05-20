@@ -43,6 +43,7 @@ export const botsValidation = {
       .min(botDefaultSettings.tradeCapitalPercent.min)
       .max(botDefaultSettings.tradeCapitalPercent.max)
       .required(),
+    tradeWithStopLoss: Joi.boolean().required(),
     tradeWithTakeProfit: Joi.boolean().required(),
     tradeTakeProfitPL: Joi.number()
       .min(botDefaultSettings.tradeTakeProfitPL.min)
@@ -90,6 +91,7 @@ export const botsValidation = {
       tradeCapitalPercent: Joi.number()
         .min(botDefaultSettings.tradeCapitalPercent.min)
         .max(botDefaultSettings.tradeCapitalPercent.max),
+      tradeWithStopLoss: Joi.boolean(),
       tradeWithTakeProfit: Joi.boolean(),
       tradeTakeProfitPL: Joi.number()
         .min(botDefaultSettings.tradeTakeProfitPL.min)
