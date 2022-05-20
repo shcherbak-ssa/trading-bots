@@ -39,6 +39,7 @@ const userBotSchema = new mongoose.Schema<BotsDatabaseDocument>({
   tradeRiskPercent: { type: Number, required: true },
   tradeMaxLossPercent: { type: Number, required: true },
   tradeCapitalPercent: { type: Number, required: true },
+  tradeWithStopLoss: { type: Boolean, required: true },
   tradeWithTakeProfit: { type: Boolean, required: true },
   tradeTakeProfitPL: { type: Number, required: true },
   tradeWithCustomMarketLeverage: { type: Boolean, required: true },

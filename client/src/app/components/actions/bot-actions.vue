@@ -161,6 +161,13 @@
         </prime-vue-overlay-panel>
 
         <base-checkbox
+          label="Use stop loss"
+          checkboxId="use-stop-loss"
+          :value="state.bot.tradeWithStopLoss"
+          @change="(value) => state.bot.tradeWithStopLoss = value"
+        />
+
+        <base-checkbox
             label="Use take profit"
             checkboxId="use-take-profit"
             :value="state.bot.tradeWithTakeProfit"

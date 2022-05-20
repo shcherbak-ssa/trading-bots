@@ -25,6 +25,7 @@ export const initialBotActionState: BotActionState = {
   tradeRiskPercent: 2,
   tradeMaxLossPercent: 25,
   tradeCapitalPercent: 100,
+  tradeWithStopLoss: true,
   tradeWithTakeProfit: false,
   tradeTakeProfitPL: 2,
   tradeWithCustomMarketLeverage: false,

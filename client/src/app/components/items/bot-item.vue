@@ -79,8 +79,15 @@
           </span>
         </div>
 
+        <div class="bot-settings-label">Stop Loss</div>
+        <div class="bot-settings-value">
+          <strong v-if="selectedBot.tradeWithStopLoss">Used</strong>
+
+          <strong v-else>Not used</strong>
+        </div>
+
         <template v-if="selectedBot.tradeWithTakeProfit">
-          <div class="bot-settings-label">Take profit</div>
+          <div class="bot-settings-label">Take Profit</div>
           <div class="bot-settings-value">{{ selectedBot.tradeTakeProfitPL }} pl</div>
         </template>
 

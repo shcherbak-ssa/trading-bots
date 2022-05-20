@@ -41,6 +41,8 @@ export class Bot {
   setCurrentPosition(position: BotPosition | null): void {
     this.currentPosition = position;
 
+    if (!this.settings.tradeWithStopLoss) return;
+
     if (position) {
       this.broker.market.subscribeToPriceUpdates(this.checkPosition.bind(this));
     } else {
